@@ -1,0 +1,1826 @@
+
+import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { 
+  Paper, 
+  Typography, 
+  Box, 
+  Button, 
+  TextField, 
+  Stack,
+  Grid,
+  Divider,
+  Card,
+  CardContent,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  Autocomplete
+} from '@mui/material';
+import {
+  Person as PersonIcon,
+  Email as EmailIcon,
+  Phone as PhoneIcon,
+  Work as WorkIcon,
+  School as SchoolIcon,
+  Star as StarIcon,
+  LinkedIn as LinkedInIcon,
+  Link as LinkIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Business as BusinessIcon,
+  AttachMoney as MoneyIcon,
+  CalendarToday as CalendarIcon,
+  LocationOn as LocationIcon,
+  Group as GroupIcon,
+  CloudUpload as CloudUploadIcon,
+  InsertDriveFile as FileIcon,
+  CheckCircle as CheckCircleIcon
+} from '@mui/icons-material';
+import { useLocationDropdowns } from './useLocationDropdowns';
+import API_URL from '../config/api';
+
+const AddCandidate = () => {
+  const [form, setForm] = useState({
+    name: '', 
+    email: '', 
+    phone: '', 
+    linkedin: '',
+    totalExperienceYears: '',
+    totalExperienceMonths: '',
+    currentCTC: '',
+    expectedCTC: ''
+  });
+  const [experience, setExperience] = useState([
+    { company: '', position: '', role: '', ctc: '', start: '', end: '' }
+  ]);
+  const [education, setEducation] = useState([
+    { clg: '', course: '', start: '', end: '' }
+  ]);
+  const [certifications, setCertifications] = useState([
+    { name: '', organization: '', link: '' }
+  ]);
+  const [additionalLinks, setAdditionalLinks] = useState([
+    { name: '', link: '' }
+  ]);
+  const [msg, setMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState({ country: '', state: '', city: '' });
+  const [preferredLocations, setPreferredLocations] = useState([
+    { country: '', state: '', city: '' }
+  ]);
+  const [preferredLocationStates, setPreferredLocationStates] = useState([[]]);
+  const [preferredLocationCities, setPreferredLocationCities] = useState([[]]);
+  const { countries, states, cities, fetchStates, fetchCities, loading: locationLoading } = useLocationDropdowns();
+  const [talentPools, setTalentPools] = useState([]);
+  const [selectedTalentPools, setSelectedTalentPools] = useState([]);
+  const [availableSkills, setAvailableSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [resumeFileName, setResumeFileName] = useState('');
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  const [selectedJobs, setSelectedJobs] = useState([]);
+
+  const skillCategories = [
+    { value: 'sales-and-business-development', label: 'Sales and Business Development' },
+    { value: 'marketing-communications', label: 'Marketing & Communications' },
+    { value: 'technology-engineering', label: 'Technology and Engineering' },
+    { value: 'finance-accounting-audit', label: 'Finance, Accounting & Audit' },
+    { value: 'human-resources', label: 'Human Resources' },
+    { value: 'operations-supply-chain-procurement', label: 'Operations, Supply Chain & Procurement' },
+    { value: 'product-management-design', label: 'Product Management & Design' },
+    { value: 'data-analytics-insights', label: 'Data, Analytics and Insights' },
+    { value: 'customer-success-support', label: 'Customer Success & Support' },
+    { value: 'legal-risk-compliance', label: 'Legal Risk & Compliance' },
+    { value: 'manufacturing-projects-quality', label: 'Manufacturing, Projects & Quality' },
+    { value: 'general-management-strategy', label: 'General Management & Strategy' },
+    { value: 'miscellaneous', label: 'Miscellaneous' }
+  ];
+
+  // Fetch talent pools and jobs on component mount
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+        const [poolsResponse, jobsResponse] = await Promise.all([
+          axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('https://ats-backend-2vus.onrender.com/api/jobs', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+        setTalentPools(poolsResponse.data);
+        setJobs(jobsResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Fetch skills when category changes
+  React.useEffect(() => {
+    const fetchSkillsByCategory = async () => {
+      if (!selectedCategory) {
+        setAvailableSkills([]);
+        setSelectedSkills([]);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('jwt');
+        const skillsResponse = await axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { category: selectedCategory }
+        });
+        console.log('Skills response for category', selectedCategory, ':', skillsResponse.data);
+        setAvailableSkills(skillsResponse.data.map(skill => skill.name));
+        setSelectedSkills([]); // Clear selected skills when category changes
+      } catch (error) {
+        console.error('Error fetching skills:', error);
+        setAvailableSkills([]);
+      }
+    };
+    fetchSkillsByCategory();
+  }, [selectedCategory]);
+
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleExpChange = (idx, e) => {
+    const newExp = [...experience];
+    newExp[idx][e.target.name] = e.target.value;
+    setExperience(newExp);
+  };
+  
+  const addExp = () => setExperience([...experience, { company: '', position: '', role: '', ctc: '', start: '', end: '' }]);
+  
+  const removeExp = (idx) => {
+    if (experience.length > 1) {
+      setExperience(experience.filter((_, i) => i !== idx));
+    }
+  };
+
+  const handleEduChange = (idx, e) => {
+    const newEdu = [...education];
+    newEdu[idx][e.target.name] = e.target.value;
+    setEducation(newEdu);
+  };
+  
+  const addEdu = () => setEducation([...education, { clg: '', course: '', start: '', end: '' }]);
+  
+  const removeEdu = (idx) => {
+    if (education.length > 1) {
+      setEducation(education.filter((_, i) => i !== idx));
+    }
+  };
+
+  const handleCertChange = (idx, e) => {
+    const newCert = [...certifications];
+    newCert[idx][e.target.name] = e.target.value;
+    setCertifications(newCert);
+  };
+  
+  const addCert = () => setCertifications([...certifications, { name: '', organization: '', link: '' }]);
+  
+  const removeCert = (idx) => {
+    if (certifications.length > 1) {
+      setCertifications(certifications.filter((_, i) => i !== idx));
+    }
+  };
+
+  const handleLinkChange = (idx, e) => {
+    const newLinks = [...additionalLinks];
+    newLinks[idx][e.target.name] = e.target.value;
+    setAdditionalLinks(newLinks);
+  };
+  
+  const addLink = () => setAdditionalLinks([...additionalLinks, { name: '', link: '' }]);
+  
+  const removeLink = (idx) => {
+    if (additionalLinks.length > 1) {
+      setAdditionalLinks(additionalLinks.filter((_, i) => i !== idx));
+    }
+  };
+
+  // Handlers for current location
+  const handleCountryChange = (e) => {
+    const country = e.target.value;
+    setCurrentLocation({ country, state: '', city: '' });
+    fetchStates(country);
+  };
+  const handleStateChange = (e) => {
+    const state = e.target.value;
+    setCurrentLocation((loc) => ({ ...loc, state, city: '' }));
+    fetchCities(currentLocation.country, state);
+  };
+  const handleCityChange = (e) => {
+    const city = e.target.value;
+    setCurrentLocation((loc) => ({ ...loc, city }));
+  };
+
+  // Handlers for preferred locations
+  const handlePreferredChange = async (idx, field, value) => {
+    const updated = [...preferredLocations];
+    updated[idx][field] = value;
+    
+    // Reset dependent fields
+    if (field === 'country') {
+      updated[idx].state = '';
+      updated[idx].city = '';
+      // Fetch states for this preferred location
+      try {
+        const res = await axios.post('https://countriesnow.space/api/v0.1/countries/states', { country: value });
+        const newStates = res.data.data.states.map(s => s.name);
+        const updatedStates = [...preferredLocationStates];
+        updatedStates[idx] = newStates;
+        setPreferredLocationStates(updatedStates);
+      } catch (error) {
+        console.error('Error fetching states:', error);
+      }
+    } else if (field === 'state') {
+      updated[idx].city = '';
+      // Fetch cities for this preferred location
+      try {
+        const res = await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { 
+          country: updated[idx].country, 
+          state: value 
+        });
+        const newCities = res.data.data;
+        const updatedCities = [...preferredLocationCities];
+        updatedCities[idx] = newCities;
+        setPreferredLocationCities(updatedCities);
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+      }
+    }
+    
+    setPreferredLocations(updated);
+  };
+
+  const addPreferredLocation = () => {
+    if (preferredLocations.length < 3) {
+      setPreferredLocations([...preferredLocations, { country: '', state: '', city: '' }]);
+      setPreferredLocationStates([...preferredLocationStates, []]);
+      setPreferredLocationCities([...preferredLocationCities, []]);
+    }
+  };
+
+  const removePreferredLocation = (idx) => {
+    if (preferredLocations.length > 1) {
+      setPreferredLocations(preferredLocations.filter((_, i) => i !== idx));
+      setPreferredLocationStates(preferredLocationStates.filter((_, i) => i !== idx));
+      setPreferredLocationCities(preferredLocationCities.filter((_, i) => i !== idx));
+    }
+  };
+
+  // Handle resume file selection
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Only PDF and DOCX files are allowed');
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      
+      setResumeFile(file);
+      setResumeFileName(file.name);
+    }
+  };
+
+  // Upload resume after candidate creation
+  const uploadResumeForCandidate = async (candidateId) => {
+    if (!resumeFile) return;
+    
+    setUploadingResume(true);
+    try {
+      const formData = new FormData();
+      formData.append('resume', resumeFile);
+      
+      const token = localStorage.getItem('jwt');
+      await axios.post(
+        `${API_URL}/api/candidates/${candidateId}/resume`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      toast.success('Resume uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading resume:', error);
+      toast.error('Failed to upload resume: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    
+    // Validation
+    if (!selectedCategory) {
+      toast.error('Please select a skill category');
+      setLoading(false);
+      return;
+    }
+    
+    if (selectedSkills.length === 0) {
+      toast.error('Please select at least one skill');
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/candidates', {
+        ...form,
+        skills: selectedSkills,
+        experience,
+        education,
+        certifications,
+        additionalLinks,
+        currentLocation,
+        preferredLocations,
+        talentPools: selectedTalentPools
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Add candidate to selected talent pools
+      const candidateId = response.data._id;
+      for (const poolId of selectedTalentPools) {
+        try {
+          await axios.post(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}/candidates`, {
+            candidateId
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (error) {
+          console.error('Error adding candidate to talent pool:', error);
+        }
+      }
+
+      // Upload resume (required)
+      if (!resumeFile) {
+        toast.error('Please upload a resume');
+        setLoading(false);
+        return;
+      }
+      
+      await uploadResumeForCandidate(candidateId);
+
+      // Link candidate to selected jobs
+      if (selectedJobs.length > 0) {
+        try {
+          await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+            candidateIds: [candidateId],
+            jobId: selectedJobs[0], // We'll handle multiple jobs in a loop
+            source: 'added-by-recruiter'
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          // Link to remaining jobs if multiple selected
+          for (let i = 1; i < selectedJobs.length; i++) {
+            await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+              candidateIds: [candidateId],
+              jobId: selectedJobs[i],
+              source: 'added-by-recruiter'
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+          }
+          toast.success(`Candidate linked to ${selectedJobs.length} job(s)`);
+        } catch (error) {
+          console.error('Error linking candidate to jobs:', error);
+          toast.warning('Candidate added but some job links failed');
+        }
+      }
+
+      setMsg('Candidate added successfully!');
+      toast.success('Candidate added successfully!');
+      // Reset form
+      setForm({ name: '', email: '', phone: '', linkedin: '', totalExperienceYears: '', totalExperienceMonths: '', currentCTC: '', expectedCTC: '' });
+      setResumeFile(null);
+      setResumeFileName('');
+      setSelectedCategory('');
+      setSelectedSkills([]);
+      setAvailableSkills([]);
+      setExperience([{ company: '', position: '', role: '', ctc: '', start: '', end: '' }]);
+      setEducation([{ clg: '', course: '', start: '', end: '' }]);
+      setCertifications([{ name: '', organization: '', link: '' }]);
+      setAdditionalLinks([{ name: '', link: '' }]);
+      setCurrentLocation({ country: '', state: '', city: '' });
+      setPreferredLocations([{ country: '', state: '', city: '' }]);
+      setSelectedTalentPools([]);
+      setResumeFile(null);
+      setResumeFileName('');
+      setSelectedJobs([]);
+    } catch (error) {
+      setMsg('Error adding candidate');
+      toast.error('Error adding candidate');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box sx={{ 
+      maxWidth: 900, 
+      mx: 'auto', 
+      p: 3,
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+      borderRadius: 3,
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+      border: '1px solid rgba(255, 255, 255, 0.1)'
+    }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+          <PersonIcon sx={{ fontSize: 40, color: '#eebbc3', mr: 2 }} />
+          <Typography variant="h3" sx={{ 
+            fontWeight: 700, 
+            color: '#f5f7fa',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #eebbc3 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Add New Candidate
+          </Typography>
+        </Box>
+        <Typography variant="body1" sx={{ color: '#b8c5d6', fontSize: '1.1rem' }}>
+          Create a comprehensive candidate profile with detailed information
+        </Typography>
+      </Box>
+
+      <Paper elevation={0} sx={{
+        background: 'transparent',
+        p: 4,
+        borderRadius: 3,
+        border: '1px solid rgba(255, 255, 255, 0.1)'
+      }}>
+        <Box component="form" onSubmit={handleSubmit}>
+          {/* Basic Information Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <PersonIcon sx={{ color: '#eebbc3', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                Basic Information
+              </Typography>
+            </Box>
+            
+            {/* Full Name */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="name"
+                label="Full Name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                fullWidth
+                InputProps={{
+                  startAdornment: <PersonIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+            
+            {/* Email Address */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="email"
+                label="Email Address"
+                value={form.email}
+                onChange={handleChange}
+                required
+                fullWidth
+                type="email"
+                InputProps={{
+                  startAdornment: <EmailIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+            
+            {/* Phone Number */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="phone"
+                label="Phone Number"
+                value={form.phone}
+                onChange={handleChange}
+                required
+                fullWidth
+                InputProps={{
+                  startAdornment: <PhoneIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+
+            {/* Total Experience */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" sx={{ color: '#b8c5d6', mb: 1 }}>
+                Total Experience
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  name="totalExperienceYears"
+                  label="Years"
+                  type="number"
+                  value={form.totalExperienceYears}
+                  onChange={handleChange}
+                  fullWidth
+                  inputProps={{ min: 0, max: 50 }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  }}
+                />
+                <TextField
+                  name="totalExperienceMonths"
+                  label="Months"
+                  type="number"
+                  value={form.totalExperienceMonths}
+                  onChange={handleChange}
+                  fullWidth
+                  inputProps={{ min: 0, max: 11 }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Current CTC */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="currentCTC"
+                label="Current CTC"
+                value={form.currentCTC}
+                onChange={handleChange}
+                fullWidth
+                placeholder="e.g., 10 LPA"
+                InputProps={{
+                  startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+
+            {/* Expected CTC */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="expectedCTC"
+                label="Expected CTC"
+                value={form.expectedCTC}
+                onChange={handleChange}
+                fullWidth
+                placeholder="e.g., 15 LPA"
+                InputProps={{
+                  startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+
+            {/* Skills */}
+            <Box sx={{ mb: 3 }}>
+              {/* Category Selection */}
+              <Box sx={{ mb: 2 }}>
+                <FormControl fullWidth required>
+                  <InputLabel sx={{ color: '#b8c5d6' }}>Category</InputLabel>
+                  <Select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    label="Category"
+                    sx={{
+                      color: '#f5f7fa',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                      '& .MuiSvgIcon-root': { color: '#b8c5d6' }
+                    }}
+                  >
+                    {skillCategories.map((category) => (
+                      <MenuItem key={category.value} value={category.value}>
+                        {category.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {/* Skills Selection */}
+              {selectedCategory && (
+                <Autocomplete
+                  multiple
+                  options={availableSkills}
+                  value={selectedSkills}
+                  onChange={(e, newValue) => setSelectedSkills(newValue)}
+                  disabled={!selectedCategory || availableSkills.length === 0}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Skills"
+                      required={selectedSkills.length === 0}
+                      placeholder={availableSkills.length === 0 ? "No skills available for this category" : "Select skills..."}
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                        },
+                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                        '& .MuiInputBase-input': { color: '#f5f7fa' },
+                      }}
+                    />
+                  )}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        {...getTagProps({ index })}
+                        key={option}
+                        label={option}
+                        sx={{ 
+                          backgroundColor: 'rgba(79, 140, 255, 0.2)', 
+                          color: '#4f8cff',
+                          textTransform: 'capitalize',
+                          '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                        }}
+                      />
+                    ))
+                  }
+                  sx={{
+                    '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
+                    '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                  }}
+                />
+              )}
+              {!selectedCategory && (
+                <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+                  Please select a category first
+                </Typography>
+              )}
+            </Box>
+
+            {/* LinkedIn Username */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                name="linkedin"
+                label="LinkedIn Username"
+                value={form.linkedin}
+                onChange={handleChange}
+                fullWidth
+                InputProps={{
+                  startAdornment: <LinkedInIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  },
+                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                }}
+              />
+            </Box>
+
+            {/* Resume Upload */}
+            <Box sx={{ mb: 3 }}>
+              <input
+                accept=".pdf,.doc,.docx"
+                style={{ display: 'none' }}
+                id="resume-upload"
+                type="file"
+                onChange={handleResumeChange}
+              />
+              <label htmlFor="resume-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  fullWidth
+                  startIcon={resumeFile ? <CheckCircleIcon /> : <CloudUploadIcon />}
+                  sx={{
+                    borderColor: resumeFile ? '#51cf66' : 'rgba(255, 255, 255, 0.3)',
+                    color: resumeFile ? '#51cf66' : '#b8c5d6',
+                    py: 1.5,
+                    '&:hover': {
+                      borderColor: resumeFile ? '#51cf66' : 'rgba(238, 187, 195, 0.5)',
+                      backgroundColor: resumeFile ? 'rgba(81, 207, 102, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                    },
+                  }}
+                >
+                  {resumeFile ? 'Resume Selected' : 'Upload Resume (Required)'}
+                </Button>
+              </label>
+              {resumeFileName && (
+                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FileIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
+                  <Typography variant="caption" sx={{ color: '#4f8cff' }}>
+                    {resumeFileName}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setResumeFile(null);
+                      setResumeFileName('');
+                    }}
+                    sx={{ color: '#ff6b6b', ml: 'auto' }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
+              <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+                Accepted formats: PDF, DOC, DOCX (Max 5MB) <span style={{ color: '#ff6b6b' }}>* Required</span>
+              </Typography>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Current Location Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <LocationIcon sx={{ color: '#eebbc3', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                Current Location
+              </Typography>
+            </Box>
+            
+            {/* Country */}
+            <Box sx={{ mb: 3 }}>
+              <FormControl fullWidth required>
+                <InputLabel sx={{ color: '#b8c5d6' }}>Country</InputLabel>
+                <Select 
+                  value={currentLocation.country} 
+                  onChange={handleCountryChange} 
+                  label="Country"
+                  sx={{
+                    color: '#f5f7fa',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                  }}
+                >
+                  <MenuItem value="">Select Country</MenuItem>
+                  {countries.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Box>
+            
+            {/* State */}
+            <Box sx={{ mb: 3 }}>
+              <FormControl fullWidth required>
+                <InputLabel sx={{ color: '#b8c5d6' }}>State</InputLabel>
+                <Select 
+                  value={currentLocation.state} 
+                  onChange={handleStateChange} 
+                  label="State" 
+                  disabled={!currentLocation.country}
+                  sx={{
+                    color: '#f5f7fa',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                  }}
+                >
+                  <MenuItem value="">Select State</MenuItem>
+                  {states.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Box>
+            
+            {/* City */}
+            <Box sx={{ mb: 3 }}>
+              <FormControl fullWidth required>
+                <InputLabel sx={{ color: '#b8c5d6' }}>City</InputLabel>
+                <Select 
+                  value={currentLocation.city} 
+                  onChange={handleCityChange} 
+                  label="City" 
+                  disabled={!currentLocation.state}
+                  sx={{
+                    color: '#f5f7fa',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                  }}
+                >
+                  <MenuItem value="">Select City</MenuItem>
+                  {cities.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Preferred Locations Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LocationIcon sx={{ color: '#eebbc3', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  Preferred Locations (up to 3)
+                </Typography>
+              </Box>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addPreferredLocation}
+                variant="outlined"
+                sx={{
+                  borderColor: '#eebbc3',
+                  color: '#eebbc3',
+                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                }}
+              >
+                Add Preferred Location
+              </Button>
+            </Box>
+            
+            <Stack spacing={3}>
+              {preferredLocations.map((loc, idx) => (
+                <Card key={idx} sx={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 2
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                        Preferred Location #{idx + 1}
+                      </Typography>
+                      <Box>
+                        {preferredLocations.length > 1 && (
+                          <IconButton 
+                            onClick={() => removePreferredLocation(idx)}
+                            sx={{ color: '#ff6b6b', mr: 1, '&:hover': { backgroundColor: 'rgba(255, 107, 107, 0.1)' } }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                        {idx === preferredLocations.length - 1 && preferredLocations.length < 3 && (
+                          <IconButton 
+                            onClick={addPreferredLocation}
+                            sx={{ color: '#51cf66', '&:hover': { backgroundColor: 'rgba(81, 207, 102, 0.1)' } }}
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+                    
+                    {/* Country */}
+                    <Box sx={{ mb: 3 }}>
+                      <FormControl fullWidth required>
+                        <InputLabel sx={{ color: '#b8c5d6' }}>Country</InputLabel>
+                        <Select 
+                          value={loc.country} 
+                          onChange={e => handlePreferredChange(idx, 'country', e.target.value)} 
+                          label="Country"
+                          sx={{
+                            color: '#f5f7fa',
+                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          }}
+                        >
+                          <MenuItem value="">Select Country</MenuItem>
+                          {countries.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    {/* State */}
+                    <Box sx={{ mb: 3 }}>
+                      <FormControl fullWidth required>
+                        <InputLabel sx={{ color: '#b8c5d6' }}>State</InputLabel>
+                        <Select 
+                          value={loc.state} 
+                          onChange={e => handlePreferredChange(idx, 'state', e.target.value)} 
+                          label="State" 
+                          disabled={!loc.country}
+                          sx={{
+                            color: '#f5f7fa',
+                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          }}
+                        >
+                          <MenuItem value="">Select State</MenuItem>
+                          {loc.country && preferredLocationStates[idx]?.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    {/* City */}
+                    <Box sx={{ mb: 3 }}>
+                      <FormControl fullWidth required>
+                        <InputLabel sx={{ color: '#b8c5d6' }}>City</InputLabel>
+                        <Select 
+                          value={loc.city} 
+                          onChange={e => handlePreferredChange(idx, 'city', e.target.value)} 
+                          label="City" 
+                          disabled={!loc.state}
+                          sx={{
+                            color: '#f5f7fa',
+                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
+                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          }}
+                        >
+                          <MenuItem value="">Select City</MenuItem>
+                          {loc.state && preferredLocationCities[idx]?.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Experience Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <WorkIcon sx={{ color: '#eebbc3', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  Work Experience
+                </Typography>
+              </Box>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addExp}
+                variant="outlined"
+                sx={{
+                  borderColor: '#eebbc3',
+                  color: '#eebbc3',
+                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                }}
+              >
+                Add Experience
+              </Button>
+            </Box>
+            
+            <Stack spacing={3}>
+              {experience.map((exp, idx) => (
+                <Card key={idx} sx={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 2
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                        Experience #{idx + 1}
+                      </Typography>
+                      {experience.length > 1 && (
+                        <IconButton 
+                          onClick={() => removeExp(idx)}
+                          sx={{ color: '#ff6b6b' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    
+                    {/* Company */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="company"
+                        label="Company"
+                        value={exp.company}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <BusinessIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Position */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="position"
+                        label="Position"
+                        value={exp.position}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* CTC */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="ctc"
+                        label="CTC (LPA)"
+                        value={exp.ctc}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Role Description */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="role"
+                        label="Role Description"
+                        value={exp.role}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Start Year */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="start"
+                        label="Start Year"
+                        value={exp.start}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        type="number"
+                        InputProps={{
+                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* End Year */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="end"
+                        label="End Year"
+                        value={exp.end}
+                        onChange={e => handleExpChange(idx, e)}
+                        fullWidth
+                        type="number"
+                        InputProps={{
+                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Education Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <SchoolIcon sx={{ color: '#eebbc3', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  Education
+                </Typography>
+              </Box>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addEdu}
+                variant="outlined"
+                sx={{
+                  borderColor: '#eebbc3',
+                  color: '#eebbc3',
+                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                }}
+              >
+                Add Education
+              </Button>
+            </Box>
+            
+            <Stack spacing={3}>
+              {education.map((edu, idx) => (
+                <Card key={idx} sx={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 2
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                        Education #{idx + 1}
+                      </Typography>
+                      {education.length > 1 && (
+                        <IconButton 
+                          onClick={() => removeEdu(idx)}
+                          sx={{ color: '#ff6b6b' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    
+                    {/* College/University */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="clg"
+                        label="College/University"
+                        value={edu.clg}
+                        onChange={e => handleEduChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <SchoolIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Course/Degree */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="course"
+                        label="Course/Degree"
+                        value={edu.course}
+                        onChange={e => handleEduChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <SchoolIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Start Year */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="start"
+                        label="Start Year"
+                        value={edu.start}
+                        onChange={e => handleEduChange(idx, e)}
+                        fullWidth
+                        type="number"
+                        InputProps={{
+                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* End Year */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="end"
+                        label="End Year"
+                        value={edu.end}
+                        onChange={e => handleEduChange(idx, e)}
+                        fullWidth
+                        type="number"
+                        InputProps={{
+                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Certifications Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <StarIcon sx={{ color: '#eebbc3', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  Certifications
+                </Typography>
+              </Box>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addCert}
+                variant="outlined"
+                sx={{
+                  borderColor: '#eebbc3',
+                  color: '#eebbc3',
+                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                }}
+              >
+                Add Certification
+              </Button>
+            </Box>
+            
+            <Stack spacing={3}>
+              {certifications.map((cert, idx) => (
+                <Card key={idx} sx={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 2
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                        Certification #{idx + 1}
+                      </Typography>
+                      {certifications.length > 1 && (
+                        <IconButton 
+                          onClick={() => removeCert(idx)}
+                          sx={{ color: '#ff6b6b' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    
+                    {/* Certification Name */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="name"
+                        label="Certification Name"
+                        value={cert.name}
+                        onChange={e => handleCertChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Issuing Organization */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="organization"
+                        label="Issuing Organization"
+                        value={cert.organization}
+                        onChange={e => handleCertChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <BusinessIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* Certification Link */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="link"
+                        label="Certification Link"
+                        value={cert.link}
+                        onChange={e => handleCertChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Additional Links Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LinkIcon sx={{ color: '#eebbc3', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  Additional Links
+                </Typography>
+              </Box>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addLink}
+                variant="outlined"
+                sx={{
+                  borderColor: '#eebbc3',
+                  color: '#eebbc3',
+                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                }}
+              >
+                Add Link
+              </Button>
+            </Box>
+            
+            <Stack spacing={3}>
+              {additionalLinks.map((link, idx) => (
+                <Card key={idx} sx={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 2
+                }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                        Link #{idx + 1}
+                      </Typography>
+                      {additionalLinks.length > 1 && (
+                        <IconButton 
+                          onClick={() => removeLink(idx)}
+                          sx={{ color: '#ff6b6b' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                    
+                    {/* Link Name */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="name"
+                        label="Link Name"
+                        value={link.name}
+                        onChange={e => handleLinkChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                    
+                    {/* URL */}
+                    <Box sx={{ mb: 3 }}>
+                      <TextField
+                        name="link"
+                        label="URL"
+                        value={link.link}
+                        onChange={e => handleLinkChange(idx, e)}
+                        fullWidth
+                        InputProps={{
+                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                            '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          },
+                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Talent Pools Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <GroupIcon sx={{ color: '#eebbc3', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                Talent Pools (Optional)
+              </Typography>
+            </Box>
+            
+            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+              Select talent pools to add this candidate to
+            </Typography>
+
+            {talentPools.length === 0 ? (
+              <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+                No talent pools available. Create a talent pool first.
+              </Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {talentPools.map((pool) => (
+                  <Chip
+                    key={pool._id}
+                    label={pool.name}
+                    onClick={() => {
+                      setSelectedTalentPools(prev =>
+                        prev.includes(pool._id)
+                          ? prev.filter(id => id !== pool._id)
+                          : [...prev, pool._id]
+                      );
+                    }}
+                    sx={{
+                      backgroundColor: selectedTalentPools.includes(pool._id)
+                        ? 'rgba(79, 140, 255, 0.3)'
+                        : 'rgba(255, 255, 255, 0.1)',
+                      color: selectedTalentPools.includes(pool._id) ? '#4f8cff' : '#b8c5d6',
+                      border: selectedTalentPools.includes(pool._id)
+                        ? '2px solid #4f8cff'
+                        : '2px solid rgba(255, 255, 255, 0.2)',
+                      fontWeight: selectedTalentPools.includes(pool._id) ? 600 : 400,
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: selectedTalentPools.includes(pool._id)
+                          ? 'rgba(79, 140, 255, 0.4)'
+                          : 'rgba(255, 255, 255, 0.15)',
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          </Box>
+
+          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+          {/* Link to Jobs Section */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <WorkIcon sx={{ color: '#eebbc3', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                Link to Jobs (Optional)
+              </Typography>
+            </Box>
+            
+            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+              Select one or more jobs to link this candidate to
+            </Typography>
+
+            {jobs.length === 0 ? (
+              <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+                No jobs available. Create a job first.
+              </Typography>
+            ) : (
+              <Autocomplete
+                multiple
+                options={jobs}
+                value={jobs.filter(job => selectedJobs.includes(job._id))}
+                onChange={(e, newValue) => {
+                  setSelectedJobs(newValue.map(job => job._id));
+                }}
+                getOptionLabel={(option) => `${option.title} - ${option.organization}`}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Select jobs to link..."
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <>
+                          <WorkIcon sx={{ color: '#b8c5d6', mr: 1, ml: 1 }} />
+                          {params.InputProps.startAdornment}
+                        </>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                        '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                        '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      },
+                      '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                      '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    }}
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      {...getTagProps({ index })}
+                      key={option._id}
+                      label={option.title}
+                      sx={{
+                        backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                        color: '#4f8cff',
+                        fontWeight: 600,
+                        '& .MuiChip-deleteIcon': { 
+                          color: '#4f8cff',
+                          '&:hover': { color: '#3d7be8' }
+                        }
+                      }}
+                    />
+                  ))
+                }
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} sx={{ 
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    py: 1.5
+                  }}>
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#f5f7fa' }}>
+                        {option.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                        {option.organization} {option.location && `• ${option.location}`}
+                      </Typography>
+                      {option.industry && (
+                        <Chip
+                          label={option.industry}
+                          size="small"
+                          sx={{
+                            ml: 1,
+                            backgroundColor: 'rgba(238, 187, 195, 0.2)',
+                            color: '#eebbc3',
+                            fontSize: '0.7rem',
+                            height: 20,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                )}
+                sx={{
+                  '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
+                  '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                  '& .MuiAutocomplete-tag': {
+                    backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                    color: '#4f8cff',
+                  }
+                }}
+                ChipProps={{
+                  sx: {
+                    backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                    color: '#4f8cff',
+                  }
+                }}
+                ListboxProps={{
+                  sx: {
+                    backgroundColor: '#1a1a2e',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    '& .MuiAutocomplete-option': {
+                      color: '#f5f7fa',
+                      '&:hover': {
+                        backgroundColor: 'rgba(79, 140, 255, 0.15)',
+                      },
+                      '&[aria-selected="true"]': {
+                        backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(79, 140, 255, 0.25)',
+                        }
+                      }
+                    }
+                  }
+                }}
+              />
+            )}
+            
+            {selectedJobs.length > 0 && (
+              <Typography variant="caption" sx={{ color: '#4f8cff', mt: 1, display: 'block', fontWeight: 600 }}>
+                {selectedJobs.length} job{selectedJobs.length !== 1 ? 's' : ''} selected
+              </Typography>
+            )}
+          </Box>
+
+          {/* Submit Button */}
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Button 
+              type="submit" 
+              variant="contained" 
+              disabled={loading}
+              sx={{
+                background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                py: 2,
+                px: 6,
+                fontSize: '1.1rem',
+                borderRadius: 3,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+                },
+                '&:disabled': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                }
+              }}
+            >
+              {loading ? (uploadingResume ? 'Uploading Resume...' : 'Adding Candidate...') : 'Add Candidate'}
+            </Button>
+            
+            {msg && (
+              <Typography sx={{ mt: 2, color: msg.includes('Error') ? '#ff6b6b' : '#51cf66', fontWeight: 600 }}>
+                {msg}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
+  );
+};
+
+export default AddCandidate;

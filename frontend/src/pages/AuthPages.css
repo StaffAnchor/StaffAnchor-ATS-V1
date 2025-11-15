@@ -1,0 +1,221 @@
+/* Auth Pages Styles */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.auth-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1200px;
+  width: 100%;
+  height: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Left Side - Image Section */
+.auth-image-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right Side - Form Section */
+.auth-form-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.02);
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.auth-form-paper {
+  width: 100%;
+  max-width: 400px;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.auth-form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-form-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #f5f7fa !important;
+  margin-bottom: 0.5rem !important;
+  background: linear-gradient(135deg, #f5f7fa 0%, #eebbc3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-form-subtitle {
+  color: #b8c5d6 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth-alert {
+  margin-bottom: 1rem;
+  background: rgba(244, 67, 54, 0.1) !important;
+  border: 1px solid rgba(244, 67, 54, 0.3) !important;
+  color: #ff6b6b !important;
+}
+
+.auth-input {
+  margin-bottom: 0.5rem;
+}
+
+.auth-submit-button {
+  margin-top: 1rem;
+  height: 48px;
+}
+
+.auth-form-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-form-footer-text {
+  color: #b8c5d6 !important;
+  font-size: 0.9rem !important;
+}
+
+.auth-link {
+  color: #eebbc3 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: color 0.3s ease !important;
+}
+
+.auth-link:hover {
+  color: #4f8cff !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: 90vh;
+  }
+  
+  .auth-image-section {
+    height: 300px;
+  }
+  
+  .auth-form-section {
+    padding: 2rem;
+    max-height: 60vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 1rem;
+  }
+  
+  .auth-container {
+    border-radius: 16px;
+  }
+  
+  .auth-image-section {
+    height: 250px;
+  }
+  
+  .auth-form-section {
+    padding: 2rem 1.5rem;
+    max-height: 50vh;
+  }
+  
+  .auth-form-title {
+    font-size: 1.8rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .auth-image-section {
+    height: 200px;
+  }
+  
+  .auth-form-section {
+    padding: 1.5rem 1rem;
+    max-height: 70vh;
+  }
+  
+  .auth-form-title {
+    font-size: 1.6rem !important;
+  }
+}
+
+/* Animation for form elements */
+.auth-form-paper {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.auth-input {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.auth-input:nth-child(1) { animation-delay: 0.1s; }
+.auth-input:nth-child(2) { animation-delay: 0.2s; }
+.auth-input:nth-child(3) { animation-delay: 0.3s; }
+.auth-input:nth-child(4) { animation-delay: 0.4s; }
+.auth-input:nth-child(5) { animation-delay: 0.5s; }
+.auth-input:nth-child(6) { animation-delay: 0.6s; }
+.auth-input:nth-child(7) { animation-delay: 0.7s; }
+
+.auth-submit-button {
+  animation: fadeInUp 0.6s ease-out 0.8s both;
+}
+
+.auth-form-footer {
+  animation: fadeInUp 0.6s ease-out 0.9s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

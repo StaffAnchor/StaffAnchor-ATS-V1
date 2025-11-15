@@ -1,0 +1,26 @@
+:root {
+  --color-bg-light: #f5f7fa;
+  --color-bg-dark: #181a20;
+  --color-text-light: #222;
+  --color-text-dark: #f5f7fa;
+  --color-primary: #4f8cff;
+  --color-secondary: #232946;
+  --color-accent: #eebbc3;
+  --radius: 12px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --font-family: 'Ubuntu', Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-bg-light);
+  color: var(--color-text-light);
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+body.dark {
+  background: var(--color-bg-dark);
+  color: var(--color-text-dark);
+}
