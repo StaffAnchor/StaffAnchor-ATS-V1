@@ -5,7 +5,7 @@ exports.createSkill = async (req, res) => {
   try {
     const { name, category = 'sales-and-business-development' } = req.body;
     
-    console.log('Creating skill:', { name, category, organization: req.user.organization, createdBy: req.user._id });
+    //console.log('Creating skill:', { name, category, organization: req.user.organization, createdBy: req.user._id });
     
     // Validate category
     const validCategories = [
@@ -78,10 +78,10 @@ exports.getSkills = async (req, res) => {
   try {
     const { category, search } = req.query;
     
-    console.log('=== GET SKILLS ===');
-    console.log('User:', req.user);
-    console.log('Category:', category);
-    console.log('Organization:', req.user?.organization);
+    //console.log('=== GET SKILLS ===');
+    //console.log('User:', req.user);
+    //console.log('Category:', category);
+    //console.log('Organization:', req.user?.organization);
     
     // Build query - if user has organization, filter by it (case-insensitive); otherwise show all
     let query = {};
@@ -101,12 +101,12 @@ exports.getSkills = async (req, res) => {
       .sort({ usageCount: -1, name: 1 })
       .limit(100); // Limit to prevent large responses
 
-    console.log('Skills found:', skills.length);
+    //console.log('Skills found:', skills.length);
 
     // If no skills found for organization but category specified,
     // try to find skills from other organizations with same category
     if (skills.length === 0 && category && req.user.organization) {
-      console.log('No skills found for organization, fetching from all organizations');
+      //console.log('No skills found for organization, fetching from all organizations');
       const fallbackQuery = { category };
       if (search) {
         fallbackQuery.name = { $regex: search, $options: 'i' };
@@ -114,14 +114,14 @@ exports.getSkills = async (req, res) => {
       skills = await Skill.find(fallbackQuery)
         .sort({ usageCount: -1, name: 1 })
         .limit(100);
-      console.log('Fallback skills found:', skills.length);
+      //console.log('Fallback skills found:', skills.length);
     }
     
     // Additional debugging if no skills found
     if (skills.length === 0 && req.user.organization) {
       const allSkills = await Skill.find({});
-      console.log('Total skills in database:', allSkills.length);
-      console.log('Sample skill organizations:', allSkills.slice(0, 5).map(s => ({ name: s.name, org: s.organization })));
+      //console.log('Total skills in database:', allSkills.length);
+      //console.log('Sample skill organizations:', allSkills.slice(0, 5).map(s => ({ name: s.name, org: s.organization })));
     }
 
     res.json(skills);

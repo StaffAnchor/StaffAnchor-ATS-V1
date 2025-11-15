@@ -32,11 +32,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   // Debug: Log job data when expanded to verify recruiter fields
   useEffect(() => {
     if (expanded) {
-      console.log('=== JOB DETAILS EXPANDED ===');
-      console.log('Job ID:', job._id);
-      console.log('Job Title:', job.title);
-      console.log('Recruiters:', job.recruiters);
-      console.log('Full job object:', job);
+      //console.log('=== JOB DETAILS EXPANDED ===');
+      //console.log('Job ID:', job._id);
+      //console.log('Job Title:', job.title);
+      //console.log('Recruiters:', job.recruiters);
+      //console.log('Full job object:', job);
     }
   }, [expanded, job]);
 
@@ -243,9 +243,9 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         }
       });
 
-      console.log('Original editJob data:', editJob);
-      console.log('Prepared job data to update:', jobDataToUpdate);
-      console.log('Job ID:', job._id);
+      //console.log('Original editJob data:', editJob);
+      //console.log('Prepared job data to update:', jobDataToUpdate);
+      //console.log('Job ID:', job._id);
 
       const token = localStorage.getItem('jwt');
       const response = await axios.put(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}`, jobDataToUpdate, {
@@ -268,7 +268,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
           detail: { jobId: job._id, updatedJob: updatedJobData } 
         }));
         
-        console.log('Job updated successfully in frontend:', updatedJobData);
+        //console.log('Job updated successfully in frontend:', updatedJobData);
       }
     } catch (error) {
       console.error('Error updating job:', error);

@@ -43,29 +43,29 @@ exports.createTalentPool = async (req, res) => {
 // Get all talent pools for the organization
 exports.getTalentPools = async (req, res) => {
   try {
-    console.log('=== GET TALENT POOLS ===');
-    console.log('User:', req.user);
-    console.log('Organization:', req.user?.organization);
+    //console.log('=== GET TALENT POOLS ===');
+    //console.log('User:', req.user);
+    //console.log('Organization:', req.user?.organization);
     
     // If user has organization, filter by organization (case-insensitive); otherwise show all
     const query = req.user.organization 
       ? { organization: { $regex: new RegExp(`^${req.user.organization}$`, 'i') } }
       : {};
     
-    console.log('Query:', JSON.stringify(query));
+    //console.log('Query:', JSON.stringify(query));
     
     const talentPools = await TalentPool.find(query)
       .populate('createdBy', 'fullName email')
       .populate('candidates', 'name email phone')
       .sort({ createdAt: -1 });
 
-    console.log('Found talent pools:', talentPools.length);
+    //console.log('Found talent pools:', talentPools.length);
     
     // If no pools found with organization filter, let's check all pools for debugging
     if (talentPools.length === 0 && req.user.organization) {
       const allPools = await TalentPool.find({});
-      console.log('Total pools in database:', allPools.length);
-      console.log('All pool organizations:', allPools.map(p => ({ id: p._id, org: p.organization })));
+      //console.log('Total pools in database:', allPools.length);
+      //console.log('All pool organizations:', allPools.map(p => ({ id: p._id, org: p.organization })));
     }
 
     res.json(talentPools);

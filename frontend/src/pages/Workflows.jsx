@@ -85,7 +85,7 @@ const Workflows = ({ user }) => {
     if (workflowData) {
       try {
         const data = JSON.parse(workflowData);
-        console.log('Found workflow data from linked candidates:', data);
+        //console.log('Found workflow data from linked candidates:', data);
         
         // Open workflow creation modal with pre-filled data
         // We'll need to structure this data appropriately
@@ -125,15 +125,15 @@ const Workflows = ({ user }) => {
   const [workflowToDelete, setWorkflowToDelete] = useState(null);
 
   const handleDeleteWorkflow = (workflow) => {
-    console.log('Setting workflow to delete:', workflow);
+    //console.log('Setting workflow to delete:', workflow);
     setWorkflowToDelete(workflow);
     setShowDeletePopup(true);
   };
 
   const confirmDeleteWorkflow = async () => {
     try {
-      console.log('Confirming delete for workflow:', workflowToDelete);
-      console.log('Workflow ID to delete:', workflowToDelete?._id);
+      //console.log('Confirming delete for workflow:', workflowToDelete);
+      //console.log('Workflow ID to delete:', workflowToDelete?._id);
       
       if (!workflowToDelete || !workflowToDelete._id) {
         toast.error('Invalid workflow data for deletion');

@@ -66,7 +66,7 @@ const uploadResume = async (fileBuffer, fileName, candidateName) => {
 const deleteResume = async (publicId) => {
   try {
     if (!publicId) {
-      console.log('No publicId provided for deletion');
+      //console.log('No publicId provided for deletion');
       return { result: 'no_public_id' };
     }
 
@@ -74,7 +74,7 @@ const deleteResume = async (publicId) => {
       resource_type: 'raw'
     });
 
-    console.log('Cloudinary deletion result:', result);
+    //console.log('Cloudinary deletion result:', result);
     return result;
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);

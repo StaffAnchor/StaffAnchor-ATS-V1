@@ -41,24 +41,24 @@ exports.testEndpoint = async (req, res) => {
 
 exports.updateJob = async (req, res) => {
   try {
-    console.log('=== UPDATE JOB REQUEST ===');
-    console.log('Job ID:', req.params.id);
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    //console.log('=== UPDATE JOB REQUEST ===');
+    //console.log('Job ID:', req.params.id);
+    //console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     // Validate the job ID
     if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      console.log('Invalid job ID format:', req.params.id);
+      //console.log('Invalid job ID format:', req.params.id);
       return res.status(400).json({ error: 'Invalid job ID format' });
     }
 
     // Check if job exists first
     const existingJob = await Job.findById(req.params.id);
     if (!existingJob) {
-      console.log('Job not found with ID:', req.params.id);
+      //console.log('Job not found with ID:', req.params.id);
       return res.status(404).json({ error: 'Job not found' });
     }
 
-    console.log('Existing job found:', existingJob);
+    //console.log('Existing job found:', existingJob);
 
     // Clean the update data - remove undefined and null values
     const cleanUpdateData = {};
@@ -68,7 +68,7 @@ exports.updateJob = async (req, res) => {
       }
     });
 
-    console.log('Cleaned update data:', JSON.stringify(cleanUpdateData, null, 2));
+    //console.log('Cleaned update data:', JSON.stringify(cleanUpdateData, null, 2));
 
     // Use findOneAndUpdate instead of findByIdAndUpdate to avoid write concern issues
     const updatedJob = await Job.findOneAndUpdate(
@@ -81,11 +81,11 @@ exports.updateJob = async (req, res) => {
     );
 
     if (!updatedJob) {
-      console.log('Job not found after update');
+      //console.log('Job not found after update');
       return res.status(404).json({ error: 'Job not found after update' });
     }
 
-    console.log('Job updated successfully:', updatedJob);
+    //console.log('Job updated successfully:', updatedJob);
     res.json(updatedJob);
   } catch (err) {
     console.error('=== ERROR UPDATING JOB ===');

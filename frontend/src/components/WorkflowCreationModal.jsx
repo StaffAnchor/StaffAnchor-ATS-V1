@@ -85,7 +85,7 @@ const WorkflowCreationModal = ({
 
   useEffect(() => {
     if (open) {
-      console.log('WorkflowCreationModal opened with props:', { job, selectedJob, suitableCandidates, existingWorkflow });
+      //console.log('WorkflowCreationModal opened with props:', { job, selectedJob, suitableCandidates, existingWorkflow });
       
       if (existingWorkflow) {
         // Check if this is from LinkedCandidates (special case)
@@ -285,7 +285,7 @@ const WorkflowCreationModal = ({
   };
 
   const handleAICandidateSuggestion = (phaseIndex) => {
-    console.log('Setting AI candidate phase index:', phaseIndex);
+    //console.log('Setting AI candidate phase index:', phaseIndex);
     setAiCandidatePhaseIndex(phaseIndex);
     setShowPreferenceModal(true);
   };
@@ -360,12 +360,12 @@ const WorkflowCreationModal = ({
         return;
       }
 
-      console.log('Target job:', targetJob);
-      console.log('Target job ID:', targetJob._id);
-      console.log('Target job ID type:', typeof targetJob._id);
-      console.log('Target job ID value:', JSON.stringify(targetJob._id));
-      console.log('AI candidate limit:', aiCandidateLimit);
-      console.log('Phase index:', aiCandidatePhaseIndex);
+      //console.log('Target job:', targetJob);
+      //console.log('Target job ID:', targetJob._id);
+      //console.log('Target job ID type:', typeof targetJob._id);
+      //console.log('Target job ID value:', JSON.stringify(targetJob._id));
+      //console.log('AI candidate limit:', aiCandidateLimit);
+      //console.log('Phase index:', aiCandidatePhaseIndex);
 
       // Extract the actual job ID - handle both string and object formats
       const jobId = typeof targetJob._id === 'string' ? targetJob._id : targetJob._id._id || targetJob._id.id;
@@ -377,8 +377,8 @@ const WorkflowCreationModal = ({
       }
       
       const apiUrl = `${API_URL}/api/jobs/${jobId}/suitable-candidates?limit=${aiCandidateLimit}`;
-      console.log('Extracted job ID:', jobId);
-      console.log('Making API call to:', apiUrl);
+      //console.log('Extracted job ID:', jobId);
+      //console.log('Making API call to:', apiUrl);
 
       const token = localStorage.getItem('jwt');
 
@@ -387,7 +387,7 @@ const WorkflowCreationModal = ({
         const testResponse = await axios.get(`${API_URL}/api/jobs/test`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('Test endpoint response:', testResponse.data);
+        //console.log('Test endpoint response:', testResponse.data);
       } catch (testError) {
         console.error('Test endpoint failed:', testError);
         toast.error('Backend connectivity test failed');
@@ -406,20 +406,20 @@ const WorkflowCreationModal = ({
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      console.log('API response status:', response.status);
-      console.log('API response data:', response.data);
+      //console.log('API response status:', response.status);
+      //console.log('API response data:', response.data);
       
       if (response.data.suitableCandidates && response.data.suitableCandidates.length > 0) {
         const updatedPhases = [...phases];
         const currentPhase = updatedPhases[aiCandidatePhaseIndex];
         
-        console.log('Current phase before update:', currentPhase);
+        //console.log('Current phase before update:', currentPhase);
         
         // Add new candidates to the current phase (avoiding duplicates)
         const existingCandidateIds = currentPhase.candidates.map(c => c._id);
         const newCandidates = response.data.suitableCandidates.filter(c => !existingCandidateIds.includes(c._id));
         
-        console.log('New candidates to add:', newCandidates);
+        //console.log('New candidates to add:', newCandidates);
         
         updatedPhases[aiCandidatePhaseIndex].candidates = [...currentPhase.candidates, ...newCandidates];
         setPhases(updatedPhases);
@@ -498,10 +498,10 @@ const WorkflowCreationModal = ({
         priority
       };
 
-      console.log('Workflow data being sent:', workflowData);
-      console.log('User ID:', userId);
-      console.log('Is edit mode:', isEditMode);
-      console.log('Existing workflow ID:', existingWorkflow?._id);
+      //console.log('Workflow data being sent:', workflowData);
+      //console.log('User ID:', userId);
+      //console.log('Is edit mode:', isEditMode);
+      //console.log('Existing workflow ID:', existingWorkflow?._id);
 
       const token = localStorage.getItem('jwt');
 
@@ -511,7 +511,7 @@ const WorkflowCreationModal = ({
           ...workflowData,
           userId
         };
-        console.log('Update data being sent:', updateData);
+        //console.log('Update data being sent:', updateData);
         
         result = await axios.put(`${API_URL}/api/workflows/${existingWorkflow._id}`, updateData, {
           headers: { Authorization: `Bearer ${token}` }
@@ -522,7 +522,7 @@ const WorkflowCreationModal = ({
           ...workflowData,
           userId
         };
-        console.log('Create data being sent:', createData);
+        //console.log('Create data being sent:', createData);
         
         result = await axios.post(`${API_URL}/api/workflows`, createData, {
           headers: { Authorization: `Bearer ${token}` }

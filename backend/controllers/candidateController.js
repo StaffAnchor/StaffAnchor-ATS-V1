@@ -448,7 +448,7 @@ exports.deleteCandidate = async (req, res) => {
     if (candidate.resume && candidate.resume.publicId) {
       try {
         await deleteResume(candidate.resume.publicId);
-        console.log('Resume deleted from Cloudinary');
+        //console.log('Resume deleted from Cloudinary');
       } catch (cloudinaryError) {
         console.error('Error deleting resume from Cloudinary:', cloudinaryError);
         // Continue with candidate deletion even if Cloudinary deletion fails
@@ -483,7 +483,7 @@ exports.uploadResume = async (req, res) => {
     if (candidate.resume && candidate.resume.publicId) {
       try {
         await deleteResume(candidate.resume.publicId);
-        console.log('Old resume deleted from Cloudinary');
+        //console.log('Old resume deleted from Cloudinary');
       } catch (cloudinaryError) {
         console.error('Error deleting old resume:', cloudinaryError);
       }

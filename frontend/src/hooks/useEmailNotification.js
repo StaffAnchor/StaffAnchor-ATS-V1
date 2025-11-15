@@ -19,9 +19,9 @@ const useEmailNotification = () => {
     try {
       setLoading(true);
       
-      console.log('=== EMAIL PREVIEW DEBUG ===');
-      console.log('Email type:', type);
-      console.log('Email data:', data);
+      //console.log('=== EMAIL PREVIEW DEBUG ===');
+      //console.log('Email type:', type);
+      //console.log('Email data:', data);
       
       const token = getAuthToken();
       const response = await axios.post(
@@ -35,7 +35,7 @@ const useEmailNotification = () => {
         }
       );
 
-      console.log('Email preview response:', response.data);
+      //console.log('Email preview response:', response.data);
 
       if (response.data.success) {
         setEmailPreview(response.data.preview);
@@ -87,7 +87,7 @@ const useEmailNotification = () => {
   // Handle workflow creation email notification
   const handleWorkflowCreatedEmail = async (workflow) => {
     if (!workflow || !workflow.phases || workflow.phases.length === 0) {
-      console.log('No phases in workflow, skipping email');
+      //console.log('No phases in workflow, skipping email');
       return;
     }
 
@@ -136,7 +136,7 @@ const useEmailNotification = () => {
   // Handle workflow update email notification
   const handleWorkflowUpdatedEmail = async (workflow, updatedPhaseIndex) => {
     if (!workflow || !workflow.phases) {
-      console.log('No workflow or phases, skipping email');
+      //console.log('No workflow or phases, skipping email');
       return;
     }
 
@@ -145,7 +145,7 @@ const useEmailNotification = () => {
       : workflow.phases[workflow.phases.length - 1]; // Last phase if not specified
 
     if (!phase || !phase.candidates || phase.candidates.length === 0) {
-      console.log('No candidates in phase, skipping email');
+      //console.log('No candidates in phase, skipping email');
       return;
     }
 
@@ -172,7 +172,7 @@ const useEmailNotification = () => {
   // Handle job creation email notification
   const handleJobCreatedEmail = async (job, creatorId) => {
     if (!job || !job.recruiters || job.recruiters.length === 0) {
-      console.log('No recruiters in job, skipping email');
+      //console.log('No recruiters in job, skipping email');
       return;
     }
 

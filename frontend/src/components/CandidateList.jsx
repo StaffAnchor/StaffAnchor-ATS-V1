@@ -172,7 +172,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
 
   const handleViewCandidate = (candidate) => {
     // Navigate to candidate details page or open modal
-    console.log('Viewing candidate:', candidate);
+    //console.log('Viewing candidate:', candidate);
     // You can implement navigation or modal opening here
   };
 
