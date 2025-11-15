@@ -11,7 +11,7 @@ const AuthorizedJobs = ({ userId }) => {
     const fetchJobs = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const res = await axios.get('https://ats-backend-2vus.onrender.com/api/jobs', {
+        const res = await axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setJobs(

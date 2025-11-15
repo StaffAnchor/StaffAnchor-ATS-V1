@@ -47,7 +47,7 @@ const Dashboard = ({ user, setUser, onLogout }) => {
   useEffect(() => {
     if (view === 'candidates') {
       const token = localStorage.getItem('jwt');
-      axios.get('https://ats-backend-2vus.onrender.com/api/candidates', {
+      axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => setCandidates(res.data));
     }

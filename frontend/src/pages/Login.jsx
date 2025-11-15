@@ -35,7 +35,7 @@ const Login = ({ setUser }) => {
     setError('');
     
     try {
-      const res = await axios.post('https://ats-backend-2vus.onrender.com/api/auth/login', { email, password });
+      const res = await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/login', { email, password });
       setUser(res.data.user, res.data.token);
       toast.success('Login successful!');
       navigate('/dashboard');

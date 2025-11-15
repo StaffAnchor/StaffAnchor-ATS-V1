@@ -47,7 +47,7 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
   const fetchSubordinates = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/auth/subordinates', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSubordinates(response.data);
@@ -59,7 +59,7 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
   const fetchJobAssignments = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}/assignments`, {
+      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}/assignments`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAssignedSubordinates(response.data.assignedSubordinates || []);
@@ -90,7 +90,7 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}/assign`, {
+      await axios.post(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}/assign`, {
         subordinateIds: selectedSubordinates
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -116,7 +116,7 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}/unassign`, {
+      await axios.post(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}/unassign`, {
         subordinateIds: [subordinateId]
       }, {
         headers: { Authorization: `Bearer ${token}` }
