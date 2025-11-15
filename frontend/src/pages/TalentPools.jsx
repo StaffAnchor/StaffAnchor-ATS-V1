@@ -115,7 +115,7 @@ const TalentPools = ({ user }) => {
   const fetchTalentPools = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTalentPools(response.data);
@@ -128,7 +128,7 @@ const TalentPools = ({ user }) => {
   const fetchCandidates = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/candidates', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCandidates(response.data);
@@ -146,7 +146,7 @@ const TalentPools = ({ user }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+      await axios.post('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
         name: formData.name,
         description: formData.description,
         candidateIds: formData.selectedCandidates
@@ -172,7 +172,7 @@ const TalentPools = ({ user }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Talent pool deleted successfully!');
@@ -186,7 +186,7 @@ const TalentPools = ({ user }) => {
   const handleRemoveCandidateFromPool = async (poolId, candidateId) => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}/candidates`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { candidateId }
       });
@@ -215,7 +215,7 @@ const TalentPools = ({ user }) => {
   const fetchSkills = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSkills(response.data);
@@ -233,7 +233,7 @@ const TalentPools = ({ user }) => {
     setSkillLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post('https://ats-backend-2vus.onrender.com/api/skills', {
+      await axios.post('https://staffanchor-ats-v1.onrender.com/api/skills', {
         name: newSkillName.trim(),
         category: skillCategory
       }, {
@@ -259,7 +259,7 @@ const TalentPools = ({ user }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/skills/${skillId}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/skills/${skillId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Skill deleted successfully!');

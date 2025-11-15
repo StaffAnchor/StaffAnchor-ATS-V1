@@ -71,7 +71,7 @@ const OrganizationConfig = ({ user }) => {
   const fetchTalentPools = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTalentPools(response.data);
@@ -83,7 +83,7 @@ const OrganizationConfig = ({ user }) => {
   const fetchSkills = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSkills(response.data);
@@ -103,7 +103,7 @@ const OrganizationConfig = ({ user }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/talent-pools', newTalentPool, {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/talent-pools', newTalentPool, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -128,7 +128,7 @@ const OrganizationConfig = ({ user }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/skills', newSkill, {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/skills', newSkill, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -150,7 +150,7 @@ const OrganizationConfig = ({ user }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -171,7 +171,7 @@ const OrganizationConfig = ({ user }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/skills/${skillId}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/skills/${skillId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

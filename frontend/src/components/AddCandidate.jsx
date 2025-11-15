@@ -109,10 +109,10 @@ const AddCandidate = () => {
       try {
         const token = localStorage.getItem('jwt');
         const [poolsResponse, jobsResponse] = await Promise.all([
-          axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+          axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
             headers: { Authorization: `Bearer ${token}` }
           }),
-          axios.get('https://ats-backend-2vus.onrender.com/api/jobs', {
+          axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
@@ -136,7 +136,7 @@ const AddCandidate = () => {
 
       try {
         const token = localStorage.getItem('jwt');
-        const skillsResponse = await axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+        const skillsResponse = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
           headers: { Authorization: `Bearer ${token}` },
           params: { category: selectedCategory }
         });
@@ -353,7 +353,7 @@ const AddCandidate = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/candidates', {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidates', {
         ...form,
         skills: selectedSkills,
         experience,
@@ -371,7 +371,7 @@ const AddCandidate = () => {
       const candidateId = response.data._id;
       for (const poolId of selectedTalentPools) {
         try {
-          await axios.post(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}/candidates`, {
+          await axios.post(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
             candidateId
           }, {
             headers: { Authorization: `Bearer ${token}` }
@@ -393,7 +393,7 @@ const AddCandidate = () => {
       // Link candidate to selected jobs
       if (selectedJobs.length > 0) {
         try {
-          await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+          await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
             candidateIds: [candidateId],
             jobId: selectedJobs[0], // We'll handle multiple jobs in a loop
             source: 'added-by-recruiter'
@@ -403,7 +403,7 @@ const AddCandidate = () => {
 
           // Link to remaining jobs if multiple selected
           for (let i = 1; i < selectedJobs.length; i++) {
-            await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+            await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
               candidateIds: [candidateId],
               jobId: selectedJobs[i],
               source: 'added-by-recruiter'

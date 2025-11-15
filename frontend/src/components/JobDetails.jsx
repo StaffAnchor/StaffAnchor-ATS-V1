@@ -44,7 +44,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   useEffect(() => {
     if (editMode) {
       const token = localStorage.getItem('jwt');
-      axios.get('https://ats-backend-2vus.onrender.com/api/auth/subordinates', {
+      axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => setSubordinates(res.data));
     }
@@ -91,7 +91,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       const token = localStorage.getItem('jwt');
       const candidateIds = candidates.map(c => c._id);
       
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
         candidateIds,
         jobId: job._id,
         source: 'ai-suggested'
@@ -112,7 +112,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('jwt');
-      const res = await axios.post(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}/suitable-candidates?limit=${limit}`, {
+      const res = await axios.post(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}/suitable-candidates?limit=${limit}`, {
         preferences: userPreferences
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -147,7 +147,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Job deleted successfully!');
@@ -248,7 +248,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       console.log('Job ID:', job._id);
 
       const token = localStorage.getItem('jwt');
-      const response = await axios.put(`https://ats-backend-2vus.onrender.com/api/jobs/${job._id}`, jobDataToUpdate, {
+      const response = await axios.put(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}`, jobDataToUpdate, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

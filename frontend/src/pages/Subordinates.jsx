@@ -39,7 +39,7 @@ const Subordinates = ({ user }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
-    axios.get('https://ats-backend-2vus.onrender.com/api/auth/subordinates', {
+    axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => setSubordinates(res.data));
   }, []);
@@ -49,7 +49,7 @@ const Subordinates = ({ user }) => {
     setExpandedJobId(null);
     if (!jobs[id]) {
       const token = localStorage.getItem('jwt');
-      axios.get('https://ats-backend-2vus.onrender.com/api/jobs', {
+      axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const authorizedJobs = res.data.filter(j => Array.isArray(j.authorizedUsers) && j.authorizedUsers.includes(id));

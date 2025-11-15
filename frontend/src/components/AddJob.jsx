@@ -87,10 +87,10 @@ const AddJob = ({ user }) => {
       try {
         const token = localStorage.getItem('jwt');
         const [usersResponse, skillsResponse] = await Promise.all([
-          axios.get('https://ats-backend-2vus.onrender.com/api/auth/subordinates', {
+          axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
             headers: { Authorization: `Bearer ${token}` }
           }),
-          axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+          axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
@@ -251,7 +251,7 @@ const AddJob = ({ user }) => {
       }
       
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/jobs', jobData, {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/jobs', jobData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const newJob = response.data;

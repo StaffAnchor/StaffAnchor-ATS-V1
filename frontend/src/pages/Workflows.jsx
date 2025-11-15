@@ -109,7 +109,7 @@ const Workflows = ({ user }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/workflows', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/workflows', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWorkflows(response.data);
@@ -141,7 +141,7 @@ const Workflows = ({ user }) => {
       }
       
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/workflows/${workflowToDelete._id}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/workflows/${workflowToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { userId: user._id }
       });
