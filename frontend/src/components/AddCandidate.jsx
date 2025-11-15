@@ -140,7 +140,7 @@ const AddCandidate = () => {
           headers: { Authorization: `Bearer ${token}` },
           params: { category: selectedCategory }
         });
-        console.log('Skills response for category', selectedCategory, ':', skillsResponse.data);
+        //console.log('Skills response for category', selectedCategory, ':', skillsResponse.data);
         setAvailableSkills(skillsResponse.data.map(skill => skill.name));
         setSelectedSkills([]); // Clear selected skills when category changes
       } catch (error) {

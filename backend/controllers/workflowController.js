@@ -134,7 +134,7 @@ const updateWorkflow = async (req, res) => {
     const { workflowId } = req.params;
     const { userId, phases, description, priority } = req.body;
     
-    console.log('Update workflow request:', { workflowId, userId, phases, description, priority });
+    //console.log('Update workflow request:', { workflowId, userId, phases, description, priority });
     
     const workflow = await Workflow.findById(workflowId);
     if (!workflow) {
@@ -155,7 +155,7 @@ const updateWorkflow = async (req, res) => {
     if (description !== undefined) updates.description = description;
     if (priority !== undefined) updates.priority = priority;
     
-    console.log('Updates to apply:', updates);
+    //console.log('Updates to apply:', updates);
     
     const updatedWorkflow = await Workflow.findByIdAndUpdate(
       workflowId,

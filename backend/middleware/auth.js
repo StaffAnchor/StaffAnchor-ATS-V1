@@ -7,19 +7,19 @@ const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    console.log('=== AUTHENTICATION DEBUG ===');
-    console.log('Auth header:', authHeader);
-    console.log('Token:', token ? 'Present' : 'Missing');
+    //console.log('=== AUTHENTICATION DEBUG ===');
+    //console.log('Auth header:', authHeader);
+    //console.log('Token:', token ? 'Present' : 'Missing');
 
     if (!token) {
       return res.status(401).json({ error: 'Access token required' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded);
+    //console.log('Decoded token:', decoded);
     
     const user = await User.findById(decoded.id).select('-password');
-    console.log('Found user:', user ? { id: user._id, email: user.email, accessLevel: user.accessLevel } : 'Not found');
+    //console.log('Found user:', user ? { id: user._id, email: user.email, accessLevel: user.accessLevel } : 'Not found');
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid token' });

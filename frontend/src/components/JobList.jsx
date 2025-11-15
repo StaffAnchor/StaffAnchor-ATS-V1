@@ -51,8 +51,8 @@ const JobList = ({ accessLevel, userId }) => {
         const res = await axios.get("https://staffanchor-ats-v1.onrender.com/api/jobs", {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('=== FETCHED JOBS ===');
-        console.log('Jobs from API:', res.data);
+        //console.log('=== FETCHED JOBS ===');
+        //console.log('Jobs from API:', res.data);
         setJobs(res.data);
       } catch (error) {
         console.error('Failed to fetch jobs:', error);
@@ -69,14 +69,14 @@ const JobList = ({ accessLevel, userId }) => {
 
     const handleJobDeleted = (event) => {
       const { jobId } = event.detail;
-      console.log('Job deleted event received:', jobId);
+      //console.log('Job deleted event received:', jobId);
       // Remove the deleted job from the list
       setJobs(prevJobs => prevJobs.filter(job => job._id !== jobId));
     };
 
     const handleJobUpdated = (event) => {
       const { jobId, updatedJob } = event.detail;
-      console.log('Job updated event received:', jobId, updatedJob);
+      //console.log('Job updated event received:', jobId, updatedJob);
       // Update the job in the list with fresh data from backend
       setJobs(prevJobs => prevJobs.map(job => 
         job._id === jobId ? updatedJob : job
@@ -114,21 +114,21 @@ const JobList = ({ accessLevel, userId }) => {
   };
 
   const filteredJobs = jobs.filter((job) => {
-    console.log('=== JOB FILTERING DEBUG ===');
-    console.log('Job:', job);
-    console.log('Access Level:', accessLevel);
-    console.log('User ID:', userId);
-    console.log('Show Only Assigned:', showOnlyAssigned);
-    console.log('Job authorizedUsers:', job.authorizedUsers);
+    //console.log('=== JOB FILTERING DEBUG ===');
+    //console.log('Job:', job);
+    //console.log('Access Level:', accessLevel);
+    //console.log('User ID:', userId);
+    //console.log('Show Only Assigned:', showOnlyAssigned);
+    //console.log('Job authorizedUsers:', job.authorizedUsers);
     
     // Access level filter - Now both admin and subordinate can see all jobs by default
     // But subordinates can toggle to see only assigned jobs
     if (accessLevel === 1 && showOnlyAssigned) {
       // Subordinate with "Assigned Jobs Only" toggle enabled
-      console.log('Subordinate user - filtering for assigned jobs only');
+      //console.log('Subordinate user - filtering for assigned jobs only');
       
       if (!job.authorizedUsers || job.authorizedUsers.length === 0) {
-        console.log('Job has no authorized users - filtering out');
+        //console.log('Job has no authorized users - filtering out');
         return false;
       }
       
@@ -136,12 +136,12 @@ const JobList = ({ accessLevel, userId }) => {
       const authorizedUserIds = job.authorizedUsers.map(id => id.toString());
       const userIdString = userId.toString();
       
-      console.log('Authorized user IDs (strings):', authorizedUserIds);
-      console.log('Current user ID (string):', userIdString);
-      console.log('Is user authorized:', authorizedUserIds.includes(userIdString));
+      //console.log('Authorized user IDs (strings):', authorizedUserIds);
+      //console.log('Current user ID (string):', userIdString);
+      //console.log('Is user authorized:', authorizedUserIds.includes(userIdString));
       
       if (!authorizedUserIds.includes(userIdString)) {
-        console.log('User not authorized for this job - filtering out');
+        //console.log('User not authorized for this job - filtering out');
         return false;
       }
     }
@@ -222,10 +222,10 @@ const JobList = ({ accessLevel, userId }) => {
     return true;
   });
 
-  console.log('=== FILTERING RESULTS ===');
-  console.log('Total jobs:', jobs.length);
-  console.log('Filtered jobs:', filteredJobs.length);
-  console.log('Filtered jobs data:', filteredJobs);
+  //console.log('=== FILTERING RESULTS ===');
+  //console.log('Total jobs:', jobs.length);
+  //console.log('Filtered jobs:', filteredJobs.length);
+  //console.log('Filtered jobs data:', filteredJobs);
 
   const handleExpandClick = (jobId) => {
     setExpandedJobId((prev) => (prev === jobId ? null : jobId));
