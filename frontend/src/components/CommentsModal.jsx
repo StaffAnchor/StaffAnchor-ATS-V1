@@ -43,7 +43,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://ats-backend-2vus.onrender.com/api/comments/candidate/${candidateId}`, {
+      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/comments/candidate/${candidateId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComments(response.data);
@@ -65,7 +65,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
       setSubmitting(true);
       const token = localStorage.getItem('jwt');
       const response = await axios.post(
-        `https://ats-backend-2vus.onrender.com/api/comments/candidate/${candidateId}`,
+        `https://staffanchor-ats-v1.onrender.com/api/comments/candidate/${candidateId}`,
         { text: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -89,7 +89,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
     try {
       const token = localStorage.getItem('jwt');
       const response = await axios.put(
-        `https://ats-backend-2vus.onrender.com/api/comments/${commentId}`,
+        `https://staffanchor-ats-v1.onrender.com/api/comments/${commentId}`,
         { text: editText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -110,7 +110,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/comments/${commentId}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComments(comments.filter(c => c._id !== commentId));

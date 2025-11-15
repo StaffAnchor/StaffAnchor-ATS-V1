@@ -32,10 +32,10 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
     try {
       const token = localStorage.getItem('jwt');
       const [poolsResponse, candidateResponse] = await Promise.all([
-        axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+        axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`https://ats-backend-2vus.onrender.com/api/candidates/${candidateId}`, {
+        axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -77,7 +77,7 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
 
       // Add to new pools
       for (const poolId of poolsToAdd) {
-        await axios.post(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}/candidates`, {
+        await axios.post(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
           candidateId
         }, {
           headers: { Authorization: `Bearer ${token}` }
@@ -86,7 +86,7 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
 
       // Remove from old pools
       for (const poolId of poolsToRemove) {
-        await axios.delete(`https://ats-backend-2vus.onrender.com/api/talent-pools/${poolId}/candidates`, {
+        await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
           headers: { Authorization: `Bearer ${token}` },
           data: { candidateId }
         });

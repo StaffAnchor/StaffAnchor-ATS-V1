@@ -71,9 +71,9 @@ const Signup = ({ setUser }) => {
     }
     
     try {
-      await axios.post('https://ats-backend-2vus.onrender.com/api/auth/signup', form);
+      await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/signup', form);
       // After signup, immediately log in to get user object
-      const loginRes = await axios.post('https://ats-backend-2vus.onrender.com/api/auth/login', { email: form.email, password: form.password });
+      const loginRes = await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/login', { email: form.email, password: form.password });
       setUser(loginRes.data.user, loginRes.data.token);
       toast.success('Signup successful!');
       navigate('/dashboard');

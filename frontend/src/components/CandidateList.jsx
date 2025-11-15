@@ -115,7 +115,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
     const fetchTalentPools = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const response = await axios.get('https://ats-backend-2vus.onrender.com/api/talent-pools', {
+        const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTalentPools(response.data);
@@ -187,7 +187,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
     try {
       setLoadingJobs(prev => ({ ...prev, [selectedCandidate._id]: true }));
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://ats-backend-2vus.onrender.com/api/candidates/${selectedCandidate._id}/suitable-jobs?limit=${limit}`, {
+      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${selectedCandidate._id}/suitable-jobs?limit=${limit}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.suitableJobs && response.data.suitableJobs.length > 0) {
@@ -225,7 +225,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
     try {
       setIsDeleting(prev => ({ ...prev, [candidateToDelete._id]: true }));
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/candidates/${candidateToDelete._id}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate deleted successfully!');
@@ -300,7 +300,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://ats-backend-2vus.onrender.com/api/jobs', {
+      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAvailableJobs(response.data);
@@ -320,7 +320,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
     try {
       setLinkingCandidates(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://ats-backend-2vus.onrender.com/api/candidate-job-links/link', {
+      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
         candidateIds: selectedCandidates,
         jobId: selectedJob,
         source: 'added-by-recruiter'

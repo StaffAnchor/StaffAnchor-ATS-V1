@@ -25,7 +25,7 @@ const useEmailNotification = () => {
       
       const token = getAuthToken();
       const response = await axios.post(
-        'https://ats-backend-2vus.onrender.com/api/email/preview',
+        'https://staffanchor-ats-v1.onrender.com/api/email/preview',
         { type, data },
         {
           headers: {
@@ -61,7 +61,7 @@ const useEmailNotification = () => {
       
       const token = getAuthToken();
       const response = await axios.post(
-        'https://ats-backend-2vus.onrender.com/api/email/send',
+        'https://staffanchor-ats-v1.onrender.com/api/email/send',
         { recipients, subject, html },
         {
           headers: {

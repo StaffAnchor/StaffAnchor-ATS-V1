@@ -34,7 +34,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
       const fetchSkills = async () => {
         try {
           const token = localStorage.getItem('jwt');
-          const response = await axios.get('https://ats-backend-2vus.onrender.com/api/skills', {
+          const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setAvailableSkills(response.data.map(skill => skill.name));
@@ -54,7 +54,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
     try {
       setIsLoading(true);
       const token = localStorage.getItem('jwt');
-      const res = await axios.get(`https://ats-backend-2vus.onrender.com/api/candidates/${candidate._id}/suitable-jobs?limit=${limit}`, {
+      const res = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}/suitable-jobs?limit=${limit}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -87,7 +87,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://ats-backend-2vus.onrender.com/api/candidates/${candidate._id}`, {
+      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate deleted successfully!');
@@ -120,7 +120,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.put(`https://ats-backend-2vus.onrender.com/api/candidates/${candidate._id}`, editCandidate, {
+      await axios.put(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}`, editCandidate, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate updated!');
