@@ -16,6 +16,7 @@ import {
   Chip,
   Button,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -27,6 +28,7 @@ import {
 
 const JobList = ({ accessLevel, userId }) => {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [expandedJobId, setExpandedJobId] = useState(null);
   const [filter, setFilter] = useState("");
   const [showFilters, setShowFilters] = useState(true);
@@ -47,6 +49,7 @@ const JobList = ({ accessLevel, userId }) => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem('jwt');
         const res = await axios.get("https://staffanchor-ats-v1.onrender.com/api/jobs", {
           headers: { Authorization: `Bearer ${token}` }
@@ -57,6 +60,8 @@ const JobList = ({ accessLevel, userId }) => {
       } catch (error) {
         console.error('Failed to fetch jobs:', error);
         setJobs([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchJobs();
@@ -403,7 +408,34 @@ const JobList = ({ accessLevel, userId }) => {
             </Box>
           )}
 
-          {filteredJobs.length === 0 ? (
+          {/* Loading Screen */}
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "400px",
+                color: "#b8c5d6",
+              }}
+            >
+              <CircularProgress
+                size={60}
+                sx={{
+                  color: "#eebbc3",
+                  mb: 3,
+                }}
+              />
+              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+                Loading Jobs...
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                Please wait while we fetch the job listings
+              </Typography>
+            </Box>
+          ) : filteredJobs.length === 0 ? (
             <Box
               sx={{
                 display: "flex",
