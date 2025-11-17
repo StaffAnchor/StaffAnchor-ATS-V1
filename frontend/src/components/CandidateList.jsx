@@ -52,6 +52,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
   const [filter, setFilter] = useState("");
   const [showFilters, setShowFilters] = useState(true);
   const [editingCandidateId, setEditingCandidateId] = useState(null);
+  const [expandedSkills, setExpandedSkills] = useState({});
   const [activeFilters, setActiveFilters] = useState({
     name: "",
     email: "",
@@ -754,11 +755,11 @@ const CandidateList = ({ candidates, accessLevel }) => {
                 borderRadius: 1,
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
-                overflow: "hidden",
+                overflowX: "auto",
                 width: "100%",
               }}
             >
-              <Table>
+              <Table sx={{ tableLayout: "auto" }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -833,19 +834,12 @@ const CandidateList = ({ candidates, accessLevel }) => {
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
                         padding: "18px 12px",
-                        minWidth: "140px",
-                      }}
-                    >
-                      Skills
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#4f8cff",
-                        fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "120px",
+                        minWidth: "300px",
+                        position: "sticky",
+                        right: 0,
+                        background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                        zIndex: 2,
+                        boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                       }}
                     >
                       Actions
@@ -976,60 +970,15 @@ const CandidateList = ({ candidates, accessLevel }) => {
                         sx={{
                           borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                           padding: "16px 12px",
+                          position: "sticky",
+                          right: 0,
+                          background: index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.03)",
+                          zIndex: 1,
+                          boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                          {candidate.skills && candidate.skills.length > 0 ? (
-                            candidate.skills.slice(0, 3).map((skill, idx) => (
-                              <Chip
-                                key={idx}
-                                label={skill}
-                                size="small"
-                                sx={{
-                                  backgroundColor: "rgba(79, 140, 255, 0.2)",
-                                  color: "#4f8cff",
-                                  fontWeight: 500,
-                                  borderRadius: 1,
-                                  fontSize: "0.75rem",
-                                  height: "24px",
-                                }}
-                              />
-                            ))
-                          ) : (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: "#b8c5d6",
-                                fontStyle: "italic",
-                                fontSize: "0.875rem",
-                              }}
-                            >
-                              No skills listed
-                            </Typography>
-                          )}
-                          {candidate.skills && candidate.skills.length > 3 && (
-                            <Chip
-                              label={`+${candidate.skills.length - 3} more`}
-                              size="small"
-                              sx={{
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                color: "#b8c5d6",
-                                fontWeight: 500,
-                                borderRadius: 1,
-                                fontSize: "0.75rem",
-                                height: "24px",
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                          padding: "16px 12px",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                        <Box sx={{ display: "flex", gap: 1, flexWrap: "nowrap", alignItems: "center" }}>
                           <Tooltip title="View Details">
                             <Button
                               variant="outlined"
@@ -1190,7 +1139,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
                     // Expanded Candidate Details
                     expandedCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-expanded`}>
-                        <TableCell colSpan={6} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
                           <CandidateDetails 
                             candidate={candidate} 
                             accessLevel={accessLevel}
@@ -1203,7 +1152,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
                     // Suitable Jobs Section
                     expandedJobsCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-jobs`}>
-                        <TableCell colSpan={6} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
                           <Box sx={{ 
                             p: 2, 
                             background: 'rgba(255, 255, 255, 0.02)', 
