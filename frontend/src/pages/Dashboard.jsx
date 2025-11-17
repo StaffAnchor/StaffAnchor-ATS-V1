@@ -15,6 +15,7 @@ const Dashboard = ({ user, setUser, onLogout }) => {
   // Set initial view - all users see jobs by default
   const [view, setView] = useState('jobs');
   const [candidates, setCandidates] = useState([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,10 +47,21 @@ const Dashboard = ({ user, setUser, onLogout }) => {
 
   useEffect(() => {
     if (view === 'candidates') {
-      const token = localStorage.getItem('jwt');
-      axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
-        headers: { Authorization: `Bearer ${token}` }
-      }).then(res => setCandidates(res.data));
+      const fetchCandidates = async () => {
+        try {
+          setLoadingCandidates(true);
+          const token = localStorage.getItem('jwt');
+          const res = await axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setCandidates(res.data);
+        } catch (error) {
+          console.error('Error fetching candidates:', error);
+        } finally {
+          setLoadingCandidates(false);
+        }
+      };
+      fetchCandidates();
     }
   }, [view]);
 
@@ -173,7 +185,7 @@ const Dashboard = ({ user, setUser, onLogout }) => {
       </div>
       <div>
         {view === 'jobs' && <JobList accessLevel={user.accessLevel} userId={user._id} />}
-        {view === 'candidates' && <CandidateList candidates={candidates} accessLevel={user.accessLevel} />}
+        {view === 'candidates' && <CandidateList candidates={candidates} accessLevel={user.accessLevel} loading={loadingCandidates} />}
         {view === 'addJob' && <AddJob user={user} />}
         {view === 'addCandidate' && <AddCandidate />}
         {view === 'workflows' && <Workflows user={user} />}

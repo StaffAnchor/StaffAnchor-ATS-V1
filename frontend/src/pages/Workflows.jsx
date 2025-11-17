@@ -26,7 +26,9 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow
+  TableRow,
+  TableHead,
+  Collapse
 } from '@mui/material';
 import {
   AccountTree as WorkflowIcon,
@@ -37,15 +39,12 @@ import {
   Close as CloseIcon,
   Person as PersonIcon,
   Business as BusinessIcon,
-  Flag as FlagIcon,
   Warning as WarningIcon,
   Work as WorkIcon,
   LocationOn as LocationIcon,
-  Tag as TagIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon
 } from '@mui/icons-material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import WorkflowCreationModal from '../components/WorkflowCreationModal';
@@ -62,10 +61,11 @@ const Workflows = ({ user }) => {
   const [filter, setFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
-  const [showOnlyMyWorkflows, setShowOnlyMyWorkflows] = useState(false); // New state for toggle
-  const [expandedPhases, setExpandedPhases] = useState(new Set());
+  const [showOnlyMyWorkflows, setShowOnlyMyWorkflows] = useState(false);
+  const [expandedPhases, setExpandedPhases] = useState({});
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showCandidateModal, setShowCandidateModal] = useState(false);
+  const [expandedWorkflowId, setExpandedWorkflowId] = useState(null);
   
   // Email notification hook
   const {
@@ -174,10 +174,32 @@ const Workflows = ({ user }) => {
     setSelectedWorkflow(workflow);
     setShowViewModal(true);
     // Reset expanded phases when opening modal
-    setExpandedPhases(new Set());
+    setExpandedPhases({});
   };
 
-  const togglePhaseExpansion = (phaseIndex) => {
+  const togglePhaseExpansion = (workflowId, phaseIndex) => {
+    const key = `${workflowId}-${phaseIndex}`;
+    setExpandedPhases(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const handleCandidateClick = async (candidateId) => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSelectedCandidate(response.data);
+      setShowCandidateModal(true);
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      toast.error('Failed to load candidate details');
+    }
+  };
+
+  const togglePhaseExpansionOld = (phaseIndex) => {
     setExpandedPhases(prev => {
       const newSet = new Set(prev);
       if (newSet.has(phaseIndex)) {
@@ -187,11 +209,6 @@ const Workflows = ({ user }) => {
       }
       return newSet;
     });
-  };
-
-  const handleCandidateClick = (candidate) => {
-    setSelectedCandidate(candidate);
-    setShowCandidateModal(true);
   };
 
   const handleWorkflowUpdated = async (resultData, action) => {
@@ -429,176 +446,501 @@ const Workflows = ({ user }) => {
           )}
         </Box>
       ) : (
-        <Stack spacing={2}>
-          {filteredWorkflows.map((workflow, index) => (
-            <Paper
-              key={workflow._id}
-              onClick={() => handleViewWorkflow(workflow)}
-              sx={{ 
-                background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: 2,
-                transition: 'all 0.3s ease',
-                p: 2,
-                cursor: 'pointer',
-                '&:hover': {
-                  boxShadow: '0 6px 25px rgba(0, 0, 0, 0.25)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  transform: 'translateX(4px)'
-                }
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, width: '100%' }}>
-                {/* Workflow Number */}
-                <Box sx={{
-                  minWidth: 50,
-                  height: 50,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #eebbc3 0%, #d4a5ac 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 700,
-                  fontSize: '1.2rem',
-                  color: '#1a1a2e',
-                  boxShadow: '0 4px 12px rgba(238, 187, 195, 0.3)'
-                }}>
-                  {index + 1}
-                </Box>
-
-                {/* Job Info */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                    <WorkIcon sx={{ color: '#90caf9', fontSize: 20 }} />
-                    <Typography variant="h6" sx={{ color: '#f5f7fa', fontWeight: 600, noWrap: true }}>
-                      {workflow.jobTitle}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <BusinessIcon sx={{ color: '#90caf9', fontSize: 16 }} />
-                    <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
-                      {workflow.organization}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* State (Status) */}
-                <Box sx={{ minWidth: 110 }}>
-                  <Chip 
-                    label={workflow.status} 
-                    size="medium"
-                    icon={<TagIcon />}
+        <TableContainer
+          component={Paper}
+          sx={{
+            background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  background: "rgba(238, 187, 195, 0.1)",
+                  borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
+                }}
+              >
+                <TableCell
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                    py: 2,
+                  }}
+                >
+                  Job Title
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Organization
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Priority
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Phases
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Candidates
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "#eebbc3",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredWorkflows.map((workflow) => (
+                <React.Fragment key={workflow._id}>
+                  <TableRow
+                    onClick={() => setExpandedWorkflowId(expandedWorkflowId === workflow._id ? null : workflow._id)}
                     sx={{
-                      backgroundColor: getStatusColor(workflow.status).bg,
-                      color: getStatusColor(workflow.status).color,
-                      fontWeight: 600,
-                      width: '100%'
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      "&:hover": {
+                        background: "rgba(238, 187, 195, 0.05)",
+                      },
                     }}
-                  />
-                </Box>
+                  >
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#f5f7fa",
+                          fontWeight: 600,
+                          fontSize: "1rem",
+                        }}
+                      >
+                        {workflow.jobTitle}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#b8c5d6",
+                        }}
+                      >
+                        {workflow.organization}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={workflow.status}
+                        size="small"
+                        sx={{
+                          backgroundColor: getStatusColor(workflow.status).bg,
+                          color: getStatusColor(workflow.status).color,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={workflow.priority}
+                        size="small"
+                        sx={{
+                          backgroundColor: getPriorityColor(workflow.priority).bg,
+                          color: getPriorityColor(workflow.priority).color,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#eebbc3",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {workflow.phases?.length || 0}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#4f8cff",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {workflow.totalCandidates || 0}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                      <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+                        <Tooltip title={expandedWorkflowId === workflow._id ? "Hide Details" : "View Details"}>
+                          <IconButton
+                            onClick={() => setExpandedWorkflowId(expandedWorkflowId === workflow._id ? null : workflow._id)}
+                            sx={{
+                              color: "#4f8cff",
+                              backgroundColor: "rgba(79, 140, 255, 0.1)",
+                              "&:hover": {
+                                backgroundColor: "rgba(79, 140, 255, 0.2)",
+                                transform: "scale(1.1)",
+                              },
+                            }}
+                          >
+                            {expandedWorkflowId === workflow._id ? (
+                              <ExpandLessIcon />
+                            ) : (
+                              <ExpandMoreIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={user.accessLevel === 1 && workflow.createdBy._id !== user._id ? "You can only edit your own workflows" : "Edit Workflow"}>
+                          <span>
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditWorkflow(workflow);
+                              }}
+                              disabled={user.accessLevel === 1 && workflow.createdBy._id !== user._id}
+                              sx={{
+                                color: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? '#666' : '#eebbc3',
+                                backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(238, 187, 195, 0.1)',
+                                "&:hover": {
+                                  backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(238, 187, 195, 0.2)',
+                                  transform: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'none' : 'scale(1.1)',
+                                },
+                                '&.Mui-disabled': {
+                                  color: '#666',
+                                }
+                              }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        {user.accessLevel === 2 && (
+                          <Tooltip title="Delete Workflow">
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteWorkflow(workflow);
+                              }}
+                              sx={{
+                                color: "#f44336",
+                                backgroundColor: "rgba(244, 67, 54, 0.1)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(244, 67, 54, 0.2)",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
 
-                {/* Priority */}
-                <Box sx={{ minWidth: 100 }}>
-                  <Chip 
-                    label={workflow.priority} 
-                    size="medium"
-                    icon={<FlagIcon />}
-                    sx={{
-                      backgroundColor: getPriorityColor(workflow.priority).bg,
-                      color: getPriorityColor(workflow.priority).color,
-                      fontWeight: 600,
-                      width: '100%'
-                    }}
-                  />
-                </Box>
-
-                {/* Stats */}
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 3,
-                  minWidth: 150
-                }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 700, fontSize: '1.2rem' }}>
-                      {workflow.phases?.length || 0}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#b8c5d6', fontSize: '0.7rem' }}>
-                      Phases
-                    </Typography>
-                  </Box>
-                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} />
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ color: '#4f8cff', fontWeight: 700, fontSize: '1.2rem' }}>
-                      {workflow.totalCandidates || 0}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#b8c5d6', fontSize: '0.7rem' }}>
-                      Candidates
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Action Buttons */}
-                <Box sx={{ display: 'flex', gap: 1, minWidth: 'auto' }} onClick={(e) => e.stopPropagation()}>
-                  <Tooltip title="View Details">
-                    <Button
-                      variant="outlined"
-                      size="medium"
-                      startIcon={<ViewIcon />}
-                      onClick={() => handleViewWorkflow(workflow)}
+                  {/* Expanded Workflow Details Row */}
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
                       sx={{
-                        borderColor: '#4f8cff',
-                        color: '#4f8cff',
-                        '&:hover': {
-                          borderColor: '#4f8cff',
-                          backgroundColor: 'rgba(79, 140, 255, 0.1)'
-                        }
+                        py: 0,
+                        borderBottom:
+                          expandedWorkflowId === workflow._id
+                            ? "1px solid rgba(255, 255, 255, 0.1)"
+                            : "none",
                       }}
                     >
-                      View
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title={user.accessLevel === 1 && workflow.createdBy._id !== user._id ? "You can only edit your own workflows" : "Edit Workflow"}>
-                    <span>
-                      <IconButton
-                        onClick={() => handleEditWorkflow(workflow)}
-                        disabled={user.accessLevel === 1 && workflow.createdBy._id !== user._id}
-                        sx={{
-                          color: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? '#666' : '#eebbc3',
-                          border: `1px solid ${user.accessLevel === 1 && workflow.createdBy._id !== user._id ? '#666' : '#eebbc3'}`,
-                          '&:hover': {
-                            backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(238, 187, 195, 0.1)'
-                          },
-                          '&.Mui-disabled': {
-                            color: '#666',
-                            borderColor: '#666'
-                          }
-                        }}
+                      <Collapse
+                        in={expandedWorkflowId === workflow._id}
+                        timeout="auto"
+                        unmountOnExit
                       >
-                        <EditIcon />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                  {user.accessLevel === 2 && (
-                    <Tooltip title="Delete Workflow">
-                      <IconButton
-                        onClick={() => handleDeleteWorkflow(workflow)}
-                        sx={{
-                          color: '#f44336',
-                          border: '1px solid #f44336',
-                          '&:hover': {
-                            backgroundColor: 'rgba(244, 67, 54, 0.1)'
-                          }
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
-              </Box>
-            </Paper>
-          ))}
-        </Stack>
+                        <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: "#eebbc3",
+                              fontWeight: 600,
+                              mb: 2,
+                            }}
+                          >
+                            Workflow Details
+                          </Typography>
+
+                          {/* Workflow Phases Table */}
+                          {workflow.phases && workflow.phases.length > 0 ? (
+                            <TableContainer
+                              component={Paper}
+                              sx={{
+                                background: "rgba(255, 255, 255, 0.05)",
+                                maxHeight: 600,
+                                overflow: "auto",
+                              }}
+                            >
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell
+                                      sx={{ color: "#4f8cff", fontWeight: 600, width: "5%" }}
+                                    >
+                                      
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                    >
+                                      Phase
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                    >
+                                      Name
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                    >
+                                      Type
+                                    </TableCell>
+                                    <TableCell
+                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                    >
+                                      Status
+                                    </TableCell>
+                                    <TableCell
+                                      align="center"
+                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                    >
+                                      Candidates
+                                    </TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {workflow.phases.map((phase, index) => {
+                                    const phaseKey = `${workflow._id}-${index}`;
+                                    const isPhaseExpanded = expandedPhases[phaseKey];
+                                    
+                                    return (
+                                      <React.Fragment key={index}>
+                                        <TableRow
+                                          onClick={() => togglePhaseExpansion(workflow._id, index)}
+                                          sx={{
+                                            cursor: "pointer",
+                                            "&:hover": {
+                                              background: "rgba(255, 255, 255, 0.05)",
+                                            },
+                                          }}
+                                        >
+                                          <TableCell>
+                                            <IconButton size="small" sx={{ color: "#4f8cff" }}>
+                                              {isPhaseExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            </IconButton>
+                                          </TableCell>
+                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                            Phase {phase.phaseNumber}
+                                          </TableCell>
+                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                            {phase.phaseName}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Chip
+                                              label={phase.type}
+                                              size="small"
+                                              sx={{
+                                                backgroundColor: "rgba(144, 202, 249, 0.2)",
+                                                color: "#90caf9",
+                                                fontWeight: 600,
+                                              }}
+                                            />
+                                          </TableCell>
+                                          <TableCell>
+                                            <Chip
+                                              label={phase.status}
+                                              size="small"
+                                              sx={{
+                                                backgroundColor: getStatusColor(phase.status).bg,
+                                                color: getStatusColor(phase.status).color,
+                                                fontWeight: 600,
+                                              }}
+                                            />
+                                          </TableCell>
+                                          <TableCell align="center" sx={{ color: "#4f8cff", fontWeight: 700 }}>
+                                            {phase.candidates?.length || 0}
+                                          </TableCell>
+                                        </TableRow>
+
+                                        {/* Expanded Candidates in Phase */}
+                                        <TableRow>
+                                          <TableCell colSpan={6} sx={{ py: 0, borderBottom: isPhaseExpanded ? "1px solid rgba(255, 255, 255, 0.1)" : "none" }}>
+                                            <Collapse in={isPhaseExpanded} timeout="auto" unmountOnExit>
+                                              <Box sx={{ p: 2, background: "rgba(255, 255, 255, 0.02)" }}>
+                                                {phase.candidates && phase.candidates.length > 0 ? (
+                                                  <Table size="small">
+                                                    <TableHead>
+                                                      <TableRow>
+                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                          Name
+                                                        </TableCell>
+                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                          Email
+                                                        </TableCell>
+                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                          Phone
+                                                        </TableCell>
+                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                          Status
+                                                        </TableCell>
+                                                        <TableCell align="center" sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                          Action
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                      {phase.candidates.map((candidate) => (
+                                                        <TableRow
+                                                          key={candidate._id}
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCandidateClick(candidate._id);
+                                                          }}
+                                                          sx={{
+                                                            cursor: "pointer",
+                                                            "&:hover": {
+                                                              background: "rgba(238, 187, 195, 0.1)",
+                                                            },
+                                                          }}
+                                                        >
+                                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                                            {candidate.name}
+                                                          </TableCell>
+                                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                                            {candidate.email}
+                                                          </TableCell>
+                                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                                            {candidate.phone || "N/A"}
+                                                          </TableCell>
+                                                          <TableCell>
+                                                            <Chip
+                                                              label={candidate.status || "Active"}
+                                                              size="small"
+                                                              sx={{
+                                                                backgroundColor: "rgba(76, 175, 80, 0.2)",
+                                                                color: "#4caf50",
+                                                                fontWeight: 600,
+                                                              }}
+                                                            />
+                                                          </TableCell>
+                                                          <TableCell align="center">
+                                                            <Tooltip title="View Details">
+                                                              <IconButton
+                                                                size="small"
+                                                                onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  handleCandidateClick(candidate._id);
+                                                                }}
+                                                                sx={{
+                                                                  color: "#4f8cff",
+                                                                  "&:hover": {
+                                                                    backgroundColor: "rgba(79, 140, 255, 0.1)",
+                                                                  },
+                                                                }}
+                                                              >
+                                                                <ViewIcon fontSize="small" />
+                                                              </IconButton>
+                                                            </Tooltip>
+                                                          </TableCell>
+                                                        </TableRow>
+                                                      ))}
+                                                    </TableBody>
+                                                  </Table>
+                                                ) : (
+                                                  <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                      color: "#b8c5d6",
+                                                      textAlign: "center",
+                                                      py: 2,
+                                                    }}
+                                                  >
+                                                    No candidates in this phase
+                                                  </Typography>
+                                                )}
+                                              </Box>
+                                            </Collapse>
+                                          </TableCell>
+                                        </TableRow>
+                                      </React.Fragment>
+                                    );
+                                  })}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          ) : (
+                            <Box
+                              sx={{
+                                textAlign: "center",
+                                py: 4,
+                                color: "#b8c5d6",
+                                background: "rgba(255, 255, 255, 0.05)",
+                                borderRadius: 2,
+                                border: "1px dashed rgba(255, 255, 255, 0.2)",
+                              }}
+                            >
+                              <Typography variant="body2">
+                                No phases in this workflow
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </Collapse>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
       {/* Workflow Creation Modal */}
@@ -662,8 +1004,7 @@ const Workflows = ({ user }) => {
               {/* Workflow Info Chips */}
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Chip 
-                  label={selectedWorkflow.status} 
-                  icon={<TagIcon />}
+                  label={selectedWorkflow.status}
                   sx={{
                     backgroundColor: getStatusColor(selectedWorkflow.status).bg,
                     color: getStatusColor(selectedWorkflow.status).color,
@@ -671,8 +1012,7 @@ const Workflows = ({ user }) => {
                   }}
                 />
                 <Chip 
-                  label={selectedWorkflow.priority} 
-                  icon={<FlagIcon />}
+                  label={selectedWorkflow.priority}
                   sx={{
                     backgroundColor: getPriorityColor(selectedWorkflow.priority).bg,
                     color: getPriorityColor(selectedWorkflow.priority).color,
@@ -697,78 +1037,10 @@ const Workflows = ({ user }) => {
                 />
               </Box>
 
-              {/* Graphical Phase Overview - Line Chart */}
-              <Paper sx={{
-                p: 3,
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: 2
-              }}>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 3, fontWeight: 600 }}>
-                  📈 Candidate Flow Across Phases
-                </Typography>
-                <ResponsiveContainer width="100%" height={350}>
-                  <AreaChart
-                    data={selectedWorkflow.phases?.map((phase, index) => ({
-                      name: phase.phaseName || `Phase ${index + 1}`,
-                      candidates: phase.candidates?.length || 0,
-                      phaseNumber: phase.phaseNumber
-                    })) || []}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                  >
-                    <defs>
-                      <linearGradient id="colorCandidates" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4f8cff" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#4f8cff" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#b8c5d6"
-                      angle={-45}
-                      textAnchor="end"
-                      height={100}
-                      style={{ fontSize: '0.8rem' }}
-                    />
-                    <YAxis 
-                      stroke="#b8c5d6"
-                      style={{ fontSize: '0.8rem' }}
-                      label={{ value: 'Candidates', angle: -90, position: 'insideLeft', fill: '#b8c5d6' }}
-                    />
-                    <RechartsTooltip 
-                      contentStyle={{
-                        backgroundColor: '#1a1a2e',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '8px',
-                        color: '#f5f7fa'
-                      }}
-                      cursor={{ stroke: '#eebbc3', strokeWidth: 2 }}
-                    />
-                    <Legend 
-                      wrapperStyle={{ color: '#b8c5d6' }}
-                    />
-                    <Area 
-                      type="monotone"
-                      dataKey="candidates" 
-                      stroke="#4f8cff"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorCandidates)"
-                      name="Number of Candidates"
-                      dot={{ fill: '#eebbc3', r: 6 }}
-                      activeDot={{ r: 8, fill: '#eebbc3' }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Paper>
-
-              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-
               {/* Detailed Phase Information - Table Format */}
               <Box>
                 <Typography variant="h6" sx={{ color: '#eebbc3', mb: 3, fontWeight: 600 }}>
-                  📋 Phase Details
+                  Phase Details
                 </Typography>
                 
                 <TableContainer component={Paper} sx={{

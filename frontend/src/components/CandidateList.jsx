@@ -6,6 +6,7 @@ import ResultsLimitPopup from "./ResultsLimitPopup.jsx";
 import DeleteConfirmationPopup from "./DeleteConfirmationPopup.jsx";
 import TalentPoolSelectionModal from "./TalentPoolSelectionModal.jsx";
 import CommentsModal from "./CommentsModal.jsx";
+import AIWarningDialog from "./AIWarningDialog.jsx";
 import { toast } from 'react-toastify';
 import {
   Table,
@@ -32,6 +33,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  CircularProgress,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -44,14 +46,17 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-const CandidateList = ({ candidates, accessLevel }) => {
+const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [expandedCandidateId, setExpandedCandidateId] = useState(null);
   const [expandedJobsCandidateId, setExpandedJobsCandidateId] = useState(null);
   const [candidateJobs, setCandidateJobs] = useState({});
   const [loadingJobs, setLoadingJobs] = useState({});
   const [filter, setFilter] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [isFiltering, setIsFiltering] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [editingCandidateId, setEditingCandidateId] = useState(null);
+  const [expandedSkills, setExpandedSkills] = useState({});
   const [activeFilters, setActiveFilters] = useState({
     name: "",
     email: "",
@@ -74,6 +79,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [candidateToDelete, setCandidateToDelete] = useState(null);
   const [showTalentPoolModal, setShowTalentPoolModal] = useState(false);
+  const [showAIWarning, setShowAIWarning] = useState(false);
   const [selectedCandidateForPool, setSelectedCandidateForPool] = useState(null);
   const [talentPools, setTalentPools] = useState([]);
   
@@ -97,6 +103,19 @@ const CandidateList = ({ candidates, accessLevel }) => {
       setCurrentUser(user);
     }
   }, []);
+
+  // Debounce search input
+  useEffect(() => {
+    setIsFiltering(true);
+    const timer = setTimeout(() => {
+      setFilter(searchInput);
+      setIsFiltering(false);
+    }, 300); // 300ms debounce
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchInput]);
 
   useEffect(() => {
     const handleToggleFilters = () => {
@@ -178,6 +197,10 @@ const CandidateList = ({ candidates, accessLevel }) => {
 
   const handleFindSuitableJobs = (candidate) => {
     setSelectedCandidate(candidate);
+    setShowAIWarning(true);
+  };
+
+  const handleAIWarningProceed = () => {
     setShowResultsPopup(true);
   };
 
@@ -624,10 +647,19 @@ const CandidateList = ({ candidates, accessLevel }) => {
             fullWidth
             variant="outlined"
             placeholder="Search candidates by name, email, or skills..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             InputProps={{
               startAdornment: <SearchIcon sx={{ color: "#b8c5d6", mr: 1 }} />,
+              endAdornment: isFiltering && (
+                <CircularProgress
+                  size={20}
+                  sx={{
+                    color: "#eebbc3",
+                    mr: 1,
+                  }}
+                />
+              ),
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -728,7 +760,34 @@ const CandidateList = ({ candidates, accessLevel }) => {
             </Box>
           )}
 
-          {filteredCandidates.length === 0 ? (
+          {/* Loading Screen */}
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "400px",
+                color: "#b8c5d6",
+              }}
+            >
+              <CircularProgress
+                size={60}
+                sx={{
+                  color: "#eebbc3",
+                  mb: 3,
+                }}
+              />
+              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+                Loading Candidates...
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                Please wait while we fetch the candidate data
+              </Typography>
+            </Box>
+          ) : filteredCandidates.length === 0 ? (
             <Box
               sx={{
                 display: "flex",
@@ -754,11 +813,11 @@ const CandidateList = ({ candidates, accessLevel }) => {
                 borderRadius: 1,
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
-                overflow: "hidden",
+                overflowX: "auto",
                 width: "100%",
               }}
             >
-              <Table>
+              <Table sx={{ tableLayout: "auto" }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -833,19 +892,12 @@ const CandidateList = ({ candidates, accessLevel }) => {
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
                         padding: "18px 12px",
-                        minWidth: "140px",
-                      }}
-                    >
-                      Skills
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#4f8cff",
-                        fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "120px",
+                        minWidth: "300px",
+                        position: "sticky",
+                        right: 0,
+                        background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                        zIndex: 2,
+                        boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                       }}
                     >
                       Actions
@@ -976,60 +1028,15 @@ const CandidateList = ({ candidates, accessLevel }) => {
                         sx={{
                           borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                           padding: "16px 12px",
+                          position: "sticky",
+                          right: 0,
+                          background: index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.03)",
+                          zIndex: 1,
+                          boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                          {candidate.skills && candidate.skills.length > 0 ? (
-                            candidate.skills.slice(0, 3).map((skill, idx) => (
-                              <Chip
-                                key={idx}
-                                label={skill}
-                                size="small"
-                                sx={{
-                                  backgroundColor: "rgba(79, 140, 255, 0.2)",
-                                  color: "#4f8cff",
-                                  fontWeight: 500,
-                                  borderRadius: 1,
-                                  fontSize: "0.75rem",
-                                  height: "24px",
-                                }}
-                              />
-                            ))
-                          ) : (
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: "#b8c5d6",
-                                fontStyle: "italic",
-                                fontSize: "0.875rem",
-                              }}
-                            >
-                              No skills listed
-                            </Typography>
-                          )}
-                          {candidate.skills && candidate.skills.length > 3 && (
-                            <Chip
-                              label={`+${candidate.skills.length - 3} more`}
-                              size="small"
-                              sx={{
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                color: "#b8c5d6",
-                                fontWeight: 500,
-                                borderRadius: 1,
-                                fontSize: "0.75rem",
-                                height: "24px",
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                          padding: "16px 12px",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                        <Box sx={{ display: "flex", gap: 1, flexWrap: "nowrap", alignItems: "center" }}>
                           <Tooltip title="View Details">
                             <Button
                               variant="outlined"
@@ -1190,7 +1197,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
                     // Expanded Candidate Details
                     expandedCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-expanded`}>
-                        <TableCell colSpan={6} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
                           <CandidateDetails 
                             candidate={candidate} 
                             accessLevel={accessLevel}
@@ -1203,7 +1210,7 @@ const CandidateList = ({ candidates, accessLevel }) => {
                     // Suitable Jobs Section
                     expandedJobsCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-jobs`}>
-                        <TableCell colSpan={6} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
                           <Box sx={{ 
                             p: 2, 
                             background: 'rgba(255, 255, 255, 0.02)', 
@@ -1295,6 +1302,13 @@ const CandidateList = ({ candidates, accessLevel }) => {
       </Box>
       
       {/* Results Limit Popup */}
+      <AIWarningDialog
+        open={showAIWarning}
+        onClose={() => setShowAIWarning(false)}
+        onProceed={handleAIWarningProceed}
+        featureName="Job Matching"
+      />
+
       <ResultsLimitPopup
         open={showResultsPopup}
         onClose={() => setShowResultsPopup(false)}

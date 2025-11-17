@@ -107,11 +107,6 @@ const AddJob = ({ user }) => {
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
-    
-    // Clear selected skills when industry changes
-    if (name === 'industry') {
-      setSelectedSkills([]);
-    }
   };
 
   const handleSwitch = e => {
@@ -617,17 +612,14 @@ const AddJob = ({ user }) => {
             <Autocomplete
               multiple
               freeSolo
-              options={availableSkills
-                .filter(skill => !form.industry || skill.category === getIndustryCategoryMapping(form.industry))
-                .map(skill => skill.name)}
+              options={availableSkills.map(skill => skill.name)}
               value={selectedSkills}
               onChange={(e, newValue) => setSelectedSkills(newValue)}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Required Skills"
-                  placeholder={form.industry ? "Select or type skills..." : "Please select an industry first"}
-                  disabled={!form.industry}
+                  placeholder="Select or type skills..."
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (

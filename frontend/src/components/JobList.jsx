@@ -16,6 +16,13 @@ import {
   Chip,
   Button,
   Tooltip,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -23,10 +30,12 @@ import {
   FilterList as FilterIcon,
   Clear as ClearIcon,
   Search as SearchIcon,
+  Visibility as VisibilityIcon,
 } from "@mui/icons-material";
 
 const JobList = ({ accessLevel, userId }) => {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [expandedJobId, setExpandedJobId] = useState(null);
   const [filter, setFilter] = useState("");
   const [showFilters, setShowFilters] = useState(true);
@@ -47,6 +56,7 @@ const JobList = ({ accessLevel, userId }) => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem('jwt');
         const res = await axios.get("https://staffanchor-ats-v1.onrender.com/api/jobs", {
           headers: { Authorization: `Bearer ${token}` }
@@ -57,6 +67,8 @@ const JobList = ({ accessLevel, userId }) => {
       } catch (error) {
         console.error('Failed to fetch jobs:', error);
         setJobs([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchJobs();
@@ -403,7 +415,34 @@ const JobList = ({ accessLevel, userId }) => {
             </Box>
           )}
 
-          {filteredJobs.length === 0 ? (
+          {/* Loading Screen */}
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "400px",
+                color: "#b8c5d6",
+              }}
+            >
+              <CircularProgress
+                size={60}
+                sx={{
+                  color: "#eebbc3",
+                  mb: 3,
+                }}
+              />
+              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+                Loading Jobs...
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                Please wait while we fetch the job listings
+              </Typography>
+            </Box>
+          ) : filteredJobs.length === 0 ? (
             <Box
               sx={{
                 display: "flex",
@@ -422,18 +461,166 @@ const JobList = ({ accessLevel, userId }) => {
               </Typography>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {filteredJobs.map((job) => (
-                <JobDetails
-                  key={job._id}
-                  job={job}
-                  expanded={expandedJobId === job._id}
-                  onExpandClick={() => handleExpandClick(job._id)}
-                  accessLevel={accessLevel}
-                  userId={userId}
-                />
-              ))}
-            </Box>
+            <TableContainer
+              component={Paper}
+              sx={{
+                background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 3,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow
+                    sx={{
+                      background: "rgba(238, 187, 195, 0.1)",
+                      borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
+                    }}
+                  >
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        py: 2,
+                      }}
+                    >
+                      Job Title
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Company
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Location
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredJobs.map((job) => (
+                    <React.Fragment key={job._id}>
+                      <TableRow
+                        onClick={() => handleExpandClick(job._id)}
+                        sx={{
+                          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                          transition: "all 0.3s ease",
+                          cursor: "pointer",
+                          "&:hover": {
+                            background: "rgba(238, 187, 195, 0.05)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ py: 2 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: "#f5f7fa",
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                            }}
+                          >
+                            {job.title}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#b8c5d6",
+                            }}
+                          >
+                            {job.organization}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#b8c5d6",
+                            }}
+                          >
+                            {job.location}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                          <Tooltip title={expandedJobId === job._id ? "Hide Details" : "View Details"}>
+                            <IconButton
+                              onClick={() => handleExpandClick(job._id)}
+                              sx={{
+                                color: "#4f8cff",
+                                backgroundColor: "rgba(79, 140, 255, 0.1)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(79, 140, 255, 0.2)",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              {expandedJobId === job._id ? (
+                                <ExpandLessIcon />
+                              ) : (
+                                <ExpandMoreIcon />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Expanded Job Details Row */}
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          sx={{
+                            py: 0,
+                            borderBottom:
+                              expandedJobId === job._id
+                                ? "1px solid rgba(255, 255, 255, 0.1)"
+                                : "none",
+                          }}
+                        >
+                          <Collapse
+                            in={expandedJobId === job._id}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
+                              <JobDetails
+                                job={job}
+                                expanded={expandedJobId === job._id}
+                                onExpandClick={() => handleExpandClick(job._id)}
+                                accessLevel={accessLevel}
+                                userId={userId}
+                              />
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </Box>
       </Box>

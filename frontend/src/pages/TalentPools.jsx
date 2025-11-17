@@ -30,7 +30,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  CircularProgress
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -48,6 +49,8 @@ const TalentPools = ({ user }) => {
   const [talentPools, setTalentPools] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [poolsLoading, setPoolsLoading] = useState(true);
+  const [candidatesLoading, setCandidatesLoading] = useState({});
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [expandedPoolId, setExpandedPoolId] = useState(null);
   const [formData, setFormData] = useState({
@@ -62,7 +65,7 @@ const TalentPools = ({ user }) => {
   const [openViewSkillsDialog, setOpenViewSkillsDialog] = useState(false);
   const [newSkillName, setNewSkillName] = useState('');
   const [skillCategory, setSkillCategory] = useState('sales-and-business-development');
-  const [skillLoading, setSkillLoading] = useState(false);
+  const [skillLoading, setSkillLoading] = useState(true);
 
   // Helper function to format category label
   const formatCategoryLabel = (category) => {
@@ -114,6 +117,7 @@ const TalentPools = ({ user }) => {
 
   const fetchTalentPools = async () => {
     try {
+      setPoolsLoading(true);
       const token = localStorage.getItem('jwt');
       const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
         headers: { Authorization: `Bearer ${token}` }
@@ -122,6 +126,8 @@ const TalentPools = ({ user }) => {
     } catch (error) {
       console.error('Error fetching talent pools:', error);
       toast.error('Failed to fetch talent pools');
+    } finally {
+      setPoolsLoading(false);
     }
   };
 
@@ -207,13 +213,25 @@ const TalentPools = ({ user }) => {
     }));
   };
 
-  const handleExpandPool = (poolId) => {
-    setExpandedPoolId(expandedPoolId === poolId ? null : poolId);
+  const handleExpandPool = async (poolId) => {
+    if (expandedPoolId === poolId) {
+      setExpandedPoolId(null);
+    } else {
+      setExpandedPoolId(poolId);
+      // Set loading state for this specific pool
+      setCandidatesLoading(prev => ({ ...prev, [poolId]: true }));
+      
+      // Simulate loading delay for candidates (they're already loaded, but we show loading animation)
+      setTimeout(() => {
+        setCandidatesLoading(prev => ({ ...prev, [poolId]: false }));
+      }, 500);
+    }
   };
 
   // Skills management functions
   const fetchSkills = async () => {
     try {
+      setSkillLoading(true);
       const token = localStorage.getItem('jwt');
       const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
         headers: { Authorization: `Bearer ${token}` }
@@ -221,6 +239,8 @@ const TalentPools = ({ user }) => {
       setSkills(response.data);
     } catch (error) {
       console.error('Error fetching skills:', error);
+    } finally {
+      setSkillLoading(false);
     }
   };
 
@@ -356,10 +376,39 @@ const TalentPools = ({ user }) => {
           </Box>
       </Box>
 
-      {/* Talent Pools Grid */}
-      <Grid container spacing={3}>
-        {talentPools.length === 0 ? (
-          <Grid item xs={12}>
+      {/* Loading Screen */}
+      {poolsLoading ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "60vh",
+            gap: 3,
+          }}
+        >
+          <CircularProgress
+            size={60}
+            thickness={4}
+            sx={{
+              color: "#eebbc3",
+            }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#b8c5d6",
+              fontWeight: 500,
+            }}
+          >
+            Loading Talent Pools...
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          {/* Talent Pools Table */}
+          {talentPools.length === 0 ? (
             <Card sx={{
               background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -374,172 +423,316 @@ const TalentPools = ({ user }) => {
                 Create your first talent pool to organize candidates
               </Typography>
             </Card>
-          </Grid>
-        ) : (
-          talentPools.map((pool) => (
-            <Grid item xs={12} md={6} lg={4} key={pool._id}>
-              <Card sx={{
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 2,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-                  borderColor: '#eebbc3'
-                }
-              }}>
-                <CardContent>
-                  {/* Pool Header */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'flex-start',
-                    mb: 2
-                  }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" sx={{ 
-                        color: '#eebbc3', 
-                        fontWeight: 600,
-                        mb: 0.5
-                      }}>
-                        {pool.name}
-                      </Typography>
-                      <Typography variant="body2" sx={{ 
-                        color: '#b8c5d6',
-                        mb: 2
-                      }}>
-                        {pool.description}
-                      </Typography>
-                    </Box>
-                    {user.accessLevel === 2 && (
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeletePool(pool._id)}
-                        sx={{
-                          color: '#ff6b6b',
-                          '&:hover': {
-                            backgroundColor: 'rgba(255, 107, 107, 0.1)'
-                          }
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </Box>
-
-                  {/* Candidate Count */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 1,
-                    mb: 2,
-                    p: 1.5,
-                    background: 'rgba(79, 140, 255, 0.1)',
-                    borderRadius: 1
-                  }}>
-                    <PeopleIcon sx={{ color: '#4f8cff' }} />
-                    <Typography variant="body1" sx={{ 
-                      color: '#4f8cff',
-                      fontWeight: 600
-                    }}>
-                      {pool.candidates?.length || 0} Candidates
-                    </Typography>
-                  </Box>
-
-                  {/* View Candidates Button */}
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    endIcon={expandedPoolId === pool._id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    onClick={() => handleExpandPool(pool._id)}
+          ) : (
+            <TableContainer
+              component={Paper}
+              sx={{
+                background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 3,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow
                     sx={{
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                      color: '#f5f7fa',
-                      '&:hover': {
-                        borderColor: '#eebbc3',
-                        backgroundColor: 'rgba(238, 187, 195, 0.1)'
-                      }
+                      background: "rgba(238, 187, 195, 0.1)",
+                      borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
                     }}
                   >
-                    {expandedPoolId === pool._id ? 'Hide Candidates' : 'View Candidates'}
-                  </Button>
-
-                  {/* Expanded Candidates List */}
-                  <Collapse in={expandedPoolId === pool._id}>
-                    <Box sx={{ mt: 2 }}>
-                      {pool.candidates && pool.candidates.length > 0 ? (
-                        <TableContainer component={Paper} sx={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          maxHeight: 300,
-                          overflow: 'auto'
-                        }}>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell sx={{ color: '#4f8cff', fontWeight: 600 }}>
-                                  Name
-                                </TableCell>
-                                <TableCell sx={{ color: '#4f8cff', fontWeight: 600 }}>
-                                  Email
-                                </TableCell>
-                                {user.accessLevel === 2 && (
-                                  <TableCell sx={{ color: '#4f8cff', fontWeight: 600, width: 50 }}>
-                                    Action
-                                  </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        py: 2,
+                      }}
+                    >
+                      Pool Name
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Description
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Candidates
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color: "#eebbc3",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {talentPools.map((pool) => (
+                    <React.Fragment key={pool._id}>
+                      <TableRow
+                        sx={{
+                          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(238, 187, 195, 0.05)",
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ py: 2 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: "#f5f7fa",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {pool.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#b8c5d6",
+                            }}
+                          >
+                            {pool.description}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            icon={<PeopleIcon />}
+                            label={`${pool.candidates?.length || 0} Candidates`}
+                            size="small"
+                            sx={{
+                              backgroundColor: "rgba(79, 140, 255, 0.2)",
+                              color: "#4f8cff",
+                              fontWeight: 600,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+                            <Tooltip title={expandedPoolId === pool._id ? "Hide Candidates" : "View Candidates"}>
+                              <IconButton
+                                onClick={() => handleExpandPool(pool._id)}
+                                sx={{
+                                  color: "#eebbc3",
+                                  backgroundColor: "rgba(238, 187, 195, 0.1)",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(238, 187, 195, 0.2)",
+                                    transform: "scale(1.1)",
+                                  },
+                                }}
+                              >
+                                {expandedPoolId === pool._id ? (
+                                  <ExpandLessIcon />
+                                ) : (
+                                  <ExpandMoreIcon />
                                 )}
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {pool.candidates.map((candidate) => (
-                                <TableRow key={candidate._id}>
-                                  <TableCell sx={{ color: '#f5f7fa' }}>
-                                    {candidate.name}
-                                  </TableCell>
-                                  <TableCell sx={{ color: '#b8c5d6' }}>
-                                    {candidate.email}
-                                  </TableCell>
-                                  {user.accessLevel === 2 && (
-                                    <TableCell>
-                                      <Tooltip title="Remove from pool">
-                                        <IconButton
-                                          size="small"
-                                          onClick={() => handleRemoveCandidateFromPool(pool._id, candidate._id)}
-                                          sx={{
-                                            color: '#ff6b6b',
-                                            '&:hover': {
-                                              backgroundColor: 'rgba(255, 107, 107, 0.1)'
-                                            }
-                                          }}
+                              </IconButton>
+                            </Tooltip>
+                            {user.accessLevel === 2 && (
+                              <Tooltip title="Delete Pool">
+                                <IconButton
+                                  onClick={() => handleDeletePool(pool._id)}
+                                  sx={{
+                                    color: "#ff6b6b",
+                                    backgroundColor: "rgba(255, 107, 107, 0.1)",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(255, 107, 107, 0.2)",
+                                      transform: "scale(1.1)",
+                                    },
+                                  }}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Expanded Candidates Row */}
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          sx={{
+                            py: 0,
+                            borderBottom:
+                              expandedPoolId === pool._id
+                                ? "1px solid rgba(255, 255, 255, 0.1)"
+                                : "none",
+                          }}
+                        >
+                          <Collapse
+                            in={expandedPoolId === pool._id}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  color: "#eebbc3",
+                                  fontWeight: 600,
+                                  mb: 2,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <PeopleIcon />
+                                Candidates in {pool.name}
+                              </Typography>
+
+                              {/* Loading animation for candidates */}
+                              {candidatesLoading[pool._id] ? (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    py: 4,
+                                    gap: 2,
+                                  }}
+                                >
+                                  <CircularProgress
+                                    size={40}
+                                    thickness={4}
+                                    sx={{
+                                      color: "#4f8cff",
+                                    }}
+                                  />
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      color: "#b8c5d6",
+                                    }}
+                                  >
+                                    Loading candidates...
+                                  </Typography>
+                                </Box>
+                              ) : pool.candidates && pool.candidates.length > 0 ? (
+                                <TableContainer
+                                  component={Paper}
+                                  sx={{
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    maxHeight: 400,
+                                    overflow: "auto",
+                                  }}
+                                >
+                                  <Table size="small">
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell
+                                          sx={{ color: "#4f8cff", fontWeight: 600 }}
                                         >
-                                          <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </TableCell>
-                                  )}
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      ) : (
-                        <Typography variant="body2" sx={{ 
-                          color: '#b8c5d6', 
-                          fontStyle: 'italic',
-                          textAlign: 'center',
-                          py: 2
-                        }}>
-                          No candidates in this pool
-                        </Typography>
-                      )}
-                    </Box>
-                  </Collapse>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
-        )}
-      </Grid>
+                                          Name
+                                        </TableCell>
+                                        <TableCell
+                                          sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                        >
+                                          Email
+                                        </TableCell>
+                                        {user.accessLevel === 2 && (
+                                          <TableCell
+                                            sx={{
+                                              color: "#4f8cff",
+                                              fontWeight: 600,
+                                              width: 50,
+                                            }}
+                                          >
+                                            Action
+                                          </TableCell>
+                                        )}
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {pool.candidates.map((candidate) => (
+                                        <TableRow key={candidate._id}>
+                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                            {candidate.name}
+                                          </TableCell>
+                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                            {candidate.email}
+                                          </TableCell>
+                                          {user.accessLevel === 2 && (
+                                            <TableCell>
+                                              <Tooltip title="Remove from pool">
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={() =>
+                                                    handleRemoveCandidateFromPool(
+                                                      pool._id,
+                                                      candidate._id
+                                                    )
+                                                  }
+                                                  sx={{
+                                                    color: "#ff6b6b",
+                                                    "&:hover": {
+                                                      backgroundColor:
+                                                        "rgba(255, 107, 107, 0.1)",
+                                                    },
+                                                  }}
+                                                >
+                                                  <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                              </Tooltip>
+                                            </TableCell>
+                                          )}
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              ) : (
+                                <Box
+                                  sx={{
+                                    textAlign: "center",
+                                    py: 4,
+                                    color: "#b8c5d6",
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    borderRadius: 2,
+                                    border: "1px dashed rgba(255, 255, 255, 0.2)",
+                                  }}
+                                >
+                                  <PeopleIcon
+                                    sx={{ fontSize: 40, color: "#b8c5d6", mb: 1 }}
+                                  />
+                                  <Typography variant="body2">
+                                    No candidates in this pool
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </>
+      )}
 
       {/* Create Talent Pool Dialog */}
       <Dialog 
@@ -783,7 +976,34 @@ const TalentPools = ({ user }) => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            {skills.length === 0 ? (
+            {skillLoading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  py: 8,
+                  gap: 2,
+                }}
+              >
+                <CircularProgress
+                  size={50}
+                  thickness={4}
+                  sx={{
+                    color: "#4f8cff",
+                  }}
+                />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "#b8c5d6",
+                  }}
+                >
+                  Loading skills...
+                </Typography>
+              </Box>
+            ) : skills.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <StarIcon sx={{ fontSize: 60, color: '#b8c5d6', mb: 2, opacity: 0.5 }} />
                 <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 1 }}>

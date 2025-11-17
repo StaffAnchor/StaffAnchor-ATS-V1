@@ -6,6 +6,7 @@ import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
 import PreferenceSelectionModal from './PreferenceSelectionModal.jsx';
 import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import LinkedCandidates from './LinkedCandidates.jsx';
+import AIWarningDialog from './AIWarningDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon } from '@mui/icons-material';
@@ -28,6 +29,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showCandidateModal, setShowCandidateModal] = useState(false);
   const [linkingCandidates, setLinkingCandidates] = useState(false);
   const [showLinkedCandidatesModal, setShowLinkedCandidatesModal] = useState(false);
+  const [showAIWarning, setShowAIWarning] = useState(false);
 
   // Debug: Log job data when expanded to verify recruiter fields
   useEffect(() => {
@@ -71,6 +73,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   };
 
   const findSuitableCandidates = () => {
+    setShowAIWarning(true);
+  };
+
+  const handleAIWarningProceed = () => {
     setShowPreferenceModal(true);
   };
 
@@ -368,7 +374,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
             </Typography>
             {job.ctc && (
               <Typography variant="body1" sx={{color: '#f5f7fa'}}>
-                <strong>CTC (LPA):</strong> ₹ {job.ctc}
+                <strong>CTC:</strong> ₹ {job.ctc} LPA
               </Typography>
             )}
             {job.industry && (
@@ -538,14 +544,14 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         py: 2
                       }}>
-                        CTC (LPA)
+                        CTC
                       </TableCell>
                       <TableCell sx={{ 
                         color: '#f5f7fa', 
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         py: 2
                       }}>
-                        ₹ {job.ctc}
+                        ₹ {job.ctc} LPA
                       </TableCell>
                     </TableRow>
                   )}
@@ -1100,6 +1106,13 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       </Stack>
       
       {/* Preference Selection Modal */}
+      <AIWarningDialog
+        open={showAIWarning}
+        onClose={() => setShowAIWarning(false)}
+        onProceed={handleAIWarningProceed}
+        featureName="Candidate Matching"
+      />
+
       <PreferenceSelectionModal
         open={showPreferenceModal}
         onClose={() => setShowPreferenceModal(false)}
