@@ -32,6 +32,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  CircularProgress,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -44,7 +45,7 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-const CandidateList = ({ candidates, accessLevel }) => {
+const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [expandedCandidateId, setExpandedCandidateId] = useState(null);
   const [expandedJobsCandidateId, setExpandedJobsCandidateId] = useState(null);
   const [candidateJobs, setCandidateJobs] = useState({});
@@ -729,7 +730,34 @@ const CandidateList = ({ candidates, accessLevel }) => {
             </Box>
           )}
 
-          {filteredCandidates.length === 0 ? (
+          {/* Loading Screen */}
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "400px",
+                color: "#b8c5d6",
+              }}
+            >
+              <CircularProgress
+                size={60}
+                sx={{
+                  color: "#eebbc3",
+                  mb: 3,
+                }}
+              />
+              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+                Loading Candidates...
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                Please wait while we fetch the candidate data
+              </Typography>
+            </Box>
+          ) : filteredCandidates.length === 0 ? (
             <Box
               sx={{
                 display: "flex",
