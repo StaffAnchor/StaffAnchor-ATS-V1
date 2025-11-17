@@ -3,6 +3,7 @@ import axios from 'axios';
 import JobList from './JobList.jsx';
 import ResultsLimitPopup from './ResultsLimitPopup.jsx';
 import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
+import AIWarningDialog from './AIWarningDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Autocomplete, IconButton } from '@mui/material';
 import { Star as StarIcon, InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
@@ -22,6 +23,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const [resumeFile, setResumeFile] = useState(null);
   const [uploadingResume, setUploadingResume] = useState(false);
   const [deletingResume, setDeletingResume] = useState(false);
+  const [showAIWarning, setShowAIWarning] = useState(false);
 
   // Sync editMode with initialEditMode prop when it changes
   React.useEffect(() => {
@@ -47,6 +49,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   }, [editMode]);
 
   const findSuitableJobs = () => {
+    setShowAIWarning(true);
+  };
+
+  const handleAIWarningProceed = () => {
     setShowResultsPopup(true);
   };
 
@@ -765,6 +771,13 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
       </Stack>
       
       {/* Results Limit Popup */}
+      <AIWarningDialog
+        open={showAIWarning}
+        onClose={() => setShowAIWarning(false)}
+        onProceed={handleAIWarningProceed}
+        featureName="Job Matching"
+      />
+
       <ResultsLimitPopup
         open={showResultsPopup}
         onClose={() => setShowResultsPopup(false)}

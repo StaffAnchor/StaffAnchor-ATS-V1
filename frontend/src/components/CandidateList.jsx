@@ -6,6 +6,7 @@ import ResultsLimitPopup from "./ResultsLimitPopup.jsx";
 import DeleteConfirmationPopup from "./DeleteConfirmationPopup.jsx";
 import TalentPoolSelectionModal from "./TalentPoolSelectionModal.jsx";
 import CommentsModal from "./CommentsModal.jsx";
+import AIWarningDialog from "./AIWarningDialog.jsx";
 import { toast } from 'react-toastify';
 import {
   Table,
@@ -51,6 +52,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [candidateJobs, setCandidateJobs] = useState({});
   const [loadingJobs, setLoadingJobs] = useState({});
   const [filter, setFilter] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [isFiltering, setIsFiltering] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [editingCandidateId, setEditingCandidateId] = useState(null);
   const [expandedSkills, setExpandedSkills] = useState({});
@@ -76,6 +79,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [candidateToDelete, setCandidateToDelete] = useState(null);
   const [showTalentPoolModal, setShowTalentPoolModal] = useState(false);
+  const [showAIWarning, setShowAIWarning] = useState(false);
   const [selectedCandidateForPool, setSelectedCandidateForPool] = useState(null);
   const [talentPools, setTalentPools] = useState([]);
   
@@ -99,6 +103,19 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
       setCurrentUser(user);
     }
   }, []);
+
+  // Debounce search input
+  useEffect(() => {
+    setIsFiltering(true);
+    const timer = setTimeout(() => {
+      setFilter(searchInput);
+      setIsFiltering(false);
+    }, 300); // 300ms debounce
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchInput]);
 
   useEffect(() => {
     const handleToggleFilters = () => {
@@ -180,6 +197,10 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
 
   const handleFindSuitableJobs = (candidate) => {
     setSelectedCandidate(candidate);
+    setShowAIWarning(true);
+  };
+
+  const handleAIWarningProceed = () => {
     setShowResultsPopup(true);
   };
 
@@ -626,10 +647,19 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             fullWidth
             variant="outlined"
             placeholder="Search candidates by name, email, or skills..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             InputProps={{
               startAdornment: <SearchIcon sx={{ color: "#b8c5d6", mr: 1 }} />,
+              endAdornment: isFiltering && (
+                <CircularProgress
+                  size={20}
+                  sx={{
+                    color: "#eebbc3",
+                    mr: 1,
+                  }}
+                />
+              ),
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -1272,6 +1302,13 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
       </Box>
       
       {/* Results Limit Popup */}
+      <AIWarningDialog
+        open={showAIWarning}
+        onClose={() => setShowAIWarning(false)}
+        onProceed={handleAIWarningProceed}
+        featureName="Job Matching"
+      />
+
       <ResultsLimitPopup
         open={showResultsPopup}
         onClose={() => setShowResultsPopup(false)}
