@@ -351,13 +351,13 @@ const JobList = ({ accessLevel, userId }) => {
           sx={{
             position: "fixed",
             left: showFilters ? 0 : -400,
-            top: "72px", // Account for header height
+            top: "190px", // Account for Dashboard header + JobList header
             width: 400,
-            height: "calc(100vh - 72px)",
+            height: "90vh",
             background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
             borderRight: "1px solid rgba(255, 255, 255, 0.1)",
             overflowY: "auto",
-            p: 2,
+            p: 0.5,
             zIndex: 5,
             transition: "left 0.3s ease-in-out",
           }}

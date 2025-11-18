@@ -78,7 +78,8 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
       borderRadius: 2,
       p: 2,
       color: '#f5f7fa',
-      height: '100%',
+      maxHeight: 'calc(100vh - 180px)', // Reduced height to prevent overlap
+      minHeight: '400px', // Minimum height for usability
       overflowY: 'auto',
       // Custom scrollbar styling
       '&::-webkit-scrollbar': {
