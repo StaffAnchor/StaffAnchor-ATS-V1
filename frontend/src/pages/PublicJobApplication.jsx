@@ -368,117 +368,166 @@ const PublicJobApplication = () => {
     <Box sx={{ 
       minHeight: '100vh',
       background: '#f5f5f5',
-      py: { xs: 2, md: 4 }
+      py: { xs: 1, sm: 2, md: 4 },
+      px: { xs: 1, sm: 2 }
     }}>
       <ToastContainer position="top-center" autoClose={3000} theme="dark" />
       
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
         {/* Header with StaffAnchor Branding */}
-        <Paper sx={{
-          mb: 4,
-          p: 3,
-          background: '#ffffff',
-          border: '1px solid #e5e5e5',
-          borderRadius: '8px',
-          boxShadow: 'none',
-          textAlign: 'center'
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          mb: { xs: 1, sm: 1, md: 1 },
+          py: { xs: 1, sm: 2 }
         }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-          }}>
-            <img 
-              src={staffAnchorLogo} 
-              alt="StaffAnchor Logo" 
-              style={{ 
-                height: '100px',
-                width: 'auto',
-                maxWidth: '100%'
-              }} 
-            />
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: 600, 
-                color: '#333',
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
-                fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
-              }}
-            >
-              StaffAnchor
-            </Typography>
-          </Box>
-        </Paper>
+          <img 
+            src={staffAnchorLogo} 
+            alt="StaffAnchor Logo" 
+            style={{ 
+              height: '100px',
+              width: 'auto',
+              maxWidth: '100%'
+            }}
+          />
+        </Box>
 
         {/* Job Details Card */}
         <Card sx={{
-          mb: 4,
+          mb: { xs: 2, sm: 3, md: 4 },
           background: '#ffffff',
           border: '1px solid #e5e5e5',
           borderRadius: '8px',
           boxShadow: 'none'
         }}>
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <WorkIcon sx={{ color: '#e74c3c', fontSize: { xs: 32, md: 40 } }} />
-              <Box>
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: { xs: 1, sm: 2 }, 
+              mb: { xs: 2, sm: 3 } 
+            }}>
+              <WorkIcon sx={{ 
+                color: '#e74c3c', 
+                fontSize: { xs: 28, sm: 32, md: 40 },
+                alignSelf: { xs: 'flex-start', sm: 'center' }
+              }} />
+              <Box sx={{ width: '100%' }}>
                 <Typography variant="h4" sx={{ 
                   fontWeight: 700, 
                   color: '#333',
-                  fontSize: { xs: '1.5rem', md: '2.125rem' }
+                  fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2.125rem' },
+                  lineHeight: { xs: 1.3, sm: 1.2 },
+                  wordBreak: 'break-word'
                 }}>
                   {job.title}
                 </Typography>
                 <Typography variant="h6" sx={{ 
                   color: '#666',
-                  fontSize: { xs: '1rem', md: '1.25rem' }
+                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
+                  mt: { xs: 0.5, sm: 0 },
+                  wordBreak: 'break-word'
                 }}>
                   {job.organization}
                 </Typography>
               </Box>
             </Box>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={{ xs: 1.5, sm: 2 }}>
               <Grid item xs={12} sm={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LocationIcon sx={{ color: '#e74c3c' }} />
-                  <Typography sx={{ color: '#333' }}>{job.location}</Typography>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  py: { xs: 0.5, sm: 0 }
+                }}>
+                  <LocationIcon sx={{ 
+                    color: '#e74c3c',
+                    fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                  }} />
+                  <Typography sx={{ 
+                    color: '#333',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    wordBreak: 'break-word',
+                    flex: 1
+                  }}>{job.location}</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <BusinessIcon sx={{ color: '#e74c3c' }} />
-                  <Typography sx={{ color: '#333' }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  py: { xs: 0.5, sm: 0 }
+                }}>
+                  <BusinessIcon sx={{ 
+                    color: '#e74c3c',
+                    fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                  }} />
+                  <Typography sx={{ 
+                    color: '#333',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}>
                     {job.experience} years experience
                   </Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <MoneyIcon sx={{ color: '#e74c3c' }} />
-                  <Typography sx={{ color: '#333' }}>₹ {job.ctc} LPA</Typography>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  py: { xs: 0.5, sm: 0 }
+                }}>
+                  <MoneyIcon sx={{ 
+                    color: '#e74c3c',
+                    fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                  }} />
+                  <Typography sx={{ 
+                    color: '#333',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}>₹ {job.ctc} LPA</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Chip 
-                  label={job.remote ? 'Remote' : 'On-site'} 
-                  sx={{ 
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #ddd',
-                    color: '#333'
-                  }} 
-                />
+                <Box sx={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  py: { xs: 0.5, sm: 0 }
+                }}>
+                  <Chip 
+                    label={job.remote ? 'Remote' : 'On-site'} 
+                    sx={{ 
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #ddd',
+                      color: '#333',
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      height: { xs: '28px', sm: '32px' }
+                    }} 
+                  />
+                </Box>
               </Grid>
             </Grid>
 
             {job.description && (
               <>
-                <Divider sx={{ my: 3, borderColor: '#e5e5e5' }} />
-                <Typography variant="h6" sx={{ color: '#333', mb: 2 }}>
+                <Divider sx={{ my: { xs: 2, sm: 3 }, borderColor: '#e5e5e5' }} />
+                <Typography variant="h6" sx={{ 
+                  color: '#333', 
+                  mb: { xs: 1.5, sm: 2 },
+                  fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                }}>
                   Job Description
                 </Typography>
-                <Typography sx={{ color: '#666', whiteSpace: 'pre-wrap' }}>
+                <Typography sx={{ 
+                  color: '#666', 
+                  whiteSpace: 'pre-wrap',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  lineHeight: { xs: 1.5, sm: 1.6 },
+                  wordBreak: 'break-word'
+                }}>
                   {job.description}
                 </Typography>
               </>
@@ -492,22 +541,23 @@ const PublicJobApplication = () => {
           border: '1px solid #e5e5e5',
           borderRadius: '8px',
           boxShadow: 'none',
-          mb: 4
+          mb: { xs: 2, sm: 3, md: 4 }
         }}>
-          <CardContent sx={{ p: 3 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
             <Typography variant="h5" sx={{ 
               fontWeight: 700, 
               color: '#333', 
-              mb: 3,
-              fontSize: { xs: '1.25rem', md: '1.5rem' }
+              mb: { xs: 2, sm: 3 },
+              fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' },
+              textAlign: { xs: 'center', sm: 'left' }
             }}>
               Apply for this Position
             </Typography>
 
             <form onSubmit={handleSubmit}>
-              <Stack spacing={3}>
+              <Stack spacing={{ xs: 2, sm: 3 }}>
                 {/* Basic Information */}
-                <Grid container spacing={2}>
+                <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
@@ -519,7 +569,7 @@ const PublicJobApplication = () => {
                       sx={inputStyles}
                     />
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       required
@@ -531,7 +581,7 @@ const PublicJobApplication = () => {
                       sx={inputStyles}
                     />
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       required
@@ -546,10 +596,14 @@ const PublicJobApplication = () => {
 
                 {/* Total Experience */}
                 <Box>
-                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    color: '#666', 
+                    mb: { xs: 1, sm: 1.5 },
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}>
                     Total Experience
                   </Typography>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -570,7 +624,7 @@ const PublicJobApplication = () => {
                         type="number"
                         value={form.totalExperienceMonths}
                         onChange={handleInputChange}
-                        inputProps={{ min: 0, max: 11 }}
+                        inputProps={{ min: 0, max: 50 }}
                         sx={inputStyles}
                       />
                     </Grid>
@@ -578,8 +632,8 @@ const PublicJobApplication = () => {
                 </Box>
 
                 {/* CTC Information */}
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
+                <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       label="Current CTC (LPA)"
@@ -590,7 +644,7 @@ const PublicJobApplication = () => {
                       sx={inputStyles}
                     />
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       label="Expected CTC (LPA)"
@@ -607,7 +661,11 @@ const PublicJobApplication = () => {
 
                 {/* Preferred Location */}
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#666', mb: 2 }}>
+                  <Typography variant="h6" sx={{ 
+                    color: '#666', 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                  }}>
                     Preferred Location(s) *
                   </Typography>
                   {job && getJobLocations().length > 0 ? (
@@ -680,7 +738,11 @@ const PublicJobApplication = () => {
 
                 {/* Skills */}
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#666', mb: 2 }}>
+                  <Typography variant="h6" sx={{ 
+                    color: '#666', 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                  }}>
                     Skills *
                   </Typography>
                   
@@ -802,34 +864,64 @@ const PublicJobApplication = () => {
 
                 {/* Work Experience */}
                 <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" sx={{ color: '#666' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 0 },
+                    mb: { xs: 1.5, sm: 2 }
+                  }}>
+                    <Typography variant="h6" sx={{ 
+                      color: '#666',
+                      fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                    }}>
                       Work Experience (Optional)
                     </Typography>
                     <Button 
                       startIcon={<AddIcon />}
                       onClick={addExperience}
-                      sx={{ color: '#e74c3c' }}
+                      sx={{ 
+                        color: '#e74c3c',
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        alignSelf: { xs: 'flex-start', sm: 'center' }
+                      }}
                     >
                       Add Experience
                     </Button>
                   </Box>
                   {form.experience.map((exp, index) => (
                       <Paper key={index} sx={{ 
-                      p: 2, 
-                      mb: 2, 
+                      p: { xs: 1.5, sm: 2 }, 
+                      mb: { xs: 1.5, sm: 2 }, 
                       background: '#ffffff',
                       border: '1px solid #e5e5e5'
                     }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography sx={{ color: '#333' }}>Experience {index + 1}</Typography>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mb: { xs: 1.5, sm: 2 }
+                      }}>
+                        <Typography sx={{ 
+                          color: '#333',
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          fontWeight: 500
+                        }}>Experience {index + 1}</Typography>
                         {form.experience.length > 1 && (
-                          <IconButton onClick={() => removeExperience(index)} sx={{ color: '#f44336' }}>
-                            <DeleteIcon />
+                          <IconButton 
+                            onClick={() => removeExperience(index)} 
+                            sx={{ 
+                              color: '#f44336',
+                              padding: { xs: '4px', sm: '8px' }
+                            }}
+                            size={window.innerWidth < 600 ? 'small' : 'medium'}
+                          >
+                            <DeleteIcon fontSize={window.innerWidth < 600 ? 'small' : 'medium'} />
                           </IconButton>
                         )}
                       </Box>
-                      <Grid container spacing={2}>
+                      <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                         <Grid item xs={12} md={6}>
                           <TextField
                             fullWidth
@@ -897,34 +989,64 @@ const PublicJobApplication = () => {
 
                 {/* Education */}
                 <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" sx={{ color: '#666' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 0 },
+                    mb: { xs: 1.5, sm: 2 }
+                  }}>
+                    <Typography variant="h6" sx={{ 
+                      color: '#666',
+                      fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                    }}>
                       Education (Optional)
                     </Typography>
                     <Button 
                       startIcon={<AddIcon />}
                       onClick={addEducation}
-                      sx={{ color: '#e74c3c' }}
+                      sx={{ 
+                        color: '#e74c3c',
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        alignSelf: { xs: 'flex-start', sm: 'center' }
+                      }}
                     >
                       Add Education
                     </Button>
                   </Box>
                   {form.education.map((edu, index) => (
                       <Paper key={index} sx={{ 
-                      p: 2, 
-                      mb: 2, 
+                      p: { xs: 1.5, sm: 2 }, 
+                      mb: { xs: 1.5, sm: 2 }, 
                       background: '#ffffff',
                       border: '1px solid #e5e5e5'
                     }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography sx={{ color: '#333' }}>Education {index + 1}</Typography>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mb: { xs: 1.5, sm: 2 }
+                      }}>
+                        <Typography sx={{ 
+                          color: '#333',
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          fontWeight: 500
+                        }}>Education {index + 1}</Typography>
                         {form.education.length > 1 && (
-                          <IconButton onClick={() => removeEducation(index)} sx={{ color: '#f44336' }}>
-                            <DeleteIcon />
+                          <IconButton 
+                            onClick={() => removeEducation(index)} 
+                            sx={{ 
+                              color: '#f44336',
+                              padding: { xs: '4px', sm: '8px' }
+                            }}
+                            size={window.innerWidth < 600 ? 'small' : 'medium'}
+                          >
+                            <DeleteIcon fontSize={window.innerWidth < 600 ? 'small' : 'medium'} />
                           </IconButton>
                         )}
                       </Box>
-                      <Grid container spacing={2}>
+                      <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                         <Grid item xs={12} md={6}>
                           <TextField
                             fullWidth
@@ -970,11 +1092,15 @@ const PublicJobApplication = () => {
 
                 {/* Resume Upload */}
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 2 }}>
+                  <Typography variant="h6" sx={{ 
+                    color: '#666', 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                  }}>
                     Resume / CV
                   </Typography>
                   <Paper sx={{ 
-                    p: 3, 
+                    p: { xs: 2, sm: 3 }, 
                     background: '#ffffff',
                     border: '2px dashed #ddd',
                     borderRadius: '8px',
@@ -982,8 +1108,17 @@ const PublicJobApplication = () => {
                   }}>
                     {!resumeFile ? (
                       <>
-                        <CloudUploadIcon sx={{ fontSize: 48, color: '#1976d2', mb: 2 }} />
-                        <Typography variant="body1" sx={{ color: '#666', mb: 2 }}>
+                        <CloudUploadIcon sx={{ 
+                          fontSize: { xs: 36, sm: 48 }, 
+                          color: '#1976d2', 
+                          mb: { xs: 1.5, sm: 2 } 
+                        }} />
+                        <Typography variant="body1" sx={{ 
+                          color: '#666', 
+                          mb: { xs: 1.5, sm: 2 },
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          px: { xs: 1, sm: 0 }
+                        }}>
                           Upload your resume (PDF, DOC, or DOCX) <span style={{ color: '#e74c3c' }}>*</span>
                         </Typography>
                         <Button
@@ -994,8 +1129,9 @@ const PublicJobApplication = () => {
                             color: '#ffffff',
                             fontWeight: 600,
                             textTransform: 'uppercase',
-                            px: 4,
-                            py: 1,
+                            px: { xs: 3, sm: 4 },
+                            py: { xs: 0.75, sm: 1 },
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
                             '&:hover': { backgroundColor: '#1565c0' }
                           }}
                         >
@@ -1007,21 +1143,56 @@ const PublicJobApplication = () => {
                             onChange={handleResumeChange}
                           />
                         </Button>
-                        <Typography variant="caption" sx={{ color: '#666', display: 'block', mt: 2 }}>
+                        <Typography variant="caption" sx={{ 
+                          color: '#666', 
+                          display: 'block', 
+                          mt: { xs: 1.5, sm: 2 },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                        }}>
                           Maximum file size: 5MB
                         </Typography>
                       </>
                     ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                        <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 32 }} />
-                        <Box sx={{ textAlign: 'left' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <FileIcon sx={{ color: '#1976d2' }} />
-                            <Typography sx={{ color: '#333', fontWeight: 600 }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: { xs: 1.5, sm: 2 },
+                        textAlign: { xs: 'center', sm: 'left' }
+                      }}>
+                        <CheckCircleIcon sx={{ 
+                          color: '#4caf50', 
+                          fontSize: { xs: 28, sm: 32 } 
+                        }} />
+                        <Box sx={{ 
+                          textAlign: { xs: 'center', sm: 'left' },
+                          flex: 1
+                        }}>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: { xs: 'center', sm: 'flex-start' },
+                            gap: 1,
+                            flexWrap: 'wrap'
+                          }}>
+                            <FileIcon sx={{ 
+                              color: '#1976d2',
+                              fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                            }} />
+                            <Typography sx={{ 
+                              color: '#333', 
+                              fontWeight: 600,
+                              fontSize: { xs: '0.875rem', sm: '1rem' },
+                              wordBreak: 'break-word'
+                            }}>
                               {resumeFileName}
                             </Typography>
                           </Box>
-                          <Typography variant="caption" sx={{ color: '#4caf50' }}>
+                          <Typography variant="caption" sx={{ 
+                            color: '#4caf50',
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                          }}>
                             Ready to upload
                           </Typography>
                         </Box>
@@ -1030,9 +1201,13 @@ const PublicJobApplication = () => {
                             setResumeFile(null);
                             setResumeFileName('');
                           }}
-                          sx={{ color: '#f44336' }}
+                          sx={{ 
+                            color: '#f44336',
+                            padding: { xs: '4px', sm: '8px' }
+                          }}
+                          size={window.innerWidth < 600 ? 'small' : 'medium'}
                         >
-                          <DeleteIcon />
+                          <DeleteIcon fontSize={window.innerWidth < 600 ? 'small' : 'medium'} />
                         </IconButton>
                       </Box>
                     )}
@@ -1040,14 +1215,20 @@ const PublicJobApplication = () => {
                 </Box>
 
                 {/* Submit Button */}
-                <Box sx={{ textAlign: 'center', pt: 4 }}>
+                <Box sx={{ textAlign: 'center', pt: { xs: 2, sm: 3, md: 4 } }}>
                   <Paper sx={{ 
-                    p: 3, 
+                    p: { xs: 2, sm: 3 }, 
                     background: '#ffffff',
                     border: '1px solid #e5e5e5',
                     borderRadius: '8px'
                   }}>
-                    <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#666', 
+                      mb: { xs: 2, sm: 3 },
+                      fontSize: { xs: '0.875rem', sm: '1rem' },
+                      px: { xs: 1, sm: 0 },
+                      lineHeight: 1.5
+                    }}>
                       By submitting this application, you agree to be contacted by StaffAnchor regarding this position.
                     </Typography>
                     <Button 
@@ -1059,13 +1240,14 @@ const PublicJobApplication = () => {
                       sx={{
                         backgroundColor: '#f8b2c1',
                         color: '#333',
-                        px: 8,
-                        py: 1.5,
-                        fontSize: '1rem',
+                        px: { xs: 4, sm: 6, md: 8 },
+                        py: { xs: 1, sm: 1.25, md: 1.5 },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         borderRadius: '6px',
                         boxShadow: 'none',
+                        minWidth: { xs: '200px', sm: '250px' },
                         '&:hover': { 
                           backgroundColor: '#f398a8'
                         },
@@ -1075,7 +1257,7 @@ const PublicJobApplication = () => {
                         }
                       }}
                     >
-                      {submitting ? 'Submitting Your Application...' : 'Submit Application'}
+                      {submitting ? 'Submitting...' : 'Submit Application'}
                     </Button>
                   </Paper>
                 </Box>
@@ -1086,8 +1268,8 @@ const PublicJobApplication = () => {
 
         {/* Footer */}
         <Paper sx={{
-          mt: 4,
-          p: 3,
+          mt: { xs: 2, sm: 3, md: 4 },
+          p: { xs: 2, sm: 3 },
           background: '#ffffff',
           border: '1px solid #e5e5e5',
           borderRadius: '8px',
@@ -1097,7 +1279,8 @@ const PublicJobApplication = () => {
             variant="body2" 
             sx={{ 
               color: '#666',
-              mb: 1
+              mb: { xs: 0.5, sm: 1 },
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
             }}
           >
             © {new Date().getFullYear()} StaffAnchor. All rights reserved.
@@ -1105,7 +1288,8 @@ const PublicJobApplication = () => {
           <Typography 
             variant="caption" 
             sx={{ 
-              color: '#666'
+              color: '#666',
+              fontSize: { xs: '0.6875rem', sm: '0.75rem' }
             }}
           >
             Connecting Talent with Opportunity
