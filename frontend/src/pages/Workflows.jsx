@@ -199,18 +199,6 @@ const Workflows = ({ user }) => {
     }
   };
 
-  const togglePhaseExpansionOld = (phaseIndex) => {
-    setExpandedPhases(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(phaseIndex)) {
-        newSet.delete(phaseIndex);
-      } else {
-        newSet.add(phaseIndex);
-      }
-      return newSet;
-    });
-  };
-
   const handleWorkflowUpdated = async (resultData, action) => {
     // Refresh workflows list
     await fetchWorkflows();
@@ -1074,12 +1062,13 @@ const Workflows = ({ user }) => {
 
                       {/* Phase Rows */}
                       {selectedWorkflow.phases?.map((phase, index) => {
-                        const isExpanded = expandedPhases.has(index);
+                        const phaseKey = `${selectedWorkflow._id}-${index}`;
+                        const isExpanded = expandedPhases[phaseKey];
                         return (
                         <React.Fragment key={index}>
                           {/* Main Phase Row */}
                           <TableRow
-                            onClick={() => togglePhaseExpansion(index)}
+                            onClick={() => togglePhaseExpansion(selectedWorkflow._id, index)}
                             sx={{ 
                               cursor: 'pointer',
                               '&:hover': {
