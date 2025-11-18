@@ -132,7 +132,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={(e, reason) => {
+        if (e) e.stopPropagation();
+        onClose();
+      }}
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -163,7 +166,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
           </Typography>
         </Box>
         <IconButton
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           sx={{
             color: '#b8c5d6',
             '&:hover': {
@@ -345,7 +351,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
 
       <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <Button
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           variant="outlined"
           sx={{
             color: '#b8c5d6',
