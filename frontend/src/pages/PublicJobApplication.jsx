@@ -305,9 +305,9 @@ const PublicJobApplication = () => {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
-        background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)'
+        background: '#f5f5f5'
       }}>
-        <CircularProgress sx={{ color: '#eebbc3' }} />
+        <CircularProgress />
       </Box>
     );
   }
@@ -320,12 +320,12 @@ const PublicJobApplication = () => {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
-        background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-        color: '#f5f7fa',
+        background: '#f5f5f5',
+        color: '#333',
         gap: 2
       }}>
-        <Typography variant="h5">Job not found</Typography>
-        <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+        <Typography variant="h5" sx={{ color: '#333' }}>Job not found</Typography>
+        <Typography variant="body2" sx={{ color: '#666' }}>
           This job posting may have been removed or does not exist.
         </Typography>
       </Box>
@@ -333,19 +333,41 @@ const PublicJobApplication = () => {
   }
 
   const inputStyles = {
-    '& .MuiInputBase-input': { color: '#f5f7fa' },
-    '& .MuiInputLabel-root': { color: '#b8c5d6' },
     '& .MuiOutlinedInput-root': {
-      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-      '&.Mui-focused fieldset': { borderColor: '#eebbc3' }
+      backgroundColor: '#ffffff !important',
+      borderRadius: '6px',
+      '& fieldset': { 
+        borderColor: '#ddd !important' 
+      },
+      '&:hover fieldset': { 
+        borderColor: '#bbb !important' 
+      },
+      '&.Mui-focused fieldset': { 
+        borderColor: '#1976d2 !important' 
+      }
+    },
+    '& .MuiInputBase-input': { 
+      color: '#333 !important',
+      backgroundColor: '#ffffff !important'
+    },
+    '& .MuiInputLabel-root': { 
+      color: '#777 !important',
+      backgroundColor: '#ffffff !important',
+      padding: '0 8px',
+      '&.Mui-focused': { 
+        color: '#1976d2 !important',
+        backgroundColor: '#ffffff !important'
+      },
+      '&.MuiFormLabel-filled': {
+        backgroundColor: '#ffffff !important'
+      }
     }
   };
 
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+      background: '#f5f5f5',
       py: { xs: 2, md: 4 }
     }}>
       <ToastContainer position="top-center" autoClose={3000} theme="dark" />
@@ -354,33 +376,33 @@ const PublicJobApplication = () => {
         {/* Header with StaffAnchor Branding */}
         <Paper sx={{
           mb: 4,
-          p: { xs: 3, md: 4 },
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 2,
+          p: 3,
+          background: '#ffffff',
+          border: '1px solid #e5e5e5',
+          borderRadius: '8px',
+          boxShadow: 'none',
           textAlign: 'center'
         }}>
           <Box sx={{ 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center',
-            gap: 2
           }}>
             <img 
               src={staffAnchorLogo} 
               alt="StaffAnchor Logo" 
               style={{ 
-                height: '60px',
+                height: '100px',
                 width: 'auto',
                 maxWidth: '100%'
               }} 
             />
             <Typography 
-              variant="h4" 
+              variant="h5" 
               sx={{ 
-                fontWeight: 700, 
-                color: '#eebbc3',
-                fontSize: { xs: '1.5rem', md: '2rem' },
+                fontWeight: 600, 
+                color: '#333',
+                fontSize: { xs: '1.25rem', md: '1.5rem' },
                 fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
               }}
             >
@@ -392,23 +414,24 @@ const PublicJobApplication = () => {
         {/* Job Details Card */}
         <Card sx={{
           mb: 4,
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 2
+          background: '#ffffff',
+          border: '1px solid #e5e5e5',
+          borderRadius: '8px',
+          boxShadow: 'none'
         }}>
-          <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+          <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <WorkIcon sx={{ color: '#eebbc3', fontSize: { xs: 32, md: 40 } }} />
+              <WorkIcon sx={{ color: '#e74c3c', fontSize: { xs: 32, md: 40 } }} />
               <Box>
                 <Typography variant="h4" sx={{ 
                   fontWeight: 700, 
-                  color: '#eebbc3',
+                  color: '#333',
                   fontSize: { xs: '1.5rem', md: '2.125rem' }
                 }}>
                   {job.title}
                 </Typography>
                 <Typography variant="h6" sx={{ 
-                  color: '#b8c5d6',
+                  color: '#666',
                   fontSize: { xs: '1rem', md: '1.25rem' }
                 }}>
                   {job.organization}
@@ -419,30 +442,31 @@ const PublicJobApplication = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LocationIcon sx={{ color: '#4f8cff' }} />
-                  <Typography sx={{ color: '#f5f7fa' }}>{job.location}</Typography>
+                  <LocationIcon sx={{ color: '#e74c3c' }} />
+                  <Typography sx={{ color: '#333' }}>{job.location}</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <BusinessIcon sx={{ color: '#4f8cff' }} />
-                  <Typography sx={{ color: '#f5f7fa' }}>
+                  <BusinessIcon sx={{ color: '#e74c3c' }} />
+                  <Typography sx={{ color: '#333' }}>
                     {job.experience} years experience
                   </Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <MoneyIcon sx={{ color: '#4f8cff' }} />
-                  <Typography sx={{ color: '#f5f7fa' }}>₹ {job.ctc} LPA</Typography>
+                  <MoneyIcon sx={{ color: '#e74c3c' }} />
+                  <Typography sx={{ color: '#333' }}>₹ {job.ctc} LPA</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Chip 
                   label={job.remote ? 'Remote' : 'On-site'} 
                   sx={{ 
-                    backgroundColor: job.remote ? 'rgba(76, 175, 80, 0.2)' : 'rgba(79, 140, 255, 0.2)',
-                    color: job.remote ? '#4caf50' : '#4f8cff'
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #ddd',
+                    color: '#333'
                   }} 
                 />
               </Grid>
@@ -450,11 +474,11 @@ const PublicJobApplication = () => {
 
             {job.description && (
               <>
-                <Divider sx={{ my: 3, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2 }}>
+                <Divider sx={{ my: 3, borderColor: '#e5e5e5' }} />
+                <Typography variant="h6" sx={{ color: '#333', mb: 2 }}>
                   Job Description
                 </Typography>
-                <Typography sx={{ color: '#b8c5d6', whiteSpace: 'pre-wrap' }}>
+                <Typography sx={{ color: '#666', whiteSpace: 'pre-wrap' }}>
                   {job.description}
                 </Typography>
               </>
@@ -464,15 +488,16 @@ const PublicJobApplication = () => {
 
         {/* Application Form */}
         <Card sx={{
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 2,
+          background: '#ffffff',
+          border: '1px solid #e5e5e5',
+          borderRadius: '8px',
+          boxShadow: 'none',
           mb: 4
         }}>
-          <CardContent sx={{ p: { xs: 2, md: 4 } }}>
+          <CardContent sx={{ p: 3 }}>
             <Typography variant="h5" sx={{ 
               fontWeight: 700, 
-              color: '#eebbc3', 
+              color: '#333', 
               mb: 3,
               fontSize: { xs: '1.25rem', md: '1.5rem' }
             }}>
@@ -521,7 +546,7 @@ const PublicJobApplication = () => {
 
                 {/* Total Experience */}
                 <Box>
-                  <Typography variant="subtitle2" sx={{ color: '#b8c5d6', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
                     Total Experience
                   </Typography>
                   <Grid container spacing={2}>
@@ -582,12 +607,12 @@ const PublicJobApplication = () => {
 
                 {/* Preferred Location */}
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 2 }}>
+                  <Typography variant="h6" sx={{ color: '#666', mb: 2 }}>
                     Preferred Location(s) *
                   </Typography>
                   {job && getJobLocations().length > 0 ? (
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#b8c5d6' }}>Select Location(s)</InputLabel>
+                      <InputLabel sx={{ color: '#777' }}>Select Location(s)</InputLabel>
                       <Select
                         multiple
                         value={selectedPreferredLocations}
@@ -601,34 +626,36 @@ const PublicJobApplication = () => {
                                 label={value}
                                 size="small"
                                 sx={{
-                                  backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                                  color: '#4f8cff',
-                                  '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                                  backgroundColor: '#ffffff',
+                                  border: '1px solid #ddd',
+                                  color: '#333'
                                 }}
                               />
                             ))}
                           </Box>
                         )}
                         sx={{
-                          color: '#f5f7fa',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                          '& .MuiSvgIcon-root': { color: '#b8c5d6' }
+                          color: '#333',
+                          backgroundColor: '#fff',
+                          borderRadius: '6px',
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ddd' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#bbb' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
+                          '& .MuiSvgIcon-root': { color: '#666' }
                         }}
                         MenuProps={{
                           PaperProps: {
                             sx: {
-                              backgroundColor: '#1a1a2e',
-                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              backgroundColor: '#ffffff',
+                              border: '1px solid #e5e5e5',
                               '& .MuiMenuItem-root': {
-                                color: '#f5f7fa',
+                                color: '#333',
                                 '&:hover': {
-                                  backgroundColor: 'rgba(238, 187, 195, 0.1)'
+                                  backgroundColor: '#f5f5f5'
                                 },
                                 '&.Mui-selected': {
-                                  backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                                  color: '#4f8cff'
+                                  backgroundColor: '#f0f0f0',
+                                  color: '#333'
                                 }
                               }
                             }
@@ -643,7 +670,7 @@ const PublicJobApplication = () => {
                       </Select>
                     </FormControl>
                   ) : (
-                    <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+                    <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
                       No locations available for this job
                     </Typography>
                   )}
@@ -653,24 +680,26 @@ const PublicJobApplication = () => {
 
                 {/* Skills */}
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 2 }}>
+                  <Typography variant="h6" sx={{ color: '#666', mb: 2 }}>
                     Skills *
                   </Typography>
                   
                   {/* Category Selection */}
                   <Box sx={{ mb: 2 }}>
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#b8c5d6' }}>Category</InputLabel>
+                      <InputLabel sx={{ color: '#777' }}>Category</InputLabel>
                       <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         label="Category"
                         sx={{
-                          color: '#f5f7fa',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                          '& .MuiSvgIcon-root': { color: '#b8c5d6' }
+                          color: '#333',
+                          backgroundColor: '#fff',
+                          borderRadius: '6px',
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ddd' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#bbb' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
+                          '& .MuiSvgIcon-root': { color: '#666' }
                         }}
                       >
                         {skillCategories.map((category) => (
@@ -696,13 +725,23 @@ const PublicJobApplication = () => {
                           placeholder={allSkills.length === 0 ? "No skills available for this category" : "Select skills..."}
                           required={selectedSkills.length === 0}
                           sx={{
+                            backgroundColor: '#ffffff !important',
+                            borderRadius: '6px',
                             '& .MuiOutlinedInput-root': {
-                              '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                              '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                              '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                              backgroundColor: '#ffffff !important',
+                              '& fieldset': { borderColor: '#ddd !important' },
+                              '&:hover fieldset': { borderColor: '#bbb !important' },
+                              '&.Mui-focused fieldset': { borderColor: '#1976d2 !important' },
                             },
-                            '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                            '& .MuiInputBase-input': { color: '#f5f7fa' },
+                            '& .MuiInputLabel-root': { color: '#777 !important' },
+                            '& .MuiInputBase-input': { 
+                              color: '#333 !important',
+                              backgroundColor: 'transparent !important'
+                            },
+                            '& .MuiAutocomplete-input': {
+                              color: '#333 !important',
+                              backgroundColor: 'transparent !important'
+                            }
                           }}
                         />
                       )}
@@ -713,38 +752,47 @@ const PublicJobApplication = () => {
                             key={option}
                             label={option}
                             sx={{ 
-                              backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                              color: '#4f8cff',
-                              textTransform: 'capitalize',
-                              '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                              backgroundColor: '#ffffff !important', 
+                              border: '1px solid #ddd !important',
+                              color: '#333 !important',
+                              textTransform: 'capitalize'
                             }}
                           />
                         ))
                       }
                       sx={{
-                        '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-                        '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                        backgroundColor: '#ffffff !important',
+                        '& .MuiAutocomplete-popupIndicator': { color: '#666 !important' },
+                        '& .MuiAutocomplete-clearIndicator': { color: '#666 !important' },
+                        '& .MuiAutocomplete-inputRoot': {
+                          backgroundColor: '#ffffff !important',
+                          color: '#333 !important'
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: '#ffffff !important'
+                        },
                         '& .MuiAutocomplete-listbox': {
-                          backgroundColor: '#1a1a2e',
+                          backgroundColor: '#ffffff !important',
                           '& .MuiAutocomplete-option': {
-                            color: '#f5f7fa',
+                            color: '#333 !important',
+                            backgroundColor: '#ffffff !important',
                             '&[aria-selected="true"]': {
-                            backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                          },
-                          '&:hover': {
-                            backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                              backgroundColor: '#f5f5f5 !important',
+                            },
+                            '&:hover': {
+                              backgroundColor: '#f5f5f5 !important',
+                            },
                           },
                         },
-                      },
-                      '& .MuiAutocomplete-paper': {
-                        backgroundColor: '#1a1a2e',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-                  />
+                        '& .MuiAutocomplete-paper': {
+                          backgroundColor: '#ffffff !important',
+                          border: '1px solid #e5e5e5 !important',
+                        },
+                      }}
+                    />
                   )}
                   {!selectedCategory && (
-                    <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+                    <Typography variant="caption" sx={{ color: '#666', mt: 0.5, display: 'block' }}>
                       Please select a category first
                     </Typography>
                   )}
@@ -755,26 +803,26 @@ const PublicJobApplication = () => {
                 {/* Work Experience */}
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" sx={{ color: '#b8c5d6' }}>
+                    <Typography variant="h6" sx={{ color: '#666' }}>
                       Work Experience (Optional)
                     </Typography>
                     <Button 
                       startIcon={<AddIcon />}
                       onClick={addExperience}
-                      sx={{ color: '#4f8cff' }}
+                      sx={{ color: '#e74c3c' }}
                     >
                       Add Experience
                     </Button>
                   </Box>
                   {form.experience.map((exp, index) => (
-                    <Paper key={index} sx={{ 
+                      <Paper key={index} sx={{ 
                       p: 2, 
                       mb: 2, 
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                      background: '#ffffff',
+                      border: '1px solid #e5e5e5'
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography sx={{ color: '#eebbc3' }}>Experience {index + 1}</Typography>
+                        <Typography sx={{ color: '#333' }}>Experience {index + 1}</Typography>
                         {form.experience.length > 1 && (
                           <IconButton onClick={() => removeExperience(index)} sx={{ color: '#f44336' }}>
                             <DeleteIcon />
@@ -850,26 +898,26 @@ const PublicJobApplication = () => {
                 {/* Education */}
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" sx={{ color: '#b8c5d6' }}>
+                    <Typography variant="h6" sx={{ color: '#666' }}>
                       Education (Optional)
                     </Typography>
                     <Button 
                       startIcon={<AddIcon />}
                       onClick={addEducation}
-                      sx={{ color: '#4f8cff' }}
+                      sx={{ color: '#e74c3c' }}
                     >
                       Add Education
                     </Button>
                   </Box>
                   {form.education.map((edu, index) => (
-                    <Paper key={index} sx={{ 
+                      <Paper key={index} sx={{ 
                       p: 2, 
                       mb: 2, 
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                      background: '#ffffff',
+                      border: '1px solid #e5e5e5'
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography sx={{ color: '#eebbc3' }}>Education {index + 1}</Typography>
+                        <Typography sx={{ color: '#333' }}>Education {index + 1}</Typography>
                         {form.education.length > 1 && (
                           <IconButton onClick={() => removeEducation(index)} sx={{ color: '#f44336' }}>
                             <DeleteIcon />
@@ -927,24 +975,28 @@ const PublicJobApplication = () => {
                   </Typography>
                   <Paper sx={{ 
                     p: 3, 
-                    background: 'rgba(238, 187, 195, 0.05)',
-                    border: '2px dashed rgba(238, 187, 195, 0.3)',
-                    borderRadius: 2,
+                    background: '#ffffff',
+                    border: '2px dashed #ddd',
+                    borderRadius: '8px',
                     textAlign: 'center'
                   }}>
                     {!resumeFile ? (
                       <>
-                        <CloudUploadIcon sx={{ fontSize: 48, color: '#eebbc3', mb: 2 }} />
-                        <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 2 }}>
-                          Upload your resume (PDF, DOC, or DOCX) <span style={{ color: '#ff6b6b' }}>*</span>
+                        <CloudUploadIcon sx={{ fontSize: 48, color: '#1976d2', mb: 2 }} />
+                        <Typography variant="body1" sx={{ color: '#666', mb: 2 }}>
+                          Upload your resume (PDF, DOC, or DOCX) <span style={{ color: '#e74c3c' }}>*</span>
                         </Typography>
                         <Button
                           variant="contained"
                           component="label"
                           sx={{
-                            backgroundColor: '#eebbc3',
-                            color: '#1a1a2e',
-                            '&:hover': { backgroundColor: '#d4a5ac' }
+                            backgroundColor: '#1976d2',
+                            color: '#ffffff',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            px: 4,
+                            py: 1,
+                            '&:hover': { backgroundColor: '#1565c0' }
                           }}
                         >
                           Choose File
@@ -955,7 +1007,7 @@ const PublicJobApplication = () => {
                             onChange={handleResumeChange}
                           />
                         </Button>
-                        <Typography variant="caption" sx={{ color: '#90caf9', display: 'block', mt: 2 }}>
+                        <Typography variant="caption" sx={{ color: '#666', display: 'block', mt: 2 }}>
                           Maximum file size: 5MB
                         </Typography>
                       </>
@@ -964,8 +1016,8 @@ const PublicJobApplication = () => {
                         <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 32 }} />
                         <Box sx={{ textAlign: 'left' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <FileIcon sx={{ color: '#eebbc3' }} />
-                            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+                            <FileIcon sx={{ color: '#1976d2' }} />
+                            <Typography sx={{ color: '#333', fontWeight: 600 }}>
                               {resumeFileName}
                             </Typography>
                           </Box>
@@ -991,11 +1043,11 @@ const PublicJobApplication = () => {
                 <Box sx={{ textAlign: 'center', pt: 4 }}>
                   <Paper sx={{ 
                     p: 3, 
-                    background: 'rgba(238, 187, 195, 0.05)',
-                    border: '1px solid rgba(238, 187, 195, 0.2)',
-                    borderRadius: 2
+                    background: '#ffffff',
+                    border: '1px solid #e5e5e5',
+                    borderRadius: '8px'
                   }}>
-                    <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 3 }}>
+                    <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
                       By submitting this application, you agree to be contacted by StaffAnchor regarding this position.
                     </Typography>
                     <Button 
@@ -1003,26 +1055,23 @@ const PublicJobApplication = () => {
                       variant="contained"
                       size="large"
                       disabled={submitting}
-                      startIcon={submitting ? <CircularProgress size={20} sx={{ color: '#999' }} /> : <CheckCircleIcon />}
+                      startIcon={submitting ? <CircularProgress size={20} /> : <CheckCircleIcon />}
                       sx={{
-                        backgroundColor: '#eebbc3',
-                        color: '#1a1a2e',
+                        backgroundColor: '#f8b2c1',
+                        color: '#333',
                         px: 8,
-                        py: 2,
-                        fontSize: '1.2rem',
+                        py: 1.5,
+                        fontSize: '1rem',
                         fontWeight: 700,
-                        borderRadius: 2,
-                        boxShadow: '0 4px 12px rgba(238, 187, 195, 0.4)',
+                        textTransform: 'uppercase',
+                        borderRadius: '6px',
+                        boxShadow: 'none',
                         '&:hover': { 
-                          backgroundColor: '#d4a5ac',
-                          boxShadow: '0 6px 16px rgba(238, 187, 195, 0.6)',
-                          transform: 'translateY(-2px)',
-                          transition: 'all 0.3s ease'
+                          backgroundColor: '#f398a8'
                         },
                         '&:disabled': { 
-                          backgroundColor: '#666', 
-                          color: '#999',
-                          boxShadow: 'none'
+                          backgroundColor: '#ccc', 
+                          color: '#888'
                         }
                       }}
                     >
@@ -1039,15 +1088,15 @@ const PublicJobApplication = () => {
         <Paper sx={{
           mt: 4,
           p: 3,
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 2,
+          background: '#ffffff',
+          border: '1px solid #e5e5e5',
+          borderRadius: '8px',
           textAlign: 'center'
         }}>
           <Typography 
             variant="body2" 
             sx={{ 
-              color: '#b8c5d6',
+              color: '#666',
               mb: 1
             }}
           >
@@ -1056,7 +1105,7 @@ const PublicJobApplication = () => {
           <Typography 
             variant="caption" 
             sx={{ 
-              color: '#90caf9'
+              color: '#666'
             }}
           >
             Connecting Talent with Opportunity
