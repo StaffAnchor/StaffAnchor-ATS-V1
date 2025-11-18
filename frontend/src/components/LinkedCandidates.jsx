@@ -377,9 +377,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                 <Select
                   value={statusFilter}
                   onChange={(e) => {
+                    e.stopPropagation();
                     setStatusFilter(e.target.value);
                     setSelectedCandidates([]); // Clear selection when filter changes
                   }}
+                  onClick={(e) => e.stopPropagation()}
                   sx={{
                     color: '#f5f7fa',
                     fontSize: '0.9rem',
@@ -440,7 +442,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                 <Chip
                   label="Clear Filter"
                   size="small"
-                  onDelete={() => setStatusFilter('All')}
+                  onDelete={(e) => {
+                    e.stopPropagation();
+                    setStatusFilter('All');
+                  }}
+                  onClick={(e) => e.stopPropagation()}
                   sx={{
                     backgroundColor: 'rgba(238, 187, 195, 0.2)',
                     color: '#eebbc3',
@@ -467,11 +473,16 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
                       width: 60,
                       textAlign: 'center'
-                    }}>
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    >
                       <Checkbox
                         checked={selectedCandidates.length === filteredCandidates.length && filteredCandidates.length > 0}
                         indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < filteredCandidates.length}
-                        onChange={handleSelectAllCandidates}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleSelectAllCandidates(e);
+                        }}
                         sx={{
                           color: '#4f8cff',
                           '&.Mui-checked': {
@@ -591,7 +602,10 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     >
                       <Checkbox
                         checked={selectedCandidates.includes(candidate._id)}
-                        onChange={() => handleSelectCandidate(candidate._id)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleSelectCandidate(candidate._id);
+                        }}
                         sx={{
                           color: '#4f8cff',
                           '&.Mui-checked': {
@@ -729,7 +743,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       <FormControl size="small" fullWidth>
                         <Select
                           value={candidate.linkInfo.status || 'New'}
-                          onChange={(e) => handleStatusChange(candidate.linkInfo.linkId, e.target.value)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(candidate.linkInfo.linkId, e.target.value);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
                           disabled={updatingStatus[candidate.linkInfo.linkId]}
                           sx={{
                             color: getStatusColor(candidate.linkInfo.status || 'New'),
@@ -797,7 +815,8 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     }}>
                       <Tooltip title="View Comments">
                         <IconButton
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedCandidateForComments({
                               _id: candidate._id,
                               name: candidate.name
@@ -828,7 +847,10 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       }}>
                         <Tooltip title="Unlink Candidate">
                           <IconButton
-                            onClick={() => handleUnlinkCandidate(candidate.linkInfo.linkId, candidate.name)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUnlinkCandidate(candidate.linkInfo.linkId, candidate.name);
+                            }}
                             disabled={unlinking[candidate.linkInfo.linkId]}
                             size="small"
                             sx={{
