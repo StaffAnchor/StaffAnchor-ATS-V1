@@ -1061,7 +1061,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                               {expandedCandidateId === candidate._id ? 'Hide' : 'View'}
                             </Button>
                           </Tooltip>
-                          {accessLevel === 2 && (
+                          {(accessLevel === 1 || accessLevel === 2) && (
                             <Tooltip title="Edit Candidate">
                               <IconButton
                                 size="small"
