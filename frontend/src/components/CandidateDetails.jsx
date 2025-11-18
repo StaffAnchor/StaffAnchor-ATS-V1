@@ -402,7 +402,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                               </Typography>
                             )}
                           </Box>
-                          {accessLevel === 2 && (
+                          {(accessLevel === 1 || accessLevel === 2) && (
                             <>
                               <input
                                 accept=".pdf,.doc,.docx"
@@ -446,7 +446,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                           <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
                             No resume uploaded
                           </Typography>
-                          {accessLevel === 2 && (
+                          {(accessLevel === 1 || accessLevel === 2) && (
                             <>
                               <input
                                 accept=".pdf,.doc,.docx"
@@ -632,10 +632,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
         )}
         <Divider sx={{my: 1, borderColor: '#444'}} />
         <Box>
-          {editMode && accessLevel === 2 ? (
+          {editMode && (accessLevel === 1 || accessLevel === 2) ? (
             <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
           ) : null}
-          {!editMode && accessLevel === 2 ? (
+          {!editMode && (accessLevel === 1 || accessLevel === 2) ? (
             <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
           ) : null}
           <Button 

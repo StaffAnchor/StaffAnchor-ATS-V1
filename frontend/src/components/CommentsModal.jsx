@@ -132,7 +132,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={(e, reason) => {
+        if (e) e.stopPropagation();
+        onClose();
+      }}
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -163,7 +166,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
           </Typography>
         </Box>
         <IconButton
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           sx={{
             color: '#b8c5d6',
             '&:hover': {
@@ -185,6 +191,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            onFocus={(e) => e.stopPropagation()}
             disabled={submitting}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -200,7 +208,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
             <Button
               variant="contained"
               startIcon={<SendIcon />}
-              onClick={handleAddComment}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddComment();
+              }}
               disabled={submitting || !newComment.trim()}
               sx={{
                 backgroundColor: '#eebbc3',
@@ -262,7 +273,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                         <Tooltip title="Edit">
                           <IconButton
                             size="small"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setEditingCommentId(comment._id);
                               setEditText(comment.text);
                             }}
@@ -275,7 +287,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                       <Tooltip title="Delete">
                         <IconButton
                           size="small"
-                          onClick={() => handleDeleteComment(comment._id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteComment(comment._id);
+                          }}
                           sx={{ color: '#ff6b6b' }}
                         >
                           <DeleteIcon fontSize="small" />
@@ -293,6 +308,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                       rows={2}
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onFocus={(e) => e.stopPropagation()}
                       sx={{
                         mb: 1,
                         '& .MuiOutlinedInput-root': {
@@ -308,7 +325,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                       <Button
                         size="small"
                         variant="contained"
-                        onClick={() => handleUpdateComment(comment._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdateComment(comment._id);
+                        }}
                         sx={{
                           backgroundColor: '#4f8cff',
                           '&:hover': { backgroundColor: '#3d7be8' }
@@ -319,7 +339,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingCommentId(null);
                           setEditText('');
                         }}
@@ -345,7 +366,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
 
       <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <Button
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           variant="outlined"
           sx={{
             color: '#b8c5d6',
