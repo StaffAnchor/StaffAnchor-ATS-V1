@@ -87,8 +87,8 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-          color: '#f5f7fa',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          color: '#1e293b',
           borderRadius: 2,
         }
       }}
@@ -100,15 +100,15 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
         borderBottom: '2px solid rgba(238, 187, 195, 0.3)',
         pb: 2
       }}>
-        <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 700 }}>
+        <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 700 }}>
           {displayCandidate.name} - Candidate Details
         </Typography>
         <Button
           onClick={onClose}
           sx={{
             minWidth: 'auto',
-            color: '#b8c5d6',
-            '&:hover': { color: '#eebbc3' }
+            color: '#64748b',
+            '&:hover': { color: '#8b5cf6' }
           }}
         >
           <CloseIcon />
@@ -118,7 +118,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
       <DialogContent sx={{ mt: 2 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
-            <CircularProgress sx={{ color: '#4f8cff' }} />
+            <CircularProgress sx={{ color: '#2563eb' }} />
           </Box>
         ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -128,25 +128,25 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           )}
 
           {/* Basic Information */}
-          <TableContainer component={Paper} sx={{ background: '#232946', borderRadius: 2 }}>
+          <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
             <Table size="small">
               <TableBody>
                 <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                   <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Name</TableCell>
-                  <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.name}</TableCell>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.name}</TableCell>
                 </TableRow>
                 <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                   <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Email</TableCell>
-                  <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.email}</TableCell>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.email}</TableCell>
                 </TableRow>
                 <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                   <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Phone</TableCell>
-                  <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.phone || 'Not provided'}</TableCell>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.phone || 'Not provided'}</TableCell>
                 </TableRow>
                 {displayCandidate.currentLocation && (
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Current Location</TableCell>
-                    <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       {displayCandidate.currentLocation.city}, {displayCandidate.currentLocation.state}, {displayCandidate.currentLocation.country}
                     </TableCell>
                   </TableRow>
@@ -154,7 +154,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                 {displayCandidate.linkedin && (
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>LinkedIn</TableCell>
-                    <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       <Link href={`https://linkedin.com/in/${displayCandidate.linkedin}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
                         {displayCandidate.linkedin}
                       </Link>
@@ -164,7 +164,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                 {displayCandidate.x && (
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>X (Twitter)</TableCell>
-                    <TableCell sx={{ color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       <Link href={`https://twitter.com/${displayCandidate.x}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
                         @{displayCandidate.x}
                       </Link>
@@ -173,10 +173,10 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                 )}
                 <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                   <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: 'none' }}>Resume</TableCell>
-                  <TableCell sx={{ color: '#f5f7fa', borderBottom: 'none' }}>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: 'none' }}>
                     {displayCandidate.resume && displayCandidate.resume.url ? (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FileIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
+                        <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
                         <Link 
                           href={displayCandidate.resume.url} 
                           target="_blank" 
@@ -186,13 +186,13 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                           {displayCandidate.resume.fileName || 'View Resume'}
                         </Link>
                         {displayCandidate.resume.fileSize && (
-                          <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                          <Typography variant="caption" sx={{ color: '#64748b' }}>
                             ({(displayCandidate.resume.fileSize / 1024).toFixed(2)} KB)
                           </Typography>
                         )}
                       </Box>
                     ) : (
-                      <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                      <Typography variant="body2" sx={{ color: '#64748b' }}>
                         No resume uploaded
                       </Typography>
                     )}
@@ -205,9 +205,9 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           {/* Skills */}
           {displayCandidate.skills && displayCandidate.skills.length > 0 && (
             <>
-              <Divider sx={{ borderColor: '#444' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1, fontWeight: 600 }}>Skills</Typography>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1, fontWeight: 600 }}>Skills</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {displayCandidate.skills.map((skill, idx) => (
                     <Chip 
@@ -216,7 +216,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                       size="small"
                       sx={{ 
                         backgroundColor: 'rgba(238, 187, 195, 0.2)', 
-                        color: '#eebbc3',
+                        color: '#8b5cf6',
                         fontSize: '0.8rem'
                       }}
                     />
@@ -229,10 +229,10 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           {/* Experience */}
           {displayCandidate.experience && displayCandidate.experience.length > 0 && displayCandidate.experience.some(exp => exp.company || exp.position) && (
             <>
-              <Divider sx={{ borderColor: '#444' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>Experience</Typography>
-                <TableContainer component={Paper} sx={{ background: '#232946', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>Experience</Typography>
+                <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
                   <Table size="small">
                     <TableBody>
                       {displayCandidate.experience.filter(exp => exp.company || exp.position).map((exp, idx) => (
@@ -240,35 +240,35 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                           {exp.company && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Company</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{exp.company}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{exp.company}</TableCell>
                             </TableRow>
                           )}
                           {exp.position && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Position</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{exp.position}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{exp.position}</TableCell>
                             </TableRow>
                           )}
                           {exp.role && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Role</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{exp.role}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{exp.role}</TableCell>
                             </TableRow>
                           )}
                           {exp.ctc && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>CTC</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>₹ {exp.ctc}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>₹ {exp.ctc}</TableCell>
                             </TableRow>
                           )}
                           {(exp.start || exp.end) && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Duration</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{exp.start} - {exp.end}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{exp.start} - {exp.end}</TableCell>
                             </TableRow>
                           )}
                           {idx < displayCandidate.experience.filter(exp => exp.company || exp.position).length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#444' }} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#e2e8f0' }} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -282,10 +282,10 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           {/* Education */}
           {displayCandidate.education && displayCandidate.education.length > 0 && displayCandidate.education.some(edu => edu.clg || edu.course) && (
             <>
-              <Divider sx={{ borderColor: '#444' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>Education</Typography>
-                <TableContainer component={Paper} sx={{ background: '#232946', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>Education</Typography>
+                <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
                   <Table size="small">
                     <TableBody>
                       {displayCandidate.education.filter(edu => edu.clg || edu.course).map((edu, idx) => (
@@ -293,23 +293,23 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                           {edu.clg && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>College</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{edu.clg}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{edu.clg}</TableCell>
                             </TableRow>
                           )}
                           {edu.course && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Course</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{edu.course}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{edu.course}</TableCell>
                             </TableRow>
                           )}
                           {(edu.start || edu.end) && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Duration</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{edu.start} - {edu.end}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{edu.start} - {edu.end}</TableCell>
                             </TableRow>
                           )}
                           {idx < displayCandidate.education.filter(edu => edu.clg || edu.course).length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#444' }} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#e2e8f0' }} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -323,28 +323,28 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           {/* Certifications */}
           {displayCandidate.certifications && displayCandidate.certifications.length > 0 && displayCandidate.certifications.some(cert => cert.name) && (
             <>
-              <Divider sx={{ borderColor: '#444' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>Certifications</Typography>
-                <TableContainer component={Paper} sx={{ background: '#232946', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>Certifications</Typography>
+                <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
                   <Table size="small">
                     <TableBody>
                       {displayCandidate.certifications.filter(cert => cert.name).map((cert, idx) => (
                         <React.Fragment key={idx}>
                           <TableRow>
                             <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Name</TableCell>
-                            <TableCell sx={{ color: '#f5f7fa' }}>{cert.name}</TableCell>
+                            <TableCell sx={{ color: '#1e293b' }}>{cert.name}</TableCell>
                           </TableRow>
                           {cert.organization && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Organization</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>{cert.organization}</TableCell>
+                              <TableCell sx={{ color: '#1e293b' }}>{cert.organization}</TableCell>
                             </TableRow>
                           )}
                           {cert.link && (
                             <TableRow>
                               <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Link</TableCell>
-                              <TableCell sx={{ color: '#f5f7fa' }}>
+                              <TableCell sx={{ color: '#1e293b' }}>
                                 <Link href={cert.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
                                   View Certificate
                                 </Link>
@@ -352,7 +352,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                             </TableRow>
                           )}
                           {idx < displayCandidate.certifications.filter(cert => cert.name).length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#444' }} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1, borderColor: '#e2e8f0' }} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -366,16 +366,16 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
           {/* Additional Links */}
           {displayCandidate.additionalLinks && displayCandidate.additionalLinks.length > 0 && displayCandidate.additionalLinks.some(link => link.link) && (
             <>
-              <Divider sx={{ borderColor: '#444' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>Additional Links</Typography>
-                <TableContainer component={Paper} sx={{ background: '#232946', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>Additional Links</Typography>
+                <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
                   <Table size="small">
                     <TableBody>
                       {displayCandidate.additionalLinks.filter(link => link.link).map((link, idx) => (
                         <TableRow key={idx}>
                           <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>{link.name || 'Link'}</TableCell>
-                          <TableCell sx={{ color: '#f5f7fa' }}>
+                          <TableCell sx={{ color: '#1e293b' }}>
                             <Link href={link.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
                               {link.link}
                             </Link>
@@ -392,12 +392,12 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
         <Button 
           onClick={onClose}
           variant="contained"
           sx={{
-            backgroundColor: '#4f8cff',
+            backgroundColor: '#2563eb',
             color: '#ffffff',
             '&:hover': { backgroundColor: '#3d7be8' }
           }}

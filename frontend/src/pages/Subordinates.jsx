@@ -87,8 +87,8 @@ const Subordinates = ({ user }) => {
   // Accent color for active tab in dark mode
   const getTabStyle = (active) =>
     active
-      ? { background: 'var(--color-accent)', color: '#232946', fontWeight: 700, border: '2px solid var(--color-accent)' }
-      : { background: 'transparent', color: '#f5f7fa', border: '2px solid #444' };
+      ? { background: 'var(--color-accent)', color: '#ffffff', fontWeight: 700, border: '2px solid var(--color-accent)' }
+      : { background: 'transparent', color: '#1e293b', border: '2px solid #e2e8f0' };
 
   const handleViewChange = (view) => {
     if (view === 'subordinates') return; // Already on subordinates page
@@ -150,14 +150,14 @@ const Subordinates = ({ user }) => {
                 onClick={handleOpenMenu}
                 sx={{
                   backgroundColor: 'transparent',
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   border: '2px solid',
-                  borderColor: '#444',
+                  borderColor: '#e2e8f0',
                   borderRadius: '4px',
                   width: '40px',
                   height: '40px',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
                   }
                 }}
               >
@@ -170,8 +170,8 @@ const Subordinates = ({ user }) => {
                 onClose={handleCloseMenu}
                 PaperProps={{
                   sx: {
-                    background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                    border: '1px solid rgba(0, 0, 0, 0.05)',
                     borderRadius: 1,
                     minWidth: '200px',
                     mt: 1
@@ -183,30 +183,30 @@ const Subordinates = ({ user }) => {
                 <MenuItem 
                   onClick={handleAddJob}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     py: 1.5,
                     '&:hover': {
-                      backgroundColor: 'rgba(238, 187, 195, 0.15)',
+                      backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     }
                   }}
                 >
                   <ListItemIcon>
-                    <WorkIcon sx={{ color: '#eebbc3' }} />
+                    <WorkIcon sx={{ color: '#8b5cf6' }} />
                   </ListItemIcon>
                   <ListItemText>Add Job</ListItemText>
                 </MenuItem>
                 <MenuItem 
                   onClick={handleAddCandidate}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     py: 1.5,
                     '&:hover': {
-                      backgroundColor: 'rgba(79, 140, 255, 0.15)',
+                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     }
                   }}
                 >
                   <ListItemIcon>
-                    <PersonIcon sx={{ color: '#4f8cff' }} />
+                    <PersonIcon sx={{ color: '#2563eb' }} />
                   </ListItemIcon>
                   <ListItemText>Add Candidate</ListItemText>
                 </MenuItem>
@@ -227,20 +227,20 @@ const Subordinates = ({ user }) => {
               alignItems: "center",
               justifyContent: "center",
               minHeight: "400px",
-              color: "#b8c5d6",
+              color: "#64748b",
             }}
           >
             <CircularProgress
               size={60}
               sx={{
-                color: "#eebbc3",
+                color: "#8b5cf6",
                 mb: 3,
               }}
             />
-            <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+            <Typography variant="h6" sx={{ mb: 1, color: "#1e293b" }}>
               Loading Subordinates...
             </Typography>
-            <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+            <Typography variant="body2" sx={{ color: "#64748b" }}>
               Please wait while we fetch your team members
             </Typography>
           </Box>
@@ -248,9 +248,9 @@ const Subordinates = ({ user }) => {
             <Box sx={{ 
               textAlign: 'center', 
               py: 8,
-              color: '#b8c5d6'
+              color: '#64748b'
             }}>
-              <GroupIcon sx={{ fontSize: 60, color: '#b8c5d6', mb: 2 }} />
+              <GroupIcon sx={{ fontSize: 60, color: '#64748b', mb: 2 }} />
               <Typography variant="h5" sx={{ mb: 1 }}>
                 No Subordinates Found
               </Typography>
@@ -262,31 +262,31 @@ const Subordinates = ({ user }) => {
             <TableContainer
               component={Paper}
               sx={{
-                background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
                 borderRadius: 2,
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
               }}
             >
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
                       Name
                     </TableCell>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
                       Email
                     </TableCell>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
                       Phone
                     </TableCell>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
                       Organization
                     </TableCell>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)" }}>
                       Access Level
                     </TableCell>
-                    <TableCell sx={{ color: "#eebbc3", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)", textAlign: "center" }}>
+                    <TableCell sx={{ color: "#8b5cf6", fontWeight: 700, borderBottom: "2px solid rgba(238, 187, 195, 0.3)", textAlign: "center" }}>
                       Actions
                     </TableCell>
                   </TableRow>
@@ -300,42 +300,42 @@ const Subordinates = ({ user }) => {
                           "&:hover": {
                             backgroundColor: "rgba(238, 187, 195, 0.05)",
                           },
-                          backgroundColor: expandedId === sub._id ? "rgba(238, 187, 195, 0.1)" : "transparent",
+                          backgroundColor: expandedId === sub._id ? "rgba(139, 92, 246, 0.08)" : "transparent",
                         }}
                       >
-                        <TableCell sx={{ color: "#f5f7fa", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <TableCell sx={{ color: "#1e293b", borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            <Avatar sx={{ bgcolor: "#eebbc3", color: "#1a1a2e", width: 40, height: 40 }}>
+                            <Avatar sx={{ bgcolor: "#8b5cf6", color: "#f8fafc", width: 40, height: 40 }}>
                               {sub.fullName.split(' ').map(n => n[0]).join('').toUpperCase()}
                             </Avatar>
                             <Typography sx={{ fontWeight: 600 }}>{sub.fullName}</Typography>
                           </Box>
                         </TableCell>
-                        <TableCell sx={{ color: "#b8c5d6", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <TableCell sx={{ color: "#64748b", borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
                           {sub.email}
                         </TableCell>
-                        <TableCell sx={{ color: "#b8c5d6", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <TableCell sx={{ color: "#64748b", borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
                           {sub.phone}
                         </TableCell>
-                        <TableCell sx={{ color: "#b8c5d6", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <TableCell sx={{ color: "#64748b", borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
                           {sub.organization}
                         </TableCell>
-                        <TableCell sx={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                        <TableCell sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
                           <Chip
                             label="Level 1"
                             size="small"
                             sx={{
-                              backgroundColor: "rgba(79, 140, 255, 0.2)",
-                              color: "#4f8cff",
+                              backgroundColor: "rgba(37, 99, 235, 0.12)",
+                              color: "#2563eb",
                               fontWeight: 600,
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)", textAlign: "center" }}>
+                        <TableCell sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.05)", textAlign: "center" }}>
                           <IconButton
                             onClick={() => handleExpand(sub._id)}
                             sx={{
-                              color: "#eebbc3",
+                              color: "#8b5cf6",
                               "&:hover": {
                                 backgroundColor: "rgba(238, 187, 195, 0.2)",
                               },
@@ -352,15 +352,15 @@ const Subordinates = ({ user }) => {
                           colSpan={6}
                           sx={{
                             p: 0,
-                            borderBottom: expandedId === sub._id ? "2px solid rgba(238, 187, 195, 0.3)" : "1px solid rgba(255, 255, 255, 0.1)",
+                            borderBottom: expandedId === sub._id ? "2px solid rgba(238, 187, 195, 0.3)" : "1px solid rgba(0, 0, 0, 0.05)",
                           }}
                         >
                           <Collapse in={expandedId === sub._id} timeout="auto" unmountOnExit>
                             <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
                               <Box sx={{ mb: 3 }}>
                                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                                  <WorkIcon sx={{ color: "#eebbc3", mr: 1 }} />
-                                  <Typography variant="h6" sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                  <WorkIcon sx={{ color: "#8b5cf6", mr: 1 }} />
+                                  <Typography variant="h6" sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                     Authorized Jobs
                                   </Typography>
                                 </Box>
@@ -372,15 +372,15 @@ const Subordinates = ({ user }) => {
                                         key={job._id}
                                         sx={{
                                           background: "rgba(255, 255, 255, 0.05)",
-                                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                                          border: "1px solid rgba(0, 0, 0, 0.05)",
                                           borderRadius: 2,
                                         }}
                                       >
                                         <CardContent>
-                                          <Typography variant="h6" sx={{ color: "#f5f7fa", fontWeight: 600, mb: 0.5 }}>
+                                          <Typography variant="h6" sx={{ color: "#1e293b", fontWeight: 600, mb: 0.5 }}>
                                             {job.title}
                                           </Typography>
-                                          <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                                          <Typography variant="body2" sx={{ color: "#64748b" }}>
                                             {job.organization} • {job.location}
                                           </Typography>
                                           <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
@@ -389,8 +389,8 @@ const Subordinates = ({ user }) => {
                                                 label="🌐 Remote"
                                                 size="small"
                                                 sx={{
-                                                  backgroundColor: "rgba(79, 140, 255, 0.2)",
-                                                  color: "#4f8cff",
+                                                  backgroundColor: "rgba(37, 99, 235, 0.12)",
+                                                  color: "#2563eb",
                                                 }}
                                               />
                                             )}
@@ -400,7 +400,7 @@ const Subordinates = ({ user }) => {
                                                 size="small"
                                                 sx={{
                                                   backgroundColor: "rgba(238, 187, 195, 0.2)",
-                                                  color: "#eebbc3",
+                                                  color: "#8b5cf6",
                                                 }}
                                               />
                                             )}
@@ -424,13 +424,13 @@ const Subordinates = ({ user }) => {
                                     sx={{
                                       textAlign: "center",
                                       py: 4,
-                                      color: "#b8c5d6",
+                                      color: "#64748b",
                                       background: "rgba(255, 255, 255, 0.05)",
                                       borderRadius: 2,
-                                      border: "1px dashed rgba(255, 255, 255, 0.2)",
+                                      border: "1px dashed rgba(0, 0, 0, 0.08)",
                                     }}
                                   >
-                                    <WorkIcon sx={{ fontSize: 40, color: "#b8c5d6", mb: 1 }} />
+                                    <WorkIcon sx={{ fontSize: 40, color: "#64748b", mb: 1 }} />
                                     <Typography>No authorized jobs assigned yet</Typography>
                                   </Box>
                                 )}

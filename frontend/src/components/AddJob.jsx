@@ -321,19 +321,19 @@ const AddJob = ({ user }) => {
       maxWidth: 800, 
       mx: 'auto', 
       p: 3,
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
       borderRadius: 3,
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
+      border: '1px solid rgba(0, 0, 0, 0.05)'
     }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <WorkIcon sx={{ fontSize: 40, color: '#eebbc3', mr: 2 }} />
+          <WorkIcon sx={{ fontSize: 40, color: '#8b5cf6', mr: 2 }} />
           <Typography variant="h3" sx={{ 
             fontWeight: 700, 
-            color: '#f5f7fa',
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #eebbc3 100%)',
+            color: '#1e293b',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #8b5cf6 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -341,7 +341,7 @@ const AddJob = ({ user }) => {
             Add New Job
           </Typography>
         </Box>
-        <Typography variant="body1" sx={{ color: '#b8c5d6', fontSize: '1.1rem' }}>
+        <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.1rem' }}>
           Create a new job posting with detailed information
         </Typography>
       </Box>
@@ -350,7 +350,7 @@ const AddJob = ({ user }) => {
         background: 'transparent',
         p: 4,
         borderRadius: 3,
-        border: '1px solid rgba(255, 255, 255, 0.1)'
+        border: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
         <Box component="form" onSubmit={handleSubmit}>
           {/* Job Title */}
@@ -363,16 +363,16 @@ const AddJob = ({ user }) => {
               required
               fullWidth
               InputProps={{
-                startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                startAdornment: <WorkIcon sx={{ color: '#64748b', mr: 1 }} />,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -387,16 +387,16 @@ const AddJob = ({ user }) => {
               required
               fullWidth
               InputProps={{
-                startAdornment: <BusinessIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                startAdornment: <BusinessIcon sx={{ color: '#64748b', mr: 1 }} />,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -405,8 +405,8 @@ const AddJob = ({ user }) => {
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LocationIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Job Locations *
                 </Typography>
               </Box>
@@ -416,11 +416,11 @@ const AddJob = ({ user }) => {
                 onClick={addLocation}
                 startIcon={<AddIcon />}
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
                   '&:hover': {
                     borderColor: '#d4a5ac',
-                    backgroundColor: 'rgba(238, 187, 195, 0.1)'
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)'
                   }
                 }}
               >
@@ -432,12 +432,12 @@ const AddJob = ({ user }) => {
               <Card key={idx} sx={{
                 mb: 2,
                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
                 borderRadius: 2
               }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                    <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                       Location #{idx + 1}
                     </Typography>
                     <Box>
@@ -465,17 +465,17 @@ const AddJob = ({ user }) => {
                   {/* Country */}
                   <Box sx={{ mb: 2 }}>
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#b8c5d6' }}>Country</InputLabel>
+                      <InputLabel sx={{ color: '#64748b' }}>Country</InputLabel>
                       <Select 
                         value={loc.country} 
                         onChange={(e) => handleLocationChange(idx, 'country', e.target.value)} 
                         label="Country"
                         sx={{
-                          color: '#f5f7fa',
+                          color: '#1e293b',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                          '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
                         <MenuItem value="">Select Country</MenuItem>
@@ -487,18 +487,18 @@ const AddJob = ({ user }) => {
                   {/* State */}
                   <Box sx={{ mb: 2 }}>
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#b8c5d6' }}>State</InputLabel>
+                      <InputLabel sx={{ color: '#64748b' }}>State</InputLabel>
                       <Select 
                         value={loc.state} 
                         onChange={(e) => handleLocationChange(idx, 'state', e.target.value)} 
                         label="State" 
                         disabled={!loc.country}
                         sx={{
-                          color: '#f5f7fa',
+                          color: '#1e293b',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                          '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
                         <MenuItem value="">Select State</MenuItem>
@@ -510,18 +510,18 @@ const AddJob = ({ user }) => {
                   {/* City */}
                   <Box sx={{ mb: 2 }}>
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#b8c5d6' }}>City</InputLabel>
+                      <InputLabel sx={{ color: '#64748b' }}>City</InputLabel>
                       <Select 
                         value={loc.city} 
                         onChange={(e) => handleLocationChange(idx, 'city', e.target.value)} 
                         label="City" 
                         disabled={!loc.state}
                         sx={{
-                          color: '#f5f7fa',
+                          color: '#1e293b',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                          '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
                         <MenuItem value="">Select City</MenuItem>
@@ -545,16 +545,16 @@ const AddJob = ({ user }) => {
               fullWidth
               type="number"
               InputProps={{
-                startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                startAdornment: <WorkIcon sx={{ color: '#64748b', mr: 1 }} />,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -569,16 +569,16 @@ const AddJob = ({ user }) => {
               required
               fullWidth
               InputProps={{
-                startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                startAdornment: <MoneyIcon sx={{ color: '#64748b', mr: 1 }} />,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -586,18 +586,18 @@ const AddJob = ({ user }) => {
           {/* Industry */}
           <Box sx={{ mb: 3 }}>
             <FormControl fullWidth>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Industry</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Industry</InputLabel>
               <Select
                 name="industry"
                 value={form.industry}
                 onChange={handleChange}
                 required
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                  '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
                 }}
               >
                 {industries.map((industry) => (
@@ -624,7 +624,7 @@ const AddJob = ({ user }) => {
                     ...params.InputProps,
                     startAdornment: (
                       <>
-                        <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />
+                        <StarIcon sx={{ color: '#64748b', mr: 1 }} />
                         {params.InputProps.startAdornment}
                       </>
                     ),
@@ -633,10 +633,10 @@ const AddJob = ({ user }) => {
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     },
-                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                   }}
                 />
               )}
@@ -647,20 +647,20 @@ const AddJob = ({ user }) => {
                     key={option}
                     label={option}
                     sx={{ 
-                      backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                      color: '#4f8cff',
+                      backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                      color: '#2563eb',
                       textTransform: 'capitalize',
-                      '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                      '& .MuiChip-deleteIcon': { color: '#2563eb' }
                     }}
                   />
                 ))
               }
               sx={{
-                '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-                '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+                '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
               }}
             />
-            <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
               {form.industry 
                 ? "Select from industry-relevant skills or type to add custom skills" 
                 : "Skills will be filtered based on selected industry"}
@@ -679,16 +679,16 @@ const AddJob = ({ user }) => {
               multiline
               rows={4}
               InputProps={{
-                startAdornment: <DescriptionIcon sx={{ color: '#b8c5d6', mr: 1, alignSelf: 'flex-start', mt: 1 }} />,
+                startAdornment: <DescriptionIcon sx={{ color: '#64748b', mr: 1, alignSelf: 'flex-start', mt: 1 }} />,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -703,17 +703,17 @@ const AddJob = ({ user }) => {
                     onChange={handleSwitch}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
-                        color: '#eebbc3',
-                        '&:hover': { backgroundColor: 'rgba(238, 187, 195, 0.1)' },
+                        color: '#8b5cf6',
+                        '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.08)' },
                       },
                       '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: '#eebbc3',
+                        backgroundColor: '#8b5cf6',
                       },
                     }}
                   />
                 }
                 label={
-                  <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+                  <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>
                     Remote Work Available
                   </Typography>
                 }
@@ -722,8 +722,8 @@ const AddJob = ({ user }) => {
                 <Chip 
                   label="🌐 Remote Position" 
                   sx={{ 
-                    backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                    color: '#4f8cff',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                    color: '#2563eb',
                     fontWeight: 600
                   }} 
                 />
@@ -731,19 +731,19 @@ const AddJob = ({ user }) => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Recruiter Details Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <PersonIcon sx={{ color: '#eebbc3', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Recruiter Details
               </Typography>
             </Box>
             
             <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2 }}>Recruiters</Typography>
+              <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2 }}>Recruiters</Typography>
               {recruiters.map((rec, idx) => (
                 <Grid container spacing={2} key={idx} alignItems="center" sx={{ mb: 2 }}>
                   <Grid item xs={12}>
@@ -757,10 +757,10 @@ const AddJob = ({ user }) => {
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                         },
-                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                        '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiInputBase-input': { color: '#1e293b' },
                       }}
                     />
                   </Grid>
@@ -776,10 +776,10 @@ const AddJob = ({ user }) => {
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                         },
-                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                        '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiInputBase-input': { color: '#1e293b' },
                       }}
                     />
                   </Grid>
@@ -794,10 +794,10 @@ const AddJob = ({ user }) => {
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                         },
-                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                        '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiInputBase-input': { color: '#1e293b' },
                       }}
                     />
                   </Grid>
@@ -808,7 +808,7 @@ const AddJob = ({ user }) => {
                       sx={{ 
                         color: '#ff6b6b', 
                         '&:hover': { backgroundColor: 'rgba(255, 107, 107, 0.1)' },
-                        '&.Mui-disabled': { color: '#666' }
+                        '&.Mui-disabled': { color: '#475569' }
                       }}
                     >
                       <DeleteIcon />
@@ -830,32 +830,32 @@ const AddJob = ({ user }) => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Authorization Section - Only show for admins */}
           {user.accessLevel === 2 && (
             <>
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <SecurityIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                  <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  <SecurityIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                  <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                     Authorization
                   </Typography>
                 </Box>
                 
                 <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#b8c5d6' }}>Authorized User (Level 1) - Optional</InputLabel>
+                  <InputLabel sx={{ color: '#64748b' }}>Authorized User (Level 1) - Optional</InputLabel>
                   <Select
                     name="authorizedUser"
                     value={form.authorizedUser}
                     onChange={handleChange}
-                    startAdornment={<SecurityIcon sx={{ color: '#b8c5d6', mr: 1 }} />}
+                    startAdornment={<SecurityIcon sx={{ color: '#64748b', mr: 1 }} />}
                     sx={{
-                      color: '#f5f7fa',
+                      color: '#1e293b',
                       '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                      '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                      '& .MuiSvgIcon-root': { color: '#64748b' },
                     }}
                   >
                     <MenuItem value="">Select Authorized User (Level 1)</MenuItem>
@@ -866,11 +866,11 @@ const AddJob = ({ user }) => {
                     ))}
                   </Select>
                 </FormControl>
-                <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
                   Select a Level 1 user to grant them access to this job, or leave empty for no specific authorization
                 </Typography>
               </Box>
-              <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+              <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
             </>
           )}
 
@@ -881,7 +881,7 @@ const AddJob = ({ user }) => {
               variant="contained" 
               disabled={loading}
               sx={{
-                background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                 color: '#fff',
                 fontWeight: 600,
                 py: 2,
@@ -891,10 +891,10 @@ const AddJob = ({ user }) => {
                 '&:hover': {
                   background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+                  boxShadow: '0 8px 16px rgba(37, 99, 235, 0.18)',
                 },
                 '&:disabled': {
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: 'rgba(0, 0, 0, 0.05)',
                   color: 'rgba(255, 255, 255, 0.5)',
                 }
               }}

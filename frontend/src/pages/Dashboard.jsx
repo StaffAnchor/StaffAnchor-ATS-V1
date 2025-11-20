@@ -77,11 +77,11 @@ const Dashboard = ({ user, setUser, onLogout }) => {
     };
   }, []);
 
-  // Accent color for active tab in dark mode
+  // Accent color for active tab in light mode
   const getTabStyle = (active) =>
     active
-      ? { background: 'var(--color-accent)', color: '#232946', fontWeight: 700, border: '2px solid var(--color-accent)' }
-      : { background: 'transparent', color: '#f5f7fa', border: '2px solid #444' };
+      ? { background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)', color: '#ffffff', fontWeight: 700, border: '2px solid transparent', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }
+      : { background: '#ffffff', color: '#475569', border: '2px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' };
 
   const handleSubordinatesTab = () => {
     navigate('/subordinates');
@@ -119,15 +119,17 @@ const Dashboard = ({ user, setUser, onLogout }) => {
           <IconButton
             onClick={handleOpenMenu}
             sx={{
-              backgroundColor: view === 'addJob' || view === 'addCandidate' ? 'var(--color-accent)' : 'transparent',
-              color: view === 'addJob' || view === 'addCandidate' ? '#232946' : '#f5f7fa',
+              backgroundColor: view === 'addJob' || view === 'addCandidate' ? '#10b981' : '#ffffff',
+              color: view === 'addJob' || view === 'addCandidate' ? '#ffffff' : '#475569',
               border: '2px solid',
-              borderColor: view === 'addJob' || view === 'addCandidate' ? 'var(--color-accent)' : '#444',
-              borderRadius: '4px',
+              borderColor: view === 'addJob' || view === 'addCandidate' ? '#10b981' : '#e2e8f0',
+              borderRadius: '8px',
               width: '40px',
               height: '40px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
               '&:hover': {
-                backgroundColor: view === 'addJob' || view === 'addCandidate' ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: view === 'addJob' || view === 'addCandidate' ? '#059669' : '#f8fafc',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               }
             }}
           >
@@ -140,11 +142,12 @@ const Dashboard = ({ user, setUser, onLogout }) => {
             onClose={handleCloseMenu}
             PaperProps={{
               sx: {
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 1,
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: 2,
                 minWidth: '200px',
-                mt: 1
+                mt: 1,
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
               }
             }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -153,30 +156,30 @@ const Dashboard = ({ user, setUser, onLogout }) => {
             <MenuItem 
               onClick={handleAddJob}
               sx={{
-                color: '#f5f7fa',
+                color: '#1e293b',
                 py: 1.5,
                 '&:hover': {
-                  backgroundColor: 'rgba(238, 187, 195, 0.15)',
+                  backgroundColor: 'rgba(37, 99, 235, 0.08)',
                 }
               }}
             >
               <ListItemIcon>
-                <WorkIcon sx={{ color: '#eebbc3' }} />
+                <WorkIcon sx={{ color: '#2563eb' }} />
               </ListItemIcon>
               <ListItemText>Add Job</ListItemText>
             </MenuItem>
             <MenuItem 
               onClick={handleAddCandidate}
               sx={{
-                color: '#f5f7fa',
+                color: '#1e293b',
                 py: 1.5,
                 '&:hover': {
-                  backgroundColor: 'rgba(79, 140, 255, 0.15)',
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
                 }
               }}
             >
               <ListItemIcon>
-                <PersonIcon sx={{ color: '#4f8cff' }} />
+                <PersonIcon sx={{ color: '#8b5cf6' }} />
               </ListItemIcon>
               <ListItemText>Add Candidate</ListItemText>
             </MenuItem>

@@ -88,14 +88,14 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
     <Paper sx={{ 
       p: 3, 
       background: 'rgba(255, 255, 255, 0.05)', 
-      border: '1px solid rgba(255, 255, 255, 0.1)',
+      border: '1px solid rgba(0, 0, 0, 0.05)',
       borderRadius: 2,
       mb: 2
     }}>
       {/* Overall Score */}
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+          <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
             Overall Match Score
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -122,7 +122,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
           sx={{
             height: 12,
             borderRadius: 6,
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'rgba(0, 0, 0, 0.05)',
             '& .MuiLinearProgress-bar': {
               backgroundColor: getScoreColor(weightedScore),
               borderRadius: 6,
@@ -132,7 +132,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
       </Box>
 
       {/* Individual Scores */}
-      <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>
+      <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
         Detailed Breakdown
       </Typography>
       
@@ -141,7 +141,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
         <Grid item xs={12} sm={6}>
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
                 Skills Match
               </Typography>
               <Typography variant="body2" sx={{ 
@@ -157,7 +157,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: getScoreColor(individualScores.skills),
                   borderRadius: 4,
@@ -174,7 +174,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
         <Grid item xs={12} sm={6}>
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
                 Experience Match
               </Typography>
               <Typography variant="body2" sx={{ 
@@ -190,7 +190,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: getScoreColor(individualScores.experience),
                   borderRadius: 4,
@@ -207,7 +207,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
         <Grid item xs={12} sm={6}>
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
                 Years of Experience
               </Typography>
               <Typography variant="body2" sx={{ 
@@ -223,7 +223,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: getScoreColor(individualScores.yearsOfExp),
                   borderRadius: 4,
@@ -240,7 +240,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
         <Grid item xs={12} sm={6}>
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
                 Location Match
               </Typography>
               <Typography variant="body2" sx={{ 
@@ -256,7 +256,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
                 '& .MuiLinearProgress-bar': {
                   backgroundColor: getScoreColor(individualScores.location),
                   borderRadius: 4,
@@ -271,21 +271,21 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
       </Grid>
 
       {/* Candidate Details */}
-      <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>
+      <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
+        <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
           Candidate Information
         </Typography>
         
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
               <strong>Name:</strong> {candidate.name}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
               <strong>Email:</strong> {candidate.email}
             </Typography>
             {candidate.phone && (
-              <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
                 <strong>Phone:</strong> {candidate.phone}
               </Typography>
             )}
@@ -293,12 +293,12 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
           
           <Grid item xs={12} sm={6}>
             {candidate.currentLocation && (
-              <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
                 <strong>Location:</strong> {candidate.currentLocation.city}, {candidate.currentLocation.state}
               </Typography>
             )}
             {candidate.experience && candidate.experience.length > 0 && (
-              <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
                 <strong>Current Role:</strong> {candidate.experience[0].position} at {candidate.experience[0].company}
               </Typography>
             )}
@@ -308,7 +308,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
         {/* Skills */}
         {candidate.skills && candidate.skills.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1, fontWeight: 600 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 1, fontWeight: 600 }}>
               Skills:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -319,7 +319,7 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
                   size="small"
                   sx={{ 
                     backgroundColor: 'rgba(238, 187, 195, 0.2)', 
-                    color: '#eebbc3',
+                    color: '#8b5cf6',
                     fontSize: '0.8rem'
                   }}
                 />
@@ -330,12 +330,12 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
 
         {/* Resume */}
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1, fontWeight: 600 }}>
+          <Typography variant="body2" sx={{ color: '#64748b', mb: 1, fontWeight: 600 }}>
             Resume:
           </Typography>
           {candidate.resume && candidate.resume.url ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FileIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
+              <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
               <Link 
                 href={candidate.resume.url} 
                 target="_blank" 
@@ -345,13 +345,13 @@ const CandidateScoreDisplay = ({ candidate, preferences }) => {
                 {candidate.resume.fileName || 'View Resume'}
               </Link>
               {candidate.resume.fileSize && (
-                <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                <Typography variant="caption" sx={{ color: '#64748b' }}>
                   ({(candidate.resume.fileSize / 1024).toFixed(2)} KB)
                 </Typography>
               )}
             </Box>
           ) : (
-            <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+            <Typography variant="body2" sx={{ color: '#64748b' }}>
               No resume uploaded
             </Typography>
           )}

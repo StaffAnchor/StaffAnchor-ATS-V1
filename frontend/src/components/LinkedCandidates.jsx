@@ -231,7 +231,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const getSourceColor = (source) => {
     switch (source) {
       case 'ai-suggested':
-        return '#4f8cff';
+        return '#2563eb';
       case 'applied-through-link':
         return '#4caf50';
       case 'added-by-recruiter':
@@ -280,28 +280,28 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           maxHeight: '90vh',
         }
       }}
     >
       <DialogTitle
         sx={{
-          color: '#f5f7fa',
+          color: '#1e293b',
           fontWeight: 600,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         }}
       >
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#eebbc3' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
             Linked Candidates
           </Typography>
-          <Typography variant="body2" sx={{ color: '#b8c5d6', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
             {jobTitle}
           </Typography>
         </Box>
@@ -311,10 +311,10 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
               label={`${selectedCandidates.length} Selected`}
               sx={{
                 backgroundColor: 'rgba(238, 187, 195, 0.3)',
-                color: '#eebbc3',
+                color: '#8b5cf6',
                 fontWeight: 600,
                 fontSize: '0.9rem',
-                border: '2px solid #eebbc3',
+                border: '2px solid #8b5cf6',
               }}
             />
           )}
@@ -322,8 +322,8 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
             <Chip
               label={`${filteredCandidates.length} of ${linkedCandidates.length}`}
               sx={{
-                backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                color: '#4f8cff',
+                backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                color: '#2563eb',
                 fontWeight: 600,
                 fontSize: '0.9rem',
               }}
@@ -332,7 +332,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
           <IconButton
             onClick={onClose}
             sx={{
-              color: '#b8c5d6',
+              color: '#64748b',
               '&:hover': {
                 backgroundColor: 'rgba(255, 255, 255, 0.05)'
               }
@@ -346,12 +346,12 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       <DialogContent sx={{ p: 0 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300, p: 4 }}>
-            <CircularProgress sx={{ color: '#eebbc3' }} />
+            <CircularProgress sx={{ color: '#8b5cf6' }} />
           </Box>
         ) : linkedCandidates.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8, px: 4 }}>
-            <PersonIcon sx={{ fontSize: 80, color: '#b8c5d6', opacity: 0.3, mb: 2 }} />
-            <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 1, fontWeight: 600 }}>
+            <PersonIcon sx={{ fontSize: 80, color: '#64748b', opacity: 0.3, mb: 2 }} />
+            <Typography variant="h6" sx={{ color: '#64748b', mb: 1, fontWeight: 600 }}>
               No Linked Candidates
             </Typography>
             <Typography variant="body2" sx={{ color: '#7a8a9e' }}>
@@ -363,14 +363,14 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
             {/* Filter Bar */}
             <Box sx={{ 
               p: 2, 
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
               background: 'rgba(255, 255, 255, 0.02)',
               display: 'flex',
               alignItems: 'center',
               gap: 2
             }}>
-              <FilterListIcon sx={{ color: '#4f8cff' }} />
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontWeight: 600 }}>
+              <FilterListIcon sx={{ color: '#2563eb' }} />
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
                 Filter by Status:
               </Typography>
               <FormControl size="small" sx={{ minWidth: 200 }}>
@@ -383,34 +383,34 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                   }}
                   onClick={(e) => e.stopPropagation()}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     fontSize: '0.9rem',
                     '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(79, 140, 255, 0.3)',
+                      borderColor: 'rgba(37, 99, 235, 0.18)',
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#4f8cff',
+                      borderColor: '#2563eb',
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#4f8cff',
+                      borderColor: '#2563eb',
                     },
                     '& .MuiSelect-icon': {
-                      color: '#4f8cff',
+                      color: '#2563eb',
                     },
                     backgroundColor: 'rgba(255, 255, 255, 0.03)',
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                        border: '1px solid rgba(0, 0, 0, 0.05)',
                         '& .MuiMenuItem-root': {
-                          color: '#f5f7fa',
+                          color: '#1e293b',
                           '&:hover': {
                             backgroundColor: 'rgba(79, 140, 255, 0.1)',
                           },
                           '&.Mui-selected': {
-                            backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
                             '&:hover': {
                               backgroundColor: 'rgba(238, 187, 195, 0.2)',
                             }
@@ -449,11 +449,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                   onClick={(e) => e.stopPropagation()}
                   sx={{
                     backgroundColor: 'rgba(238, 187, 195, 0.2)',
-                    color: '#eebbc3',
+                    color: '#8b5cf6',
                     '& .MuiChip-deleteIcon': {
-                      color: '#eebbc3',
+                      color: '#8b5cf6',
                       '&:hover': {
-                        color: '#f5f7fa',
+                        color: '#1e293b',
                       }
                     }
                   }}
@@ -466,11 +466,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ 
-                      background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                      color: '#4f8cff',
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                      color: '#2563eb',
                       fontWeight: 700,
                       fontSize: '0.95rem',
-                      borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                      borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                       width: 60,
                       textAlign: 'center'
                     }}
@@ -484,82 +484,82 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           handleSelectAllCandidates(e);
                         }}
                         sx={{
-                          color: '#4f8cff',
+                          color: '#2563eb',
                           '&.Mui-checked': {
-                            color: '#eebbc3',
+                            color: '#8b5cf6',
                           },
                           '&.MuiCheckbox-indeterminate': {
-                            color: '#eebbc3',
+                            color: '#8b5cf6',
                           },
                         }}
                       />
                     </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 180
                   }}>
                     Name
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 200
                   }}>
                     Email
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 140
                   }}>
                     Phone
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 160
                   }}>
                     Source
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 120
                   }}>
                     Resume
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 200
                   }}>
                     Status
                   </TableCell>
                   <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                    color: '#4f8cff',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     width: 80,
                     textAlign: 'center'
                   }}>
@@ -567,11 +567,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                   </TableCell>
                   {accessLevel === 2 && (
                     <TableCell sx={{ 
-                      background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                      color: '#4f8cff',
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                      color: '#2563eb',
                       fontWeight: 700,
                       fontSize: '0.95rem',
-                      borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                      borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                       width: 80,
                       textAlign: 'center'
                     }}>
@@ -607,9 +607,9 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           handleSelectCandidate(candidate._id);
                         }}
                         sx={{
-                          color: '#4f8cff',
+                          color: '#2563eb',
                           '&.Mui-checked': {
-                            color: '#eebbc3',
+                            color: '#8b5cf6',
                           },
                         }}
                       />
@@ -617,7 +617,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
 
                     {/* Name */}
                     <TableCell sx={{ 
-                      color: '#f5f7fa',
+                      color: '#1e293b',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       py: 2
                     }}>
@@ -628,14 +628,14 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
 
                     {/* Email */}
                     <TableCell sx={{ 
-                      color: '#b8c5d6',
+                      color: '#64748b',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       py: 2
                     }}>
                       <Link
                         href={`mailto:${candidate.email}`}
                         sx={{
-                          color: '#4f8cff',
+                          color: '#2563eb',
                           textDecoration: 'none',
                           '&:hover': {
                             textDecoration: 'underline',
@@ -648,7 +648,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
 
                     {/* Phone */}
                     <TableCell sx={{ 
-                      color: '#b8c5d6',
+                      color: '#64748b',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       py: 2
                     }}>
@@ -656,10 +656,10 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                         <Link
                           href={`tel:${candidate.phone}`}
                           sx={{
-                            color: '#b8c5d6',
+                            color: '#64748b',
                             textDecoration: 'none',
                             '&:hover': {
-                              color: '#4f8cff',
+                              color: '#2563eb',
                             }
                           }}
                         >
@@ -709,11 +709,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             sx={{
-                              color: '#4f8cff',
-                              border: '1px solid rgba(79, 140, 255, 0.3)',
+                              color: '#2563eb',
+                              border: '1px solid rgba(37, 99, 235, 0.18)',
                               '&:hover': {
                                 backgroundColor: 'rgba(79, 140, 255, 0.1)',
-                                borderColor: '#4f8cff',
+                                borderColor: '#2563eb',
                               }
                             }}
                           >
@@ -770,15 +770,15 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           MenuProps={{
                             PaperProps: {
                               sx: {
-                                background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                                border: '1px solid rgba(0, 0, 0, 0.05)',
                                 '& .MuiMenuItem-root': {
-                                  color: '#f5f7fa',
+                                  color: '#1e293b',
                                   '&:hover': {
                                     backgroundColor: 'rgba(79, 140, 255, 0.1)',
                                   },
                                   '&.Mui-selected': {
-                                    backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
                                     '&:hover': {
                                       backgroundColor: 'rgba(238, 187, 195, 0.2)',
                                     }
@@ -825,11 +825,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           }}
                           size="small"
                           sx={{
-                            color: '#4f8cff',
-                            border: '1px solid rgba(79, 140, 255, 0.3)',
+                            color: '#2563eb',
+                            border: '1px solid rgba(37, 99, 235, 0.18)',
                             '&:hover': {
                               backgroundColor: 'rgba(79, 140, 255, 0.1)',
-                              borderColor: '#4f8cff',
+                              borderColor: '#2563eb',
                             }
                           }}
                         >
@@ -886,8 +886,8 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
 
       <DialogActions sx={{ 
         p: 2, 
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         display: 'flex',
         justifyContent: 'space-between',
       }}>
@@ -898,7 +898,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
               variant="contained"
               startIcon={<WorkflowIcon />}
               sx={{
-                backgroundColor: '#4f8cff',
+                backgroundColor: '#2563eb',
                 color: '#ffffff',
                 fontWeight: 600,
                 textTransform: 'none',
@@ -917,11 +917,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
               startIcon={<WorkflowIcon />}
               sx={{
                 borderColor: 'rgba(79, 140, 255, 0.5)',
-                color: '#4f8cff',
+                color: '#2563eb',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  borderColor: '#4f8cff',
+                  borderColor: '#2563eb',
                   backgroundColor: 'rgba(79, 140, 255, 0.1)',
                 }
               }}
@@ -934,12 +934,12 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
           onClick={onClose}
           variant="outlined"
           sx={{
-            color: '#eebbc3',
+            color: '#8b5cf6',
             borderColor: 'rgba(238, 187, 195, 0.5)',
             fontWeight: 600,
             '&:hover': {
-              backgroundColor: 'rgba(238, 187, 195, 0.1)',
-              borderColor: '#eebbc3',
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+              borderColor: '#8b5cf6',
             }
           }}
         >

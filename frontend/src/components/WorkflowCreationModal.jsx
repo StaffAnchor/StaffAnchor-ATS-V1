@@ -544,8 +544,8 @@ const WorkflowCreationModal = ({
   const renderPhase = (phase, phaseIndex) => (
     <Card key={phaseIndex} sx={{ 
       mb: 3, 
-      background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+      border: '1px solid rgba(0, 0, 0, 0.05)',
       borderRadius: 2
     }}>
       <CardContent sx={{ p: 3 }}>
@@ -559,7 +559,7 @@ const WorkflowCreationModal = ({
           borderBottom: '2px solid rgba(238, 187, 195, 0.3)'
         }}>
           <Typography variant="h6" sx={{ 
-            color: '#eebbc3', 
+            color: '#8b5cf6', 
             fontWeight: 600,
             display: 'flex',
             alignItems: 'center',
@@ -571,8 +571,8 @@ const WorkflowCreationModal = ({
                 label="Initial Phase" 
                 size="small" 
                 sx={{ 
-                  backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                  color: '#4f8cff',
+                  backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                  color: '#2563eb',
                   fontSize: '0.7rem'
                 }} 
               />
@@ -593,21 +593,21 @@ const WorkflowCreationModal = ({
 
         <Grid container spacing={3} sx={{ width: '100%' }}>
           {/* Phase Type */}
-          <Grid item xs={12} sx={{ border: '1px solid rgba(255, 255, 255, 0.1)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
+          <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
               Phase Type Field (Full Width)
             </Typography>
             <FormControl fullWidth sx={{ width: '100%', minWidth: '100%' }}>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Phase Type</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Phase Type</InputLabel>
               <Select
                 value={phase.type}
                 onChange={(e) => updatePhase(phaseIndex, 'type', e.target.value)}
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               >
@@ -622,21 +622,21 @@ const WorkflowCreationModal = ({
           </Grid>
 
           {/* Phase Status */}
-          <Grid item xs={12} sx={{ border: '1px solid rgba(255, 255, 255, 0.1)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
+          <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
               Phase Status Field (Full Width)
             </Typography>
             <FormControl fullWidth sx={{ width: '100%', minWidth: '100%' }}>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Status</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
               <Select
                 value={phase.status}
                 onChange={(e) => updatePhase(phaseIndex, 'status', e.target.value)}
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               >
@@ -649,7 +649,7 @@ const WorkflowCreationModal = ({
           </Grid>
 
                       {/* Candidates Selection */}
-            <Grid item xs={12} sx={{ border: '1px solid rgba(255, 255, 255, 0.1)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
+            <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
               <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
                 Candidates Field (Full Width)
               </Typography>
@@ -671,8 +671,8 @@ const WorkflowCreationModal = ({
                     <TableHead>
                       <TableRow>
                         <TableCell sx={{ 
-                          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                          color: '#4f8cff',
+                          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                          color: '#2563eb',
                           fontWeight: 700,
                           width: 60,
                           textAlign: 'center'
@@ -682,22 +682,22 @@ const WorkflowCreationModal = ({
                             indeterminate={phase.candidates.length > 0 && phase.candidates.length < (phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length}
                             onChange={(e) => handleSelectAllCandidates(phaseIndex, e.target.checked)}
                             sx={{
-                              color: '#4f8cff',
-                              '&.Mui-checked': { color: '#eebbc3' },
-                              '&.MuiCheckbox-indeterminate': { color: '#eebbc3' }
+                              color: '#2563eb',
+                              '&.Mui-checked': { color: '#8b5cf6' },
+                              '&.MuiCheckbox-indeterminate': { color: '#8b5cf6' }
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)', color: '#4f8cff', fontWeight: 700 }}>
+                        <TableCell sx={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', color: '#2563eb', fontWeight: 700 }}>
                           Name
                         </TableCell>
-                        <TableCell sx={{ background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)', color: '#4f8cff', fontWeight: 700 }}>
+                        <TableCell sx={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', color: '#2563eb', fontWeight: 700 }}>
                           Email
                         </TableCell>
-                        <TableCell sx={{ background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)', color: '#4f8cff', fontWeight: 700 }}>
+                        <TableCell sx={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', color: '#2563eb', fontWeight: 700 }}>
                           Phone
                         </TableCell>
-                        <TableCell sx={{ background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)', color: '#4f8cff', fontWeight: 700, minWidth: 180 }}>
+                        <TableCell sx={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', color: '#2563eb', fontWeight: 700, minWidth: 180 }}>
                           Status
                         </TableCell>
                       </TableRow>
@@ -719,18 +719,18 @@ const WorkflowCreationModal = ({
                                 checked={isSelected}
                                 onChange={() => handleSelectCandidate(phaseIndex, candidate._id)}
                                 sx={{
-                                  color: '#4f8cff',
-                                  '&.Mui-checked': { color: '#eebbc3' }
+                                  color: '#2563eb',
+                                  '&.Mui-checked': { color: '#8b5cf6' }
                                 }}
                               />
                             </TableCell>
-                            <TableCell sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+                            <TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>
                               {candidate.name}
                             </TableCell>
-                            <TableCell sx={{ color: '#b8c5d6' }}>
+                            <TableCell sx={{ color: '#64748b' }}>
                               {candidate.email}
                             </TableCell>
-                            <TableCell sx={{ color: '#b8c5d6' }}>
+                            <TableCell sx={{ color: '#64748b' }}>
                               {candidate.phone || 'N/A'}
                             </TableCell>
                             <TableCell>
@@ -739,10 +739,10 @@ const WorkflowCreationModal = ({
                                   value={getCandidateStatus(phaseIndex, candidate._id)}
                                   onChange={(e) => handleCandidateStatusChange(phaseIndex, candidate._id, e.target.value)}
                                   sx={{
-                                    color: '#f5f7fa',
+                                    color: '#1e293b',
                                     fontSize: '0.85rem',
                                     '& .MuiOutlinedInput-notchedOutline': {
-                                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                                      borderColor: 'rgba(0, 0, 0, 0.08)',
                                     },
                                     '&:hover .MuiOutlinedInput-notchedOutline': {
                                       borderColor: getStatusColor(getCandidateStatus(phaseIndex, candidate._id)),
@@ -755,16 +755,16 @@ const WorkflowCreationModal = ({
                                   MenuProps={{
                                     PaperProps: {
                                       sx: {
-                                        background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                                        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                                        border: '1px solid rgba(0, 0, 0, 0.05)',
                                         '& .MuiMenuItem-root': {
-                                          color: '#f5f7fa',
+                                          color: '#1e293b',
                                           fontSize: '0.85rem',
                                           '&:hover': {
                                             backgroundColor: 'rgba(79, 140, 255, 0.1)',
                                           },
                                           '&.Mui-selected': {
-                                            backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
                                             '&:hover': {
                                               backgroundColor: 'rgba(238, 187, 195, 0.2)',
                                             }
@@ -799,7 +799,7 @@ const WorkflowCreationModal = ({
                   </Table>
                 </TableContainer>
               ) : (
-                <Typography variant="body2" sx={{ color: '#b8c5d6', p: 2, textAlign: 'center', fontStyle: 'italic' }}>
+                <Typography variant="body2" sx={{ color: '#64748b', p: 2, textAlign: 'center', fontStyle: 'italic' }}>
                   {phaseIndex === 0 && !selectedJob && !job 
                     ? 'Select a job first to see available candidates'
                     : 'No candidates available'}
@@ -808,7 +808,7 @@ const WorkflowCreationModal = ({
             </Grid>
 
           {/* Custom Fields */}
-          <Grid item xs={12} sx={{ border: '1px solid rgba(255, 255, 255, 0.1)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
+          <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
               Custom Fields Section (Full Width)
             </Typography>
@@ -820,8 +820,8 @@ const WorkflowCreationModal = ({
                 startIcon={<AddIcon />}
                 onClick={() => addCustomField(phaseIndex)}
                 sx={{
-                  color: '#4f8cff',
-                  borderColor: '#4f8cff',
+                  color: '#2563eb',
+                  borderColor: '#2563eb',
                   '&:hover': { borderColor: '#3d7be8', backgroundColor: 'rgba(79, 140, 255, 0.1)' }
                 }}
                 variant="outlined"
@@ -840,11 +840,11 @@ const WorkflowCreationModal = ({
                   sx={{ flex: 1 }}
                   size="small"
                   sx={{
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     }
                   }}
                 />
@@ -855,11 +855,11 @@ const WorkflowCreationModal = ({
                   sx={{ flex: 1 }}
                   size="small"
                   sx={{
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     }
                   }}
                 />
@@ -887,32 +887,32 @@ const WorkflowCreationModal = ({
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
             borderRadius: 2,
             maxHeight: '95vh'
           }
         }}
       >
       <DialogTitle sx={{ 
-        color: '#f5f7fa', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        color: '#1e293b', 
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#eebbc3' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
             {isEditMode ? 'Edit Workflow' : 'Create Workflow'}
           </Typography>
-          <Typography variant="body2" sx={{ color: '#b8c5d6', mt: 1 }}>
+          <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
             {job?.title ? `${job.title} - ${job.organization}` : 
              selectedJob?.title ? `${selectedJob.title} - ${selectedJob.organization}` : 
              'Select a job to create workflow'}
           </Typography>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: '#b8c5d6' }}>
+        <IconButton onClick={onClose} sx={{ color: '#64748b' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -930,7 +930,7 @@ const WorkflowCreationModal = ({
                 <Typography variant="subtitle2" sx={{ color: '#90caf9', mb: 2, fontWeight: 600 }}>
                   Select Job for Workflow
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#b8c5d6', mb: 2, display: 'block' }}>
+                <Typography variant="caption" sx={{ color: '#64748b', mb: 2, display: 'block' }}>
                   Available jobs: {allJobs.length}
                 </Typography>
 
@@ -946,12 +946,12 @@ const WorkflowCreationModal = ({
                       placeholder="Select a job for this workflow"
                       required
                       sx={{
-                        '& .MuiInputBase-input': { color: '#f5f7fa' },
-                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                        '& .MuiInputBase-input': { color: '#1e293b' },
+                        '& .MuiInputLabel-root': { color: '#64748b' },
                         '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                         }
                       }}
                     />
@@ -1002,16 +1002,16 @@ const WorkflowCreationModal = ({
             {/* Priority */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel sx={{ color: '#b8c5d6' }}>Priority</InputLabel>
+                <InputLabel sx={{ color: '#64748b' }}>Priority</InputLabel>
                 <Select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     }
                   }}
                 >
@@ -1024,19 +1024,19 @@ const WorkflowCreationModal = ({
             </Box>
           </Box>
 
-          <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
           {/* Phases */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-              <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Workflow Phases
               </Typography>
               <Button
                 startIcon={<AddIcon />}
                 onClick={addPhase}
                 sx={{
-                  backgroundColor: '#4f8cff',
+                  backgroundColor: '#2563eb',
                   color: '#ffffff',
                   '&:hover': { backgroundColor: '#3d7be8' }
                 }}
@@ -1052,8 +1052,8 @@ const WorkflowCreationModal = ({
           {/* Info Alert */}
           <Alert severity="info" sx={{ 
             backgroundColor: 'rgba(79, 140, 255, 0.1)',
-            border: '1px solid rgba(79, 140, 255, 0.3)',
-            color: '#4f8cff'
+            border: '1px solid rgba(37, 99, 235, 0.18)',
+            color: '#2563eb'
           }}>
             <Typography variant="body2">
               <strong>Note:</strong> Each phase can only include candidates from the previous phase. 
@@ -1066,7 +1066,7 @@ const WorkflowCreationModal = ({
       <DialogActions sx={{ 
         p: 3, 
         pt: 1,
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         justifyContent: 'center',
         gap: 2
       }}>
@@ -1075,10 +1075,10 @@ const WorkflowCreationModal = ({
           variant="outlined"
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
             }
           }}
         >
@@ -1089,10 +1089,10 @@ const WorkflowCreationModal = ({
           variant="contained"
           disabled={isLoading}
           sx={{
-            backgroundColor: '#eebbc3',
-            color: '#1a1a2e',
+            backgroundColor: '#8b5cf6',
+            color: '#f8fafc',
             '&:hover': { backgroundColor: '#d4a5ac' },
-            '&:disabled': { backgroundColor: '#666' }
+            '&:disabled': { backgroundColor: '#475569' }
           }}
         >
           {isLoading ? 'Saving...' : (isEditMode ? 'Update Workflow' : 'Create Workflow')}
@@ -1116,15 +1116,15 @@ const WorkflowCreationModal = ({
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           borderRadius: 2
         }
       }}
     >
       <DialogTitle sx={{ 
-        color: '#f5f7fa', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        color: '#1e293b', 
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2,
         display: 'flex',
         alignItems: 'center',
@@ -1137,7 +1137,7 @@ const WorkflowCreationModal = ({
       </DialogTitle>
       
       <DialogContent sx={{ pt: 3 }}>
-        <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 3 }}>
+        <Typography variant="body1" sx={{ color: '#64748b', mb: 3 }}>
           Based on your preference settings, how many top matching candidates would you like to add?
         </Typography>
         
@@ -1149,12 +1149,12 @@ const WorkflowCreationModal = ({
           fullWidth
           inputProps={{ min: 1, max: 50 }}
           sx={{
-            '& .MuiInputBase-input': { color: '#f5f7fa' },
-            '& .MuiInputLabel-root': { color: '#b8c5d6' },
+            '& .MuiInputBase-input': { color: '#1e293b' },
+            '& .MuiInputLabel-root': { color: '#64748b' },
             '& .MuiOutlinedInput-root': {
-              '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+              '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
               '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-              '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+              '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
             }
           }}
         />
@@ -1170,10 +1170,10 @@ const WorkflowCreationModal = ({
           variant="outlined"
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
             }
           }}
         >

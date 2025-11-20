@@ -85,6 +85,26 @@ const Signup = ({ setUser }) => {
     }
   };
 
+  const textFieldStyles = {
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#e2e8f0',
+      },
+      '&:hover fieldset': {
+        borderColor: '#2563eb',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#2563eb',
+      },
+    },
+    '& .MuiInputLabel-root': {
+      color: '#64748b',
+    },
+    '& .MuiInputBase-input': {
+      color: '#1e293b',
+    },
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-container">
@@ -123,29 +143,11 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PersonIcon sx={{ color: '#b8c5d6' }} />
+                      <PersonIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <TextField
@@ -160,29 +162,11 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <EmailIcon sx={{ color: '#b8c5d6' }} />
+                      <EmailIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <TextField
@@ -196,29 +180,11 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PhoneIcon sx={{ color: '#b8c5d6' }} />
+                      <PhoneIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <TextField
@@ -231,66 +197,50 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <BusinessIcon sx={{ color: '#b8c5d6' }} />
+                      <BusinessIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <FormControl fullWidth className="auth-input">
-                <InputLabel sx={{ color: '#b8c5d6' }}>Access Level</InputLabel>
+                <InputLabel sx={{ color: '#64748b' }}>Access Level</InputLabel>
                 <Select
                   name="accessLevel"
                   value={form.accessLevel}
                   onChange={handleChange}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      borderColor: '#e2e8f0',
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
+                      borderColor: '#2563eb',
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#eebbc3',
+                      borderColor: '#2563eb',
                     },
                     '& .MuiSvgIcon-root': {
-                      color: '#b8c5d6',
+                      color: '#64748b',
                     },
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        backgroundColor: '#232946',
-                        color: '#f5f7fa',
+                        backgroundColor: '#ffffff',
+                        color: '#1e293b',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                        border: '1px solid #e2e8f0',
                         '& .MuiMenuItem-root': {
-                          color: '#f5f7fa',
+                          color: '#1e293b',
                           '&:hover': {
-                            backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
                           },
                           '&.Mui-selected': {
-                            backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                            backgroundColor: 'rgba(37, 99, 235, 0.12)',
                             '&:hover': {
-                              backgroundColor: 'rgba(79, 140, 255, 0.3)',
+                              backgroundColor: 'rgba(37, 99, 235, 0.18)',
                             },
                           },
                         },
@@ -315,7 +265,7 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockIcon sx={{ color: '#b8c5d6' }} />
+                      <LockIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -323,32 +273,14 @@ const Signup = ({ setUser }) => {
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
-                        sx={{ color: '#b8c5d6' }}
+                        sx={{ color: '#64748b' }}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <TextField
@@ -363,7 +295,7 @@ const Signup = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockIcon sx={{ color: '#b8c5d6' }} />
+                      <LockIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -371,32 +303,14 @@ const Signup = ({ setUser }) => {
                       <IconButton
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         edge="end"
-                        sx={{ color: '#b8c5d6' }}
+                        sx={{ color: '#64748b' }}
                       >
                         {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
-                  },
-                }}
+                sx={textFieldStyles}
               />
 
               <Button
@@ -406,21 +320,22 @@ const Signup = ({ setUser }) => {
                 disabled={loading}
                 className="auth-submit-button"
                 sx={{
-                  background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                   color: '#fff',
                   fontWeight: 600,
                   fontSize: '1rem',
                   padding: '12px',
                   borderRadius: '8px',
                   textTransform: 'none',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
+                    background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+                    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.4)',
                   },
                   '&:disabled': {
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: 'rgba(255, 255, 255, 0.5)',
+                    background: '#e2e8f0',
+                    color: '#94a3b8',
                   },
                 }}
               >

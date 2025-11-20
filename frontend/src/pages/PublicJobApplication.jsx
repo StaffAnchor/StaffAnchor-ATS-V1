@@ -305,7 +305,7 @@ const PublicJobApplication = () => {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
-        background: '#f5f5f5'
+        background: '#f8fafc'
       }}>
         <CircularProgress />
       </Box>
@@ -320,12 +320,12 @@ const PublicJobApplication = () => {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh',
-        background: '#f5f5f5',
-        color: '#333',
+        background: '#f8fafc',
+        color: '#1e293b',
         gap: 2
       }}>
-        <Typography variant="h5" sx={{ color: '#333' }}>Job not found</Typography>
-        <Typography variant="body2" sx={{ color: '#666' }}>
+        <Typography variant="h5" sx={{ color: '#1e293b' }}>Job not found</Typography>
+        <Typography variant="body2" sx={{ color: '#475569' }}>
           This job posting may have been removed or does not exist.
         </Typography>
       </Box>
@@ -367,11 +367,11 @@ const PublicJobApplication = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: '#f5f5f5',
+      background: '#f8fafc',
       py: { xs: 1, sm: 2, md: 4 },
       px: { xs: 1, sm: 2 }
     }}>
-      <ToastContainer position="top-center" autoClose={3000} theme="dark" />
+      <ToastContainer position="top-center" autoClose={3000} theme="light" />
       
       <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
         {/* Header with StaffAnchor Branding */}
@@ -397,7 +397,7 @@ const PublicJobApplication = () => {
         <Card sx={{
           mb: { xs: 2, sm: 3, md: 4 },
           background: '#ffffff',
-          border: '1px solid #e5e5e5',
+          border: '1px solid #e2e8f0',
           borderRadius: '8px',
           boxShadow: 'none'
         }}>
@@ -417,7 +417,7 @@ const PublicJobApplication = () => {
               <Box sx={{ width: '100%' }}>
                 <Typography variant="h4" sx={{ 
                   fontWeight: 700, 
-                  color: '#333',
+                  color: '#1e293b',
                   fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2.125rem' },
                   lineHeight: { xs: 1.3, sm: 1.2 },
                   wordBreak: 'break-word'
@@ -425,7 +425,7 @@ const PublicJobApplication = () => {
                   {job.title}
                 </Typography>
                 <Typography variant="h6" sx={{ 
-                  color: '#666',
+                  color: '#475569',
                   fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
                   mt: { xs: 0.5, sm: 0 },
                   wordBreak: 'break-word'
@@ -448,7 +448,7 @@ const PublicJobApplication = () => {
                     fontSize: { xs: '1.2rem', sm: '1.5rem' }
                   }} />
                   <Typography sx={{ 
-                    color: '#333',
+                    color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' },
                     wordBreak: 'break-word',
                     flex: 1
@@ -467,7 +467,7 @@ const PublicJobApplication = () => {
                     fontSize: { xs: '1.2rem', sm: '1.5rem' }
                   }} />
                   <Typography sx={{ 
-                    color: '#333',
+                    color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}>
                     {job.experience} years experience
@@ -486,7 +486,7 @@ const PublicJobApplication = () => {
                     fontSize: { xs: '1.2rem', sm: '1.5rem' }
                   }} />
                   <Typography sx={{ 
-                    color: '#333',
+                    color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}>₹ {job.ctc} LPA</Typography>
                 </Box>
@@ -502,7 +502,7 @@ const PublicJobApplication = () => {
                     sx={{ 
                       backgroundColor: '#ffffff',
                       border: '1px solid #ddd',
-                      color: '#333',
+                      color: '#1e293b',
                       fontSize: { xs: '0.75rem', sm: '0.875rem' },
                       height: { xs: '28px', sm: '32px' }
                     }} 
@@ -513,16 +513,16 @@ const PublicJobApplication = () => {
 
             {job.description && (
               <>
-                <Divider sx={{ my: { xs: 2, sm: 3 }, borderColor: '#e5e5e5' }} />
+                <Divider sx={{ my: { xs: 2, sm: 3 }, borderColor: '#e2e8f0' }} />
                 <Typography variant="h6" sx={{ 
-                  color: '#333', 
+                  color: '#1e293b', 
                   mb: { xs: 1.5, sm: 2 },
                   fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                 }}>
                   Job Description
                 </Typography>
                 <Typography sx={{ 
-                  color: '#666', 
+                  color: '#475569', 
                   whiteSpace: 'pre-wrap',
                   fontSize: { xs: '0.875rem', sm: '1rem' },
                   lineHeight: { xs: 1.5, sm: 1.6 },
@@ -538,7 +538,7 @@ const PublicJobApplication = () => {
         {/* Application Form */}
         <Card sx={{
           background: '#ffffff',
-          border: '1px solid #e5e5e5',
+          border: '1px solid #e2e8f0',
           borderRadius: '8px',
           boxShadow: 'none',
           mb: { xs: 2, sm: 3, md: 4 }
@@ -546,7 +546,7 @@ const PublicJobApplication = () => {
           <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
             <Typography variant="h5" sx={{ 
               fontWeight: 700, 
-              color: '#333', 
+              color: '#1e293b', 
               mb: { xs: 2, sm: 3 },
               fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' },
               textAlign: { xs: 'center', sm: 'left' }
@@ -597,7 +597,7 @@ const PublicJobApplication = () => {
                 {/* Total Experience */}
                 <Box>
                   <Typography variant="subtitle2" sx={{ 
-                    color: '#666', 
+                    color: '#475569', 
                     mb: { xs: 1, sm: 1.5 },
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}>
@@ -657,12 +657,12 @@ const PublicJobApplication = () => {
                   </Grid>
                 </Grid>
 
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* Preferred Location */}
                 <Box>
                   <Typography variant="h6" sx={{ 
-                    color: '#666', 
+                    color: '#475569', 
                     mb: { xs: 1.5, sm: 2 },
                     fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                   }}>
@@ -670,7 +670,7 @@ const PublicJobApplication = () => {
                   </Typography>
                   {job && getJobLocations().length > 0 ? (
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#777' }}>Select Location(s)</InputLabel>
+                      <InputLabel sx={{ color: '#64748b' }}>Select Location(s)</InputLabel>
                       <Select
                         multiple
                         value={selectedPreferredLocations}
@@ -686,34 +686,34 @@ const PublicJobApplication = () => {
                                 sx={{
                                   backgroundColor: '#ffffff',
                                   border: '1px solid #ddd',
-                                  color: '#333'
+                                  color: '#1e293b'
                                 }}
                               />
                             ))}
                           </Box>
                         )}
                         sx={{
-                          color: '#333',
+                          color: '#1e293b',
                           backgroundColor: '#fff',
                           borderRadius: '6px',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ddd' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#bbb' },
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
-                          '& .MuiSvgIcon-root': { color: '#666' }
+                          '& .MuiSvgIcon-root': { color: '#475569' }
                         }}
                         MenuProps={{
                           PaperProps: {
                             sx: {
                               backgroundColor: '#ffffff',
-                              border: '1px solid #e5e5e5',
+                              border: '1px solid #e2e8f0',
                               '& .MuiMenuItem-root': {
-                                color: '#333',
+                                color: '#1e293b',
                                 '&:hover': {
                                   backgroundColor: '#f5f5f5'
                                 },
                                 '&.Mui-selected': {
                                   backgroundColor: '#f0f0f0',
-                                  color: '#333'
+                                  color: '#1e293b'
                                 }
                               }
                             }
@@ -728,18 +728,18 @@ const PublicJobApplication = () => {
                       </Select>
                     </FormControl>
                   ) : (
-                    <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic' }}>
+                    <Typography variant="body2" sx={{ color: '#475569', fontStyle: 'italic' }}>
                       No locations available for this job
                     </Typography>
                   )}
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* Skills */}
                 <Box>
                   <Typography variant="h6" sx={{ 
-                    color: '#666', 
+                    color: '#475569', 
                     mb: { xs: 1.5, sm: 2 },
                     fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                   }}>
@@ -749,19 +749,19 @@ const PublicJobApplication = () => {
                   {/* Category Selection */}
                   <Box sx={{ mb: 2 }}>
                     <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#777' }}>Category</InputLabel>
+                      <InputLabel sx={{ color: '#64748b' }}>Category</InputLabel>
                       <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         label="Category"
                         sx={{
-                          color: '#333',
+                          color: '#1e293b',
                           backgroundColor: '#fff',
                           borderRadius: '6px',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ddd' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#bbb' },
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
-                          '& .MuiSvgIcon-root': { color: '#666' }
+                          '& .MuiSvgIcon-root': { color: '#475569' }
                         }}
                       >
                         {skillCategories.map((category) => (
@@ -854,13 +854,13 @@ const PublicJobApplication = () => {
                     />
                   )}
                   {!selectedCategory && (
-                    <Typography variant="caption" sx={{ color: '#666', mt: 0.5, display: 'block' }}>
+                    <Typography variant="caption" sx={{ color: '#475569', mt: 0.5, display: 'block' }}>
                       Please select a category first
                     </Typography>
                   )}
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* Work Experience */}
                 <Box>
@@ -873,7 +873,7 @@ const PublicJobApplication = () => {
                     mb: { xs: 1.5, sm: 2 }
                   }}>
                     <Typography variant="h6" sx={{ 
-                      color: '#666',
+                      color: '#475569',
                       fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                     }}>
                       Work Experience (Optional)
@@ -895,7 +895,7 @@ const PublicJobApplication = () => {
                       p: { xs: 1.5, sm: 2 }, 
                       mb: { xs: 1.5, sm: 2 }, 
                       background: '#ffffff',
-                      border: '1px solid #e5e5e5'
+                      border: '1px solid #e2e8f0'
                     }}>
                       <Box sx={{ 
                         display: 'flex', 
@@ -904,7 +904,7 @@ const PublicJobApplication = () => {
                         mb: { xs: 1.5, sm: 2 }
                       }}>
                         <Typography sx={{ 
-                          color: '#333',
+                          color: '#1e293b',
                           fontSize: { xs: '0.875rem', sm: '1rem' },
                           fontWeight: 500
                         }}>Experience {index + 1}</Typography>
@@ -985,7 +985,7 @@ const PublicJobApplication = () => {
                   ))}
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* Education */}
                 <Box>
@@ -998,7 +998,7 @@ const PublicJobApplication = () => {
                     mb: { xs: 1.5, sm: 2 }
                   }}>
                     <Typography variant="h6" sx={{ 
-                      color: '#666',
+                      color: '#475569',
                       fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                     }}>
                       Education (Optional)
@@ -1020,7 +1020,7 @@ const PublicJobApplication = () => {
                       p: { xs: 1.5, sm: 2 }, 
                       mb: { xs: 1.5, sm: 2 }, 
                       background: '#ffffff',
-                      border: '1px solid #e5e5e5'
+                      border: '1px solid #e2e8f0'
                     }}>
                       <Box sx={{ 
                         display: 'flex', 
@@ -1029,7 +1029,7 @@ const PublicJobApplication = () => {
                         mb: { xs: 1.5, sm: 2 }
                       }}>
                         <Typography sx={{ 
-                          color: '#333',
+                          color: '#1e293b',
                           fontSize: { xs: '0.875rem', sm: '1rem' },
                           fontWeight: 500
                         }}>Education {index + 1}</Typography>
@@ -1088,12 +1088,12 @@ const PublicJobApplication = () => {
                   ))}
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* Resume Upload */}
                 <Box>
                   <Typography variant="h6" sx={{ 
-                    color: '#666', 
+                    color: '#475569', 
                     mb: { xs: 1.5, sm: 2 },
                     fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                   }}>
@@ -1114,7 +1114,7 @@ const PublicJobApplication = () => {
                           mb: { xs: 1.5, sm: 2 } 
                         }} />
                         <Typography variant="body1" sx={{ 
-                          color: '#666', 
+                          color: '#475569', 
                           mb: { xs: 1.5, sm: 2 },
                           fontSize: { xs: '0.875rem', sm: '1rem' },
                           px: { xs: 1, sm: 0 }
@@ -1144,7 +1144,7 @@ const PublicJobApplication = () => {
                           />
                         </Button>
                         <Typography variant="caption" sx={{ 
-                          color: '#666', 
+                          color: '#475569', 
                           display: 'block', 
                           mt: { xs: 1.5, sm: 2 },
                           fontSize: { xs: '0.75rem', sm: '0.875rem' }
@@ -1181,7 +1181,7 @@ const PublicJobApplication = () => {
                               fontSize: { xs: '1.2rem', sm: '1.5rem' }
                             }} />
                             <Typography sx={{ 
-                              color: '#333', 
+                              color: '#1e293b', 
                               fontWeight: 600,
                               fontSize: { xs: '0.875rem', sm: '1rem' },
                               wordBreak: 'break-word'
@@ -1219,11 +1219,11 @@ const PublicJobApplication = () => {
                   <Paper sx={{ 
                     p: { xs: 2, sm: 3 }, 
                     background: '#ffffff',
-                    border: '1px solid #e5e5e5',
+                    border: '1px solid #e2e8f0',
                     borderRadius: '8px'
                   }}>
                     <Typography variant="body2" sx={{ 
-                      color: '#666', 
+                      color: '#475569', 
                       mb: { xs: 2, sm: 3 },
                       fontSize: { xs: '0.875rem', sm: '1rem' },
                       px: { xs: 1, sm: 0 },
@@ -1239,7 +1239,7 @@ const PublicJobApplication = () => {
                       startIcon={submitting ? <CircularProgress size={20} /> : <CheckCircleIcon />}
                       sx={{
                         backgroundColor: '#f8b2c1',
-                        color: '#333',
+                        color: '#1e293b',
                         px: { xs: 4, sm: 6, md: 8 },
                         py: { xs: 1, sm: 1.25, md: 1.5 },
                         fontSize: { xs: '0.875rem', sm: '1rem' },
@@ -1271,14 +1271,14 @@ const PublicJobApplication = () => {
           mt: { xs: 2, sm: 3, md: 4 },
           p: { xs: 2, sm: 3 },
           background: '#ffffff',
-          border: '1px solid #e5e5e5',
+          border: '1px solid #e2e8f0',
           borderRadius: '8px',
           textAlign: 'center'
         }}>
           <Typography 
             variant="body2" 
             sx={{ 
-              color: '#666',
+              color: '#475569',
               mb: { xs: 0.5, sm: 1 },
               fontSize: { xs: '0.75rem', sm: '0.875rem' }
             }}
@@ -1288,7 +1288,7 @@ const PublicJobApplication = () => {
           <Typography 
             variant="caption" 
             sx={{ 
-              color: '#666',
+              color: '#475569',
               fontSize: { xs: '0.6875rem', sm: '0.75rem' }
             }}
           >

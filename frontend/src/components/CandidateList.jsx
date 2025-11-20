@@ -564,11 +564,11 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
       <Paper
         elevation={2}
         sx={{
-          background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
           border: "1px solid rgba(255, 255, 255, 0.08)",
           borderRadius: 1,
           p: 3,
-          color: "#f5f7fa",
+          color: "#1e293b",
           zIndex: 10,
           position: "relative",
           width: showFilters ? "calc(100% - 400px)" : "100%",
@@ -585,10 +585,10 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
           }}
         >
           <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: "#f5f7fa", mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b", mb: 1 }}>
               Candidate Database
             </Typography>
-            <Typography variant="body2" sx={{ color: "#b8c5d6", fontSize: "0.9rem" }}>
+            <Typography variant="body2" sx={{ color: "#64748b", fontSize: "0.9rem" }}>
               Browse and manage candidate profiles
             </Typography>
           </Box>
@@ -597,8 +597,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
               <Chip
                 label={`${filteredCandidates.length} results`}
                 sx={{
-                  backgroundColor: "rgba(79, 140, 255, 0.2)",
-                  color: "#4f8cff",
+                  backgroundColor: "rgba(37, 99, 235, 0.12)",
+                  color: "#2563eb",
                   fontWeight: 600,
                   borderRadius: 1,
                 }}
@@ -610,7 +610,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   label={`${selectedCandidates.length} selected`}
                   sx={{
                     backgroundColor: "rgba(238, 187, 195, 0.2)",
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 600,
                     borderRadius: 1,
                   }}
@@ -620,8 +620,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   startIcon={<LinkIcon />}
                   onClick={handleOpenLinkJobModal}
                   sx={{
-                    backgroundColor: "#eebbc3",
-                    color: "#1a1a2e",
+                    backgroundColor: "#8b5cf6",
+                    color: "#f8fafc",
                     fontWeight: 600,
                     borderRadius: 1,
                     textTransform: "none",
@@ -650,12 +650,12 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             InputProps={{
-              startAdornment: <SearchIcon sx={{ color: "#b8c5d6", mr: 1 }} />,
+              startAdornment: <SearchIcon sx={{ color: "#64748b", mr: 1 }} />,
               endAdornment: isFiltering && (
                 <CircularProgress
                   size={20}
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     mr: 1,
                   }}
                 />
@@ -663,13 +663,13 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
+                "& fieldset": { borderColor: "rgba(0, 0, 0, 0.08)" },
                 "&:hover fieldset": { borderColor: "rgba(238, 187, 195, 0.4)" },
-                "&.Mui-focused fieldset": { borderColor: "#eebbc3" },
+                "&.Mui-focused fieldset": { borderColor: "#8b5cf6" },
                 borderRadius: 1,
               },
-              "& .MuiInputLabel-root": { color: "#b8c5d6" },
-              "& .MuiInputBase-input": { color: "#f5f7fa" },
+              "& .MuiInputLabel-root": { color: "#64748b" },
+              "& .MuiInputBase-input": { color: "#1e293b" },
             }}
           />
         </Box>
@@ -692,7 +692,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             top: "200px", // Increased top offset to avoid overlap with header
             width: 400,
             height: "calc(100vh - 200px)", // Adjusted height accordingly
-            background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
             borderRight: "1px solid rgba(255, 255, 255, 0.08)",
             overflowY: "auto",
             p: 3,
@@ -741,7 +741,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   onClick={() => setShowFilters(true)}
                   sx={{
                     backgroundColor: "rgba(238, 187, 195, 0.9)",
-                    color: "#1a1a2e",
+                    color: "#f8fafc",
                     width: 48,
                     height: 48,
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.25)",
@@ -770,20 +770,20 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                 justifyContent: "center",
                 height: "100%",
                 minHeight: "400px",
-                color: "#b8c5d6",
+                color: "#64748b",
               }}
             >
               <CircularProgress
                 size={60}
                 sx={{
-                  color: "#eebbc3",
+                  color: "#8b5cf6",
                   mb: 3,
                 }}
               />
-              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+              <Typography variant="h6" sx={{ mb: 1, color: "#1e293b" }}>
                 Loading Candidates...
               </Typography>
-              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+              <Typography variant="body2" sx={{ color: "#64748b" }}>
                 Please wait while we fetch the candidate data
               </Typography>
             </Box>
@@ -795,7 +795,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 height: "100%",
-                color: "#b8c5d6",
+                color: "#64748b",
               }}
             >
               <Typography variant="h6" sx={{ mb: 1 }}>
@@ -809,7 +809,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             <TableContainer
               component={Paper}
               sx={{
-                background: "linear-gradient(135deg, #232946 0%, #1a1a2e 100%)",
+                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
                 borderRadius: 1,
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -822,13 +822,13 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   <TableRow
                     sx={{
                       background:
-                        "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                        "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
                       borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: "#4f8cff",
+                        color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
@@ -841,19 +841,19 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                         indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < filteredCandidates.length}
                         onChange={handleSelectAllCandidates}
                         sx={{
-                          color: "#4f8cff",
+                          color: "#2563eb",
                           '&.Mui-checked': {
-                            color: "#eebbc3",
+                            color: "#8b5cf6",
                           },
                           '&.MuiCheckbox-indeterminate': {
-                            color: "#eebbc3",
+                            color: "#8b5cf6",
                           },
                         }}
                       />
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#4f8cff",
+                        color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
@@ -863,7 +863,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     />
                     <TableCell
                       sx={{
-                        color: "#4f8cff",
+                        color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
@@ -875,7 +875,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#4f8cff",
+                        color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
@@ -887,7 +887,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#4f8cff",
+                        color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
                         fontSize: "1rem",
@@ -895,7 +895,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                         minWidth: "300px",
                         position: "sticky",
                         right: 0,
-                        background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
+                        background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
                         zIndex: 2,
                         boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                       }}
@@ -936,9 +936,9 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                           checked={selectedCandidates.includes(candidate._id)}
                           onChange={() => handleSelectCandidate(candidate._id)}
                           sx={{
-                            color: "#4f8cff",
+                            color: "#2563eb",
                             '&.Mui-checked': {
-                              color: "#eebbc3",
+                              color: "#8b5cf6",
                             },
                           }}
                         />
@@ -955,7 +955,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                             width: 32,
                             height: 32,
                             borderRadius: 1,
-                            background: "linear-gradient(135deg, #4f8cff 0%, #3d7be8 100%)",
+                            background: "linear-gradient(135deg, #2563eb 0%, #3d7be8 100%)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -978,7 +978,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                             variant="subtitle1"
                             sx={{
                               fontWeight: 600,
-                              color: "#f5f7fa",
+                              color: "#1e293b",
                               mb: 0.5,
                             }}
                           >
@@ -987,7 +987,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#b8c5d6",
+                              color: "#64748b",
                               fontSize: "0.875rem",
                             }}
                           >
@@ -1005,7 +1005,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#f5f7fa",
+                              color: "#1e293b",
                               mb: 0.5,
                             }}
                           >
@@ -1015,7 +1015,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                             <Typography
                               variant="body2"
                               sx={{
-                                color: "#b8c5d6",
+                                color: "#64748b",
                                 fontSize: "0.875rem",
                               }}
                             >
@@ -1047,14 +1047,14 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                               }}
                               sx={{
                                 borderColor: "rgba(255, 255, 255, 0.3)",
-                                color: "#b8c5d6",
+                                color: "#64748b",
                                 fontSize: "0.75rem",
                                 padding: "4px 8px",
                                 minWidth: "auto",
                                 borderRadius: 1,
                                 "&:hover": {
-                                  borderColor: "#eebbc3",
-                                  color: "#eebbc3",
+                                  borderColor: "#8b5cf6",
+                                  color: "#8b5cf6",
                                 },
                               }}
                             >
@@ -1070,12 +1070,12 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                   handleEditCandidate(candidate);
                                 }}
                                 sx={{
-                                  color: "#eebbc3",
-                                  border: "1px solid #eebbc3",
+                                  color: "#8b5cf6",
+                                  border: "1px solid #8b5cf6",
                                   padding: "4px",
                                   borderRadius: 1,
                                   "&:hover": {
-                                    backgroundColor: "rgba(238, 187, 195, 0.1)",
+                                    backgroundColor: "rgba(139, 92, 246, 0.08)",
                                   },
                                 }}
                               >
@@ -1093,7 +1093,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                               }}
                               disabled={loadingJobs[candidate._id]}
                               sx={{
-                                backgroundColor: "#4f8cff",
+                                backgroundColor: "#2563eb",
                                 color: "#ffffff",
                                 fontSize: "0.75rem",
                                 padding: "4px 8px",
@@ -1103,7 +1103,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                   backgroundColor: "#3d7be8",
                                 },
                                 "&:disabled": {
-                                  backgroundColor: "#666",
+                                  backgroundColor: "#475569",
                                   color: "#ccc"
                                 }
                               }}
@@ -1120,8 +1120,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                 setShowCommentsModal(true);
                               }}
                               sx={{
-                                color: "#4f8cff",
-                                border: "1px solid #4f8cff",
+                                color: "#2563eb",
+                                border: "1px solid #2563eb",
                                 padding: "4px",
                                 borderRadius: 1,
                                 "&:hover": {
@@ -1143,14 +1143,14 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                 }}
                                 sx={{
                                   borderColor: "rgba(238, 187, 195, 0.5)",
-                                  color: "#eebbc3",
+                                  color: "#8b5cf6",
                                   fontSize: "0.75rem",
                                   padding: "4px 8px",
                                   minWidth: "auto",
                                   borderRadius: 1,
                                   "&:hover": {
-                                    borderColor: "#eebbc3",
-                                    backgroundColor: "rgba(238, 187, 195, 0.1)",
+                                    borderColor: "#8b5cf6",
+                                    backgroundColor: "rgba(139, 92, 246, 0.08)",
                                   }
                                 }}
                               >
@@ -1233,53 +1233,53 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                     <Typography variant="subtitle2" sx={{color: '#90caf9', fontWeight: 600, mb: 1}}>Job {idx + 1}</Typography>
                                     
                                     {/* Job Title */}
-                                    <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Job Title:</strong> {job.title}</Typography>
+                                    <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Job Title:</strong> {job.title}</Typography>
                                     
                                     {/* Organization */}
                                     {job.organization && (
-                                      <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Organization:</strong> {job.organization}</Typography>
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Organization:</strong> {job.organization}</Typography>
                                     )}
                                     
                                     {/* Location */}
                                     {job.location && (
-                                      <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Location:</strong> {job.location}</Typography>
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Location:</strong> {job.location}</Typography>
                                     )}
                                     
                                     {/* Experience */}
                                     {job.experience && (
-                                      <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Years of Experience:</strong> {job.experience}</Typography>
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Years of Experience:</strong> {job.experience}</Typography>
                                     )}
                                     
                                     {/* Remote Work */}
-                                    <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Remote Work:</strong> {job.remote ? 'Available' : 'Not Available'}</Typography>
+                                    <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Remote Work:</strong> {job.remote ? 'Available' : 'Not Available'}</Typography>
                                     
                                     {/* Industry */}
                                     {job.industry && (
-                                      <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Industry:</strong> {job.industry}</Typography>
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Industry:</strong> {job.industry}</Typography>
                                     )}
                                     
                                     {/* CTC */}
                                     {job.ctc && (
-                                      <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>CTC:</strong> ₹ {job.ctc}</Typography>
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>CTC:</strong> ₹ {job.ctc}</Typography>
                                     )}
                                     
                                     {/* Job Description */}
                                     {job.description && (
                                       <>
-                                        <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1}}><strong>Job Description:</strong></Typography>
-                                        <Typography variant="body2" sx={{color: '#b8c5d6', fontSize: '0.875rem', pl: 2, fontStyle: 'italic'}}>{job.description}</Typography>
+                                        <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Job Description:</strong></Typography>
+                                        <Typography variant="body2" sx={{color: '#64748b', fontSize: '0.875rem', pl: 2, fontStyle: 'italic'}}>{job.description}</Typography>
                                       </>
                                     )}
                                     
                                     {/* Recruiter Details */}
                                     {(job.recruiterName || job.recruiterEmail) && (
                                       <>
-                                        <Typography variant="body2" sx={{color: '#f5f7fa', mb: 1, mt: 1}}><strong>Recruiter Details:</strong></Typography>
+                                        <Typography variant="body2" sx={{color: '#1e293b', mb: 1, mt: 1}}><strong>Recruiter Details:</strong></Typography>
                                         {job.recruiterName && (
-                                          <Typography variant="body2" sx={{color: '#b8c5d6', fontSize: '0.875rem', pl: 2, mb: 0.5}}><strong>Name:</strong> {job.recruiterName}</Typography>
+                                          <Typography variant="body2" sx={{color: '#64748b', fontSize: '0.875rem', pl: 2, mb: 0.5}}><strong>Name:</strong> {job.recruiterName}</Typography>
                                         )}
                                         {job.recruiterEmail && (
-                                          <Typography variant="body2" sx={{color: '#b8c5d6', fontSize: '0.875rem', pl: 2}}><strong>Email:</strong> {job.recruiterEmail}</Typography>
+                                          <Typography variant="body2" sx={{color: '#64748b', fontSize: '0.875rem', pl: 2}}><strong>Email:</strong> {job.recruiterEmail}</Typography>
                                         )}
                                       </>
                                     )}
@@ -1287,7 +1287,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                                 ))}
                               </Box>
                             ) : (
-                              <Typography variant="body2" sx={{color: '#b8c5d6', fontStyle: 'italic'}}>No suitable jobs found for this candidate.</Typography>
+                              <Typography variant="body2" sx={{color: '#64748b', fontStyle: 'italic'}}>No suitable jobs found for this candidate.</Typography>
                             )}
                           </Box>
                         </TableCell>
@@ -1344,16 +1344,16 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
           }
         }}
       >
-        <DialogTitle sx={{ color: "#f5f7fa", fontWeight: 600, borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+        <DialogTitle sx={{ color: "#1e293b", fontWeight: 600, borderBottom: "1px solid rgba(0, 0, 0, 0.05)" }}>
           Link {selectedCandidates.length} Candidate{selectedCandidates.length !== 1 ? 's' : ''} to Job
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
-          <Typography variant="body2" sx={{ color: "#b8c5d6", mb: 3 }}>
+          <Typography variant="body2" sx={{ color: "#64748b", mb: 3 }}>
             Select a job to link the selected candidates:
           </Typography>
           <List sx={{ maxHeight: 400, overflow: 'auto' }}>
@@ -1366,8 +1366,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                 sx={{
                   borderRadius: 1,
                   mb: 1,
-                  border: selectedJob === job._id ? "2px solid #eebbc3" : "1px solid rgba(255, 255, 255, 0.1)",
-                  backgroundColor: selectedJob === job._id ? "rgba(238, 187, 195, 0.1)" : "rgba(255, 255, 255, 0.02)",
+                  border: selectedJob === job._id ? "2px solid #8b5cf6" : "1px solid rgba(0, 0, 0, 0.05)",
+                  backgroundColor: selectedJob === job._id ? "rgba(139, 92, 246, 0.08)" : "rgba(255, 255, 255, 0.02)",
                   "&:hover": {
                     backgroundColor: "rgba(255, 255, 255, 0.05)",
                   }
@@ -1375,12 +1375,12 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
               >
                 <ListItemText
                   primary={
-                    <Typography variant="subtitle1" sx={{ color: "#f5f7fa", fontWeight: 600 }}>
+                    <Typography variant="subtitle1" sx={{ color: "#1e293b", fontWeight: 600 }}>
                       {job.title}
                     </Typography>
                   }
                   secondary={
-                    <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+                    <Typography variant="body2" sx={{ color: "#64748b" }}>
                       {job.organization} • {job.location || 'Location not specified'}
                     </Typography>
                   }
@@ -1389,12 +1389,12 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             ))}
           </List>
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+        <DialogActions sx={{ p: 2, borderTop: "1px solid rgba(0, 0, 0, 0.05)" }}>
           <Button
             onClick={() => setShowLinkJobModal(false)}
             disabled={linkingCandidates}
             sx={{
-              color: "#b8c5d6",
+              color: "#64748b",
               "&:hover": {
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
               }
@@ -1407,8 +1407,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             disabled={!selectedJob || linkingCandidates}
             variant="contained"
             sx={{
-              backgroundColor: "#eebbc3",
-              color: "#1a1a2e",
+              backgroundColor: "#8b5cf6",
+              color: "#f8fafc",
               fontWeight: 600,
               "&:hover": {
                 backgroundColor: "#d4a5ad",

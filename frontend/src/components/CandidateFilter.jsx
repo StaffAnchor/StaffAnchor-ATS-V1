@@ -87,11 +87,11 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
 
   return (
     <Paper elevation={3} sx={{
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+      border: '1px solid rgba(0, 0, 0, 0.05)',
       borderRadius: 2,
       p: 2,
-      color: '#f5f7fa',
+      color: '#1e293b',
       height: '100%',
       overflowY: 'auto',
       // Custom scrollbar styling
@@ -99,11 +99,11 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
         width: '8px',
       },
       '&::-webkit-scrollbar-track': {
-        background: 'rgba(255, 255, 255, 0.1)',
+        background: 'rgba(0, 0, 0, 0.05)',
         borderRadius: '4px',
       },
       '&::-webkit-scrollbar-thumb': {
-        background: 'linear-gradient(135deg, #eebbc3 0%, #4f8cff 100%)',
+        background: 'linear-gradient(135deg, #8b5cf6 0%, #2563eb 100%)',
         borderRadius: '4px',
         '&:hover': {
           background: 'linear-gradient(135deg, #d4a5ac 0%, #3a7bd5 100%)',
@@ -120,11 +120,11 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
         justifyContent: 'space-between',
         mb: 2,
         pb: 1,
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterIcon sx={{ color: '#eebbc3' }} />
-          <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+          <FilterIcon sx={{ color: '#8b5cf6' }} />
+          <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
             Candidate Filters
           </Typography>
         </Box>
@@ -132,8 +132,8 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
           size="small"
           onClick={handleClearFilters}
           sx={{ 
-            color: '#eebbc3',
-            '&:hover': { backgroundColor: 'rgba(238, 187, 195, 0.1)' }
+            color: '#8b5cf6',
+            '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.08)' }
           }}
         >
           <ClearIcon />
@@ -145,8 +145,8 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
         {/* Basic Information */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <PersonIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Basic Information</Typography>
+            <PersonIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Basic Information</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
@@ -158,10 +158,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
             <TextField
@@ -173,10 +173,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
             <TextField
@@ -188,22 +188,22 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
         {/* Skills */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <StarIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Skills</Typography>
+            <StarIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Skills</Typography>
           </Box>
           <Autocomplete
             multiple
@@ -218,10 +218,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             )}
@@ -233,26 +233,26 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                   label={option}
                   sx={{ 
                     backgroundColor: 'rgba(238, 187, 195, 0.2)', 
-                    color: '#eebbc3',
-                    '& .MuiChip-deleteIcon': { color: '#eebbc3' }
+                    color: '#8b5cf6',
+                    '& .MuiChip-deleteIcon': { color: '#8b5cf6' }
                   }}
                 />
               ))
             }
             sx={{
-              '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-              '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+              '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+              '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
             }}
           />
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
         {/* Experience */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <WorkIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Experience</Typography>
+            <WorkIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Experience</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
@@ -264,23 +264,23 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
             <FormControl fullWidth>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Position</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Position</InputLabel>
               <Select
                 value={localFilters.position}
                 onChange={(e) => handleFilterChange('position', e.target.value)}
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                  '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
                 }}
               >
                 <MenuItem value="">All Positions</MenuItem>
@@ -291,7 +291,7 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
             </FormControl>
             
             <Box>
-              <Typography sx={{ color: '#b8c5d6', mb: 1 }}>Years of Experience</Typography>
+              <Typography sx={{ color: '#64748b', mb: 1 }}>Years of Experience</Typography>
               <Slider
                 value={localFilters.experience}
                 onChange={(e, newValue) => handleFilterChange('experience', newValue)}
@@ -300,13 +300,13 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 max={20}
                 marks={experienceMarks}
                 sx={{
-                  color: '#eebbc3',
-                  '& .MuiSlider-thumb': { backgroundColor: '#eebbc3' },
-                  '& .MuiSlider-track': { backgroundColor: '#eebbc3' },
-                  '& .MuiSlider-rail': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
+                  color: '#8b5cf6',
+                  '& .MuiSlider-thumb': { backgroundColor: '#8b5cf6' },
+                  '& .MuiSlider-track': { backgroundColor: '#8b5cf6' },
+                  '& .MuiSlider-rail': { backgroundColor: 'rgba(0, 0, 0, 0.08)' },
                   '& .MuiSlider-mark': { backgroundColor: '#b8c5d6' },
-                  '& .MuiSlider-markLabel': { color: '#b8c5d6' },
-                  '& .MuiSlider-valueLabel': { backgroundColor: '#eebbc3', color: '#1a1a2e' },
+                  '& .MuiSlider-markLabel': { color: '#64748b' },
+                  '& .MuiSlider-valueLabel': { backgroundColor: '#8b5cf6', color: '#f8fafc' },
                 }}
               />
             </Box>
@@ -321,10 +321,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
             <TextField
@@ -337,34 +337,34 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
         {/* Education */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <SchoolIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Education</Typography>
+            <SchoolIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Education</Typography>
           </Box>
           <FormControl fullWidth>
-            <InputLabel sx={{ color: '#b8c5d6' }}>Education Level</InputLabel>
+            <InputLabel sx={{ color: '#64748b' }}>Education Level</InputLabel>
             <Select
               value={localFilters.education}
               onChange={(e) => handleFilterChange('education', e.target.value)}
               sx={{
-                color: '#f5f7fa',
+                color: '#1e293b',
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                 '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                '& .MuiSvgIcon-root': { color: '#64748b' },
               }}
             >
               <MenuItem value="">All Education Levels</MenuItem>
@@ -375,13 +375,13 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
           </FormControl>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
         {/* Talent Pools */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <GroupIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Talent Pools</Typography>
+            <GroupIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Talent Pools</Typography>
           </Box>
           <Autocomplete
             multiple
@@ -397,10 +397,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             )}
@@ -411,27 +411,27 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                   key={option._id}
                   label={option.name}
                   sx={{ 
-                    backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                    color: '#4f8cff',
-                    '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                    color: '#2563eb',
+                    '& .MuiChip-deleteIcon': { color: '#2563eb' }
                   }}
                 />
               ))
             }
             sx={{
-              '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-              '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+              '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+              '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
             }}
           />
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
         {/* Social Links */}
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <EmailIcon sx={{ color: '#eebbc3' }} />
-            <Typography sx={{ color: '#f5f7fa', fontWeight: 600 }}>Social Links</Typography>
+            <EmailIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Social Links</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
@@ -443,10 +443,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
             <TextField
@@ -458,10 +458,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
           </Box>
@@ -474,76 +474,76 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
           !(Array.isArray(value) && value[0] === 0 && value[1] === 20)
         ) && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ color: '#b8c5d6', mb: 1 }}>Active Filters:</Typography>
+            <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1 }}>Active Filters:</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {localFilters.name && (
                 <Chip 
                   label={`Name: ${localFilters.name}`} 
                   onDelete={() => handleFilterChange('name', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.email && (
                 <Chip 
                   label={`Email: ${localFilters.email}`} 
                   onDelete={() => handleFilterChange('email', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.phone && (
                 <Chip 
                   label={`Phone: ${localFilters.phone}`} 
                   onDelete={() => handleFilterChange('phone', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.skills.length > 0 && (
                 <Chip 
                   label={`Skills: ${localFilters.skills.length}`} 
                   onDelete={() => handleFilterChange('skills', [])}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.company && (
                 <Chip 
                   label={`Company: ${localFilters.company}`} 
                   onDelete={() => handleFilterChange('company', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.position && (
                 <Chip 
                   label={`Position: ${localFilters.position}`} 
                   onDelete={() => handleFilterChange('position', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.education && (
                 <Chip 
                   label={`Education: ${localFilters.education}`} 
                   onDelete={() => handleFilterChange('education', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.ctcLow && (
                 <Chip 
                   label={`CTC Low: ${localFilters.ctcLow} LPA`} 
                   onDelete={() => handleFilterChange('ctcLow', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.ctcHigh && (
                 <Chip 
                   label={`CTC High: ${localFilters.ctcHigh} LPA`} 
                   onDelete={() => handleFilterChange('ctcHigh', '')}
-                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#eebbc3' }}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
                 />
               )}
               {localFilters.talentPools && localFilters.talentPools.length > 0 && (
                 <Chip 
                   label={`Talent Pools: ${localFilters.talentPools.length}`} 
                   onDelete={() => handleFilterChange('talentPools', [])}
-                  sx={{ backgroundColor: 'rgba(79, 140, 255, 0.2)', color: '#4f8cff' }}
+                  sx={{ backgroundColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb' }}
                 />
               )}
             </Box>
@@ -556,14 +556,14 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
           variant="contained"
           onClick={handleApplyFilters}
           sx={{
-            background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+            background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
             color: '#fff',
             fontWeight: 600,
             py: 1.5,
             '&:hover': {
               background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
               transform: 'translateY(-2px)',
-              boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+              boxShadow: '0 8px 16px rgba(37, 99, 235, 0.18)',
             },
           }}
         >

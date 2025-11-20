@@ -450,19 +450,19 @@ const AddCandidate = () => {
       maxWidth: 900, 
       mx: 'auto', 
       p: 3,
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
       borderRadius: 3,
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
+      border: '1px solid rgba(0, 0, 0, 0.05)'
     }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <PersonIcon sx={{ fontSize: 40, color: '#eebbc3', mr: 2 }} />
+          <PersonIcon sx={{ fontSize: 40, color: '#8b5cf6', mr: 2 }} />
           <Typography variant="h3" sx={{ 
             fontWeight: 700, 
-            color: '#f5f7fa',
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #eebbc3 100%)',
+            color: '#1e293b',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #8b5cf6 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -470,7 +470,7 @@ const AddCandidate = () => {
             Add New Candidate
           </Typography>
         </Box>
-        <Typography variant="body1" sx={{ color: '#b8c5d6', fontSize: '1.1rem' }}>
+        <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.1rem' }}>
           Create a comprehensive candidate profile with detailed information
         </Typography>
       </Box>
@@ -479,14 +479,14 @@ const AddCandidate = () => {
         background: 'transparent',
         p: 4,
         borderRadius: 3,
-        border: '1px solid rgba(255, 255, 255, 0.1)'
+        border: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
         <Box component="form" onSubmit={handleSubmit}>
           {/* Basic Information Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <PersonIcon sx={{ color: '#eebbc3', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Basic Information
               </Typography>
             </Box>
@@ -501,16 +501,16 @@ const AddCandidate = () => {
                 required
                 fullWidth
                 InputProps={{
-                  startAdornment: <PersonIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <PersonIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
@@ -526,16 +526,16 @@ const AddCandidate = () => {
                 fullWidth
                 type="email"
                 InputProps={{
-                  startAdornment: <EmailIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <EmailIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
@@ -550,23 +550,23 @@ const AddCandidate = () => {
                 required
                 fullWidth
                 InputProps={{
-                  startAdornment: <PhoneIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <PhoneIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
 
             {/* Total Experience */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ color: '#b8c5d6', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1 }}>
                 Total Experience
               </Typography>
               <Box sx={{ display: 'flex', gap: 2 }}>
@@ -582,10 +582,10 @@ const AddCandidate = () => {
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     },
-                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                   }}
                 />
                 <TextField
@@ -600,10 +600,10 @@ const AddCandidate = () => {
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     },
-                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                   }}
                 />
               </Box>
@@ -619,16 +619,16 @@ const AddCandidate = () => {
                 fullWidth
                 placeholder="e.g., 10 LPA"
                 InputProps={{
-                  startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <MoneyIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
@@ -643,16 +643,16 @@ const AddCandidate = () => {
                 fullWidth
                 placeholder="e.g., 15 LPA"
                 InputProps={{
-                  startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <MoneyIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
@@ -662,17 +662,17 @@ const AddCandidate = () => {
               {/* Category Selection */}
               <Box sx={{ mb: 2 }}>
                 <FormControl fullWidth required>
-                  <InputLabel sx={{ color: '#b8c5d6' }}>Category</InputLabel>
+                  <InputLabel sx={{ color: '#64748b' }}>Category</InputLabel>
                   <Select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     label="Category"
                     sx={{
-                      color: '#f5f7fa',
+                      color: '#1e293b',
                       '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                      '& .MuiSvgIcon-root': { color: '#b8c5d6' }
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                      '& .MuiSvgIcon-root': { color: '#64748b' }
                     }}
                   >
                     {skillCategories.map((category) => (
@@ -702,7 +702,7 @@ const AddCandidate = () => {
                         ...params.InputProps,
                         startAdornment: (
                           <>
-                            <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />
+                            <StarIcon sx={{ color: '#64748b', mr: 1 }} />
                             {params.InputProps.startAdornment}
                           </>
                         ),
@@ -711,10 +711,10 @@ const AddCandidate = () => {
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                         },
-                        '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                        '& .MuiInputBase-input': { color: '#f5f7fa' },
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiInputBase-input': { color: '#1e293b' },
                       }}
                     />
                   )}
@@ -725,22 +725,22 @@ const AddCandidate = () => {
                         key={option}
                         label={option}
                         sx={{ 
-                          backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                          color: '#4f8cff',
+                          backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                          color: '#2563eb',
                           textTransform: 'capitalize',
-                          '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                          '& .MuiChip-deleteIcon': { color: '#2563eb' }
                         }}
                       />
                     ))
                   }
                   sx={{
-                    '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-                    '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                    '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+                    '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
                   }}
                 />
               )}
               {!selectedCategory && (
-                <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
                   Please select a category first
                 </Typography>
               )}
@@ -755,16 +755,16 @@ const AddCandidate = () => {
                 onChange={handleChange}
                 fullWidth
                 InputProps={{
-                  startAdornment: <LinkedInIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                  startAdornment: <LinkedInIcon sx={{ color: '#64748b', mr: 1 }} />,
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   },
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputLabel-root': { color: '#64748b' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
             </Box>
@@ -799,8 +799,8 @@ const AddCandidate = () => {
               </label>
               {resumeFileName && (
                 <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FileIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
-                  <Typography variant="caption" sx={{ color: '#4f8cff' }}>
+                  <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
+                  <Typography variant="caption" sx={{ color: '#2563eb' }}>
                     {resumeFileName}
                   </Typography>
                   <IconButton
@@ -815,19 +815,19 @@ const AddCandidate = () => {
                   </IconButton>
                 </Box>
               )}
-              <Typography variant="caption" sx={{ color: '#b8c5d6', mt: 0.5, display: 'block' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
                 Accepted formats: PDF, DOC, DOCX (Max 5MB) <span style={{ color: '#ff6b6b' }}>* Required</span>
               </Typography>
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Current Location Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <LocationIcon sx={{ color: '#eebbc3', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Current Location
               </Typography>
             </Box>
@@ -835,17 +835,17 @@ const AddCandidate = () => {
             {/* Country */}
             <Box sx={{ mb: 3 }}>
               <FormControl fullWidth required>
-                <InputLabel sx={{ color: '#b8c5d6' }}>Country</InputLabel>
+                <InputLabel sx={{ color: '#64748b' }}>Country</InputLabel>
                 <Select 
                   value={currentLocation.country} 
                   onChange={handleCountryChange} 
                   label="Country"
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                    '& .MuiSvgIcon-root': { color: '#64748b' },
                   }}
                 >
                   <MenuItem value="">Select Country</MenuItem>
@@ -857,18 +857,18 @@ const AddCandidate = () => {
             {/* State */}
             <Box sx={{ mb: 3 }}>
               <FormControl fullWidth required>
-                <InputLabel sx={{ color: '#b8c5d6' }}>State</InputLabel>
+                <InputLabel sx={{ color: '#64748b' }}>State</InputLabel>
                 <Select 
                   value={currentLocation.state} 
                   onChange={handleStateChange} 
                   label="State" 
                   disabled={!currentLocation.country}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                    '& .MuiSvgIcon-root': { color: '#64748b' },
                   }}
                 >
                   <MenuItem value="">Select State</MenuItem>
@@ -880,18 +880,18 @@ const AddCandidate = () => {
             {/* City */}
             <Box sx={{ mb: 3 }}>
               <FormControl fullWidth required>
-                <InputLabel sx={{ color: '#b8c5d6' }}>City</InputLabel>
+                <InputLabel sx={{ color: '#64748b' }}>City</InputLabel>
                 <Select 
                   value={currentLocation.city} 
                   onChange={handleCityChange} 
                   label="City" 
                   disabled={!currentLocation.state}
                   sx={{
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                     '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                    '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                    '& .MuiSvgIcon-root': { color: '#64748b' },
                   }}
                 >
                   <MenuItem value="">Select City</MenuItem>
@@ -901,14 +901,14 @@ const AddCandidate = () => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Preferred Locations Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LocationIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Preferred Locations (up to 3)
                 </Typography>
               </Box>
@@ -917,9 +917,9 @@ const AddCandidate = () => {
                 onClick={addPreferredLocation}
                 variant="outlined"
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
+                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
                 }}
               >
                 Add Preferred Location
@@ -930,12 +930,12 @@ const AddCandidate = () => {
               {preferredLocations.map((loc, idx) => (
                 <Card key={idx} sx={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: 2
                 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Preferred Location #{idx + 1}
                       </Typography>
                       <Box>
@@ -961,17 +961,17 @@ const AddCandidate = () => {
                     {/* Country */}
                     <Box sx={{ mb: 3 }}>
                       <FormControl fullWidth required>
-                        <InputLabel sx={{ color: '#b8c5d6' }}>Country</InputLabel>
+                        <InputLabel sx={{ color: '#64748b' }}>Country</InputLabel>
                         <Select 
                           value={loc.country} 
                           onChange={e => handlePreferredChange(idx, 'country', e.target.value)} 
                           label="Country"
                           sx={{
-                            color: '#f5f7fa',
+                            color: '#1e293b',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                            '& .MuiSvgIcon-root': { color: '#64748b' },
                           }}
                         >
                           <MenuItem value="">Select Country</MenuItem>
@@ -983,18 +983,18 @@ const AddCandidate = () => {
                     {/* State */}
                     <Box sx={{ mb: 3 }}>
                       <FormControl fullWidth required>
-                        <InputLabel sx={{ color: '#b8c5d6' }}>State</InputLabel>
+                        <InputLabel sx={{ color: '#64748b' }}>State</InputLabel>
                         <Select 
                           value={loc.state} 
                           onChange={e => handlePreferredChange(idx, 'state', e.target.value)} 
                           label="State" 
                           disabled={!loc.country}
                           sx={{
-                            color: '#f5f7fa',
+                            color: '#1e293b',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                            '& .MuiSvgIcon-root': { color: '#64748b' },
                           }}
                         >
                           <MenuItem value="">Select State</MenuItem>
@@ -1006,18 +1006,18 @@ const AddCandidate = () => {
                     {/* City */}
                     <Box sx={{ mb: 3 }}>
                       <FormControl fullWidth required>
-                        <InputLabel sx={{ color: '#b8c5d6' }}>City</InputLabel>
+                        <InputLabel sx={{ color: '#64748b' }}>City</InputLabel>
                         <Select 
                           value={loc.city} 
                           onChange={e => handlePreferredChange(idx, 'city', e.target.value)} 
                           label="City" 
                           disabled={!loc.state}
                           sx={{
-                            color: '#f5f7fa',
+                            color: '#1e293b',
                             '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#eebbc3' },
-                            '& .MuiSvgIcon-root': { color: '#b8c5d6' },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                            '& .MuiSvgIcon-root': { color: '#64748b' },
                           }}
                         >
                           <MenuItem value="">Select City</MenuItem>
@@ -1031,14 +1031,14 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Experience Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <WorkIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <WorkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Work Experience
                 </Typography>
               </Box>
@@ -1047,9 +1047,9 @@ const AddCandidate = () => {
                 onClick={addExp}
                 variant="outlined"
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
+                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
                 }}
               >
                 Add Experience
@@ -1060,12 +1060,12 @@ const AddCandidate = () => {
               {experience.map((exp, idx) => (
                 <Card key={idx} sx={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: 2
                 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Experience #{idx + 1}
                       </Typography>
                       {experience.length > 1 && (
@@ -1087,16 +1087,16 @@ const AddCandidate = () => {
                         onChange={e => handleExpChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <BusinessIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <BusinessIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1110,16 +1110,16 @@ const AddCandidate = () => {
                         onChange={e => handleExpChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <WorkIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1133,16 +1133,16 @@ const AddCandidate = () => {
                         onChange={e => handleExpChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <MoneyIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <MoneyIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1156,16 +1156,16 @@ const AddCandidate = () => {
                         onChange={e => handleExpChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <WorkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <WorkIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1180,16 +1180,16 @@ const AddCandidate = () => {
                         fullWidth
                         type="number"
                         InputProps={{
-                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <CalendarIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1204,16 +1204,16 @@ const AddCandidate = () => {
                         fullWidth
                         type="number"
                         InputProps={{
-                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <CalendarIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1223,14 +1223,14 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Education Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SchoolIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <SchoolIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Education
                 </Typography>
               </Box>
@@ -1239,9 +1239,9 @@ const AddCandidate = () => {
                 onClick={addEdu}
                 variant="outlined"
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
+                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
                 }}
               >
                 Add Education
@@ -1252,12 +1252,12 @@ const AddCandidate = () => {
               {education.map((edu, idx) => (
                 <Card key={idx} sx={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: 2
                 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Education #{idx + 1}
                       </Typography>
                       {education.length > 1 && (
@@ -1279,16 +1279,16 @@ const AddCandidate = () => {
                         onChange={e => handleEduChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <SchoolIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <SchoolIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1302,16 +1302,16 @@ const AddCandidate = () => {
                         onChange={e => handleEduChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <SchoolIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <SchoolIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1326,16 +1326,16 @@ const AddCandidate = () => {
                         fullWidth
                         type="number"
                         InputProps={{
-                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <CalendarIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1350,16 +1350,16 @@ const AddCandidate = () => {
                         fullWidth
                         type="number"
                         InputProps={{
-                          startAdornment: <CalendarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <CalendarIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1369,14 +1369,14 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Certifications Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <StarIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <StarIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Certifications
                 </Typography>
               </Box>
@@ -1385,9 +1385,9 @@ const AddCandidate = () => {
                 onClick={addCert}
                 variant="outlined"
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
+                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
                 }}
               >
                 Add Certification
@@ -1398,12 +1398,12 @@ const AddCandidate = () => {
               {certifications.map((cert, idx) => (
                 <Card key={idx} sx={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: 2
                 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Certification #{idx + 1}
                       </Typography>
                       {certifications.length > 1 && (
@@ -1425,16 +1425,16 @@ const AddCandidate = () => {
                         onChange={e => handleCertChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <StarIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1448,16 +1448,16 @@ const AddCandidate = () => {
                         onChange={e => handleCertChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <BusinessIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <BusinessIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1471,16 +1471,16 @@ const AddCandidate = () => {
                         onChange={e => handleCertChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <LinkIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1490,14 +1490,14 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Additional Links Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LinkIcon sx={{ color: '#eebbc3', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                <LinkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                   Additional Links
                 </Typography>
               </Box>
@@ -1506,9 +1506,9 @@ const AddCandidate = () => {
                 onClick={addLink}
                 variant="outlined"
                 sx={{
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  '&:hover': { borderColor: '#4f8cff', color: '#4f8cff' }
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
+                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
                 }}
               >
                 Add Link
@@ -1519,12 +1519,12 @@ const AddCandidate = () => {
               {additionalLinks.map((link, idx) => (
                 <Card key={idx} sx={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: 2
                 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Link #{idx + 1}
                       </Typography>
                       {additionalLinks.length > 1 && (
@@ -1546,16 +1546,16 @@ const AddCandidate = () => {
                         onChange={e => handleLinkChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <LinkIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1569,16 +1569,16 @@ const AddCandidate = () => {
                         onChange={e => handleLinkChange(idx, e)}
                         fullWidth
                         InputProps={{
-                          startAdornment: <LinkIcon sx={{ color: '#b8c5d6', mr: 1 }} />,
+                          startAdornment: <LinkIcon sx={{ color: '#64748b', mr: 1 }} />,
                         }}
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                             '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                            '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                            '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           },
-                          '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                          '& .MuiInputBase-input': { color: '#f5f7fa' },
+                          '& .MuiInputLabel-root': { color: '#64748b' },
+                          '& .MuiInputBase-input': { color: '#1e293b' },
                         }}
                       />
                     </Box>
@@ -1588,23 +1588,23 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Talent Pools Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <GroupIcon sx={{ color: '#eebbc3', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <GroupIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Talent Pools (Optional)
               </Typography>
             </Box>
             
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
               Select talent pools to add this candidate to
             </Typography>
 
             {talentPools.length === 0 ? (
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>
                 No talent pools available. Create a talent pool first.
               </Typography>
             ) : (
@@ -1622,12 +1622,12 @@ const AddCandidate = () => {
                     }}
                     sx={{
                       backgroundColor: selectedTalentPools.includes(pool._id)
-                        ? 'rgba(79, 140, 255, 0.3)'
-                        : 'rgba(255, 255, 255, 0.1)',
-                      color: selectedTalentPools.includes(pool._id) ? '#4f8cff' : '#b8c5d6',
+                        ? 'rgba(37, 99, 235, 0.18)'
+                        : 'rgba(0, 0, 0, 0.05)',
+                      color: selectedTalentPools.includes(pool._id) ? '#2563eb' : '#b8c5d6',
                       border: selectedTalentPools.includes(pool._id)
-                        ? '2px solid #4f8cff'
-                        : '2px solid rgba(255, 255, 255, 0.2)',
+                        ? '2px solid #2563eb'
+                        : '2px solid rgba(0, 0, 0, 0.08)',
                       fontWeight: selectedTalentPools.includes(pool._id) ? 600 : 400,
                       cursor: 'pointer',
                       '&:hover': {
@@ -1642,23 +1642,23 @@ const AddCandidate = () => {
             )}
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
+          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Link to Jobs Section */}
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <WorkIcon sx={{ color: '#eebbc3', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+              <WorkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Link to Jobs (Optional)
               </Typography>
             </Box>
             
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
               Select one or more jobs to link this candidate to
             </Typography>
 
             {jobs.length === 0 ? (
-              <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>
                 No jobs available. Create a job first.
               </Typography>
             ) : (
@@ -1679,7 +1679,7 @@ const AddCandidate = () => {
                       ...params.InputProps,
                       startAdornment: (
                         <>
-                          <WorkIcon sx={{ color: '#b8c5d6', mr: 1, ml: 1 }} />
+                          <WorkIcon sx={{ color: '#64748b', mr: 1, ml: 1 }} />
                           {params.InputProps.startAdornment}
                         </>
                       ),
@@ -1688,10 +1688,10 @@ const AddCandidate = () => {
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                         '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                        '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                        '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                       },
-                      '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                      '& .MuiInputBase-input': { color: '#f5f7fa' },
+                      '& .MuiInputLabel-root': { color: '#64748b' },
+                      '& .MuiInputBase-input': { color: '#1e293b' },
                     }}
                   />
                 )}
@@ -1702,11 +1702,11 @@ const AddCandidate = () => {
                       key={option._id}
                       label={option.title}
                       sx={{
-                        backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                        color: '#4f8cff',
+                        backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                        color: '#2563eb',
                         fontWeight: 600,
                         '& .MuiChip-deleteIcon': { 
-                          color: '#4f8cff',
+                          color: '#2563eb',
                           '&:hover': { color: '#3d7be8' }
                         }
                       }}
@@ -1719,10 +1719,10 @@ const AddCandidate = () => {
                     py: 1.5
                   }}>
                     <Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#f5f7fa' }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
                         {option.title}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                      <Typography variant="caption" sx={{ color: '#64748b' }}>
                         {option.organization} {option.location && `• ${option.location}`}
                       </Typography>
                       {option.industry && (
@@ -1732,7 +1732,7 @@ const AddCandidate = () => {
                           sx={{
                             ml: 1,
                             backgroundColor: 'rgba(238, 187, 195, 0.2)',
-                            color: '#eebbc3',
+                            color: '#8b5cf6',
                             fontSize: '0.7rem',
                             height: 20,
                           }}
@@ -1742,30 +1742,30 @@ const AddCandidate = () => {
                   </Box>
                 )}
                 sx={{
-                  '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-                  '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                  '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+                  '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
                   '& .MuiAutocomplete-tag': {
-                    backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                    color: '#4f8cff',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                    color: '#2563eb',
                   }
                 }}
                 ChipProps={{
                   sx: {
-                    backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                    color: '#4f8cff',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                    color: '#2563eb',
                   }
                 }}
                 ListboxProps={{
                   sx: {
-                    backgroundColor: '#1a1a2e',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid rgba(0, 0, 0, 0.05)',
                     '& .MuiAutocomplete-option': {
-                      color: '#f5f7fa',
+                      color: '#1e293b',
                       '&:hover': {
-                        backgroundColor: 'rgba(79, 140, 255, 0.15)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
                       },
                       '&[aria-selected="true"]': {
-                        backgroundColor: 'rgba(79, 140, 255, 0.2)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.12)',
                         '&:hover': {
                           backgroundColor: 'rgba(79, 140, 255, 0.25)',
                         }
@@ -1777,7 +1777,7 @@ const AddCandidate = () => {
             )}
             
             {selectedJobs.length > 0 && (
-              <Typography variant="caption" sx={{ color: '#4f8cff', mt: 1, display: 'block', fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: '#2563eb', mt: 1, display: 'block', fontWeight: 600 }}>
                 {selectedJobs.length} job{selectedJobs.length !== 1 ? 's' : ''} selected
               </Typography>
             )}
@@ -1790,7 +1790,7 @@ const AddCandidate = () => {
               variant="contained" 
               disabled={loading}
               sx={{
-                background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                 color: '#fff',
                 fontWeight: 600,
                 py: 2,
@@ -1800,10 +1800,10 @@ const AddCandidate = () => {
                 '&:hover': {
                   background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+                  boxShadow: '0 8px 16px rgba(37, 99, 235, 0.18)',
                 },
                 '&:disabled': {
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: 'rgba(0, 0, 0, 0.05)',
                   color: 'rgba(255, 255, 255, 0.5)',
                 }
               }}

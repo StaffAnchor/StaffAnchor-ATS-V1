@@ -140,28 +140,28 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           maxHeight: '90vh',
         }
       }}
     >
       <DialogTitle
         sx={{
-          color: '#f5f7fa',
+          color: '#1e293b',
           fontWeight: 600,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         }}
       >
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#eebbc3' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
             Comments
           </Typography>
-          <Typography variant="body2" sx={{ color: '#b8c5d6', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
             {candidateName}
           </Typography>
         </Box>
@@ -171,7 +171,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
             onClose();
           }}
           sx={{
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 0.05)'
             }
@@ -196,10 +196,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
             disabled={submitting}
             sx={{
               '& .MuiOutlinedInput-root': {
-                color: '#f5f7fa',
-                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                color: '#1e293b',
+                '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                 '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
               }
             }}
@@ -214,8 +214,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
               }}
               disabled={submitting || !newComment.trim()}
               sx={{
-                backgroundColor: '#eebbc3',
-                color: '#1a1a2e',
+                backgroundColor: '#8b5cf6',
+                color: '#f8fafc',
                 fontWeight: 600,
                 '&:hover': { backgroundColor: '#d4a5ad' },
                 '&:disabled': {
@@ -229,16 +229,16 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', mb: 2 }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)', mb: 2 }} />
 
         {/* Comments List */}
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress sx={{ color: '#eebbc3' }} />
+            <CircularProgress sx={{ color: '#8b5cf6' }} />
           </Box>
         ) : comments.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="body1" sx={{ color: '#b8c5d6' }}>
+            <Typography variant="body1" sx={{ color: '#64748b' }}>
               No comments yet. Be the first to comment!
             </Typography>
           </Box>
@@ -251,14 +251,14 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                   p: 2,
                   mb: 2,
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                 }}
               >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PersonIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
+                    <PersonIcon sx={{ color: '#2563eb', fontSize: 20 }} />
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+                      <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
                         {comment.authorName}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#7a8a9e' }}>
@@ -278,7 +278,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                               setEditingCommentId(comment._id);
                               setEditText(comment.text);
                             }}
-                            sx={{ color: '#4f8cff', mr: 0.5 }}
+                            sx={{ color: '#2563eb', mr: 0.5 }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -313,10 +313,10 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                       sx={{
                         mb: 1,
                         '& .MuiOutlinedInput-root': {
-                          color: '#f5f7fa',
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                          color: '#1e293b',
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                           '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                          '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                           backgroundColor: 'rgba(255, 255, 255, 0.03)',
                         }
                       }}
@@ -330,7 +330,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                           handleUpdateComment(comment._id);
                         }}
                         sx={{
-                          backgroundColor: '#4f8cff',
+                          backgroundColor: '#2563eb',
                           '&:hover': { backgroundColor: '#3d7be8' }
                         }}
                       >
@@ -346,7 +346,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                         }}
                         sx={{
                           borderColor: 'rgba(255, 255, 255, 0.3)',
-                          color: '#b8c5d6'
+                          color: '#64748b'
                         }}
                       >
                         Cancel
@@ -354,7 +354,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                     </Box>
                   </Box>
                 ) : (
-                  <Typography variant="body2" sx={{ color: '#b8c5d6', whiteSpace: 'pre-wrap' }}>
+                  <Typography variant="body2" sx={{ color: '#64748b', whiteSpace: 'pre-wrap' }}>
                     {comment.text}
                   </Typography>
                 )}
@@ -364,7 +364,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
         <Button
           onClick={(e) => {
             e.stopPropagation();
@@ -372,11 +372,11 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
           }}
           variant="outlined"
           sx={{
-            color: '#b8c5d6',
+            color: '#64748b',
             borderColor: 'rgba(255, 255, 255, 0.3)',
             '&:hover': {
-              borderColor: '#eebbc3',
-              backgroundColor: 'rgba(238, 187, 195, 0.1)',
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
             }
           }}
         >

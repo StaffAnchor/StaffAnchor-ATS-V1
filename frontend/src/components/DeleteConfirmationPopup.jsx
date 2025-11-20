@@ -28,16 +28,16 @@ const DeleteConfirmationPopup = ({
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           borderRadius: 2,
         }
       }}
     >
       <DialogTitle sx={{ 
-        color: '#f5f7fa', 
+        color: '#1e293b', 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2,
         display: 'flex',
         alignItems: 'center',
@@ -62,7 +62,7 @@ const DeleteConfirmationPopup = ({
             This action cannot be undone!
           </Alert>
           
-          <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 2 }}>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 2 }}>
             {message}
           </Typography>
           
@@ -87,7 +87,7 @@ const DeleteConfirmationPopup = ({
       <DialogActions sx={{ 
         p: 3, 
         pt: 1,
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         justifyContent: 'center',
         gap: 2
       }}>
@@ -97,13 +97,13 @@ const DeleteConfirmationPopup = ({
           disabled={isDeleting}
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
             },
             '&:disabled': {
-              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'rgba(0, 0, 0, 0.05)',
               color: 'rgba(255, 255, 255, 0.3)',
             }
           }}
