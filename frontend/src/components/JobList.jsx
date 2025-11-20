@@ -256,11 +256,11 @@ const JobList = ({ accessLevel, userId }) => {
       <Paper
         elevation={2}
         sx={{
-          background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
           borderRadius: 0,
           p: 2,
-          color: "#f5f7fa",
+          color: "#1e293b",
           zIndex: 10,
           position: "relative",
           width: showFilters ? "calc(100vw - 400px - 32px)" : "calc(100vw - 32px)",
@@ -277,7 +277,7 @@ const JobList = ({ accessLevel, userId }) => {
             mb: 2,
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#f5f7fa" }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
             Job Listings
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -287,11 +287,11 @@ const JobList = ({ accessLevel, userId }) => {
                 onClick={() => setShowOnlyAssigned(!showOnlyAssigned)}
                 sx={{
                   backgroundColor: showOnlyAssigned ? "rgba(238, 187, 195, 0.9)" : "transparent",
-                  color: showOnlyAssigned ? "#1a1a2e" : "#eebbc3",
-                  borderColor: "#eebbc3",
+                  color: showOnlyAssigned ? "#f8fafc" : "#8b5cf6",
+                  borderColor: "#8b5cf6",
                   "&:hover": {
-                    backgroundColor: showOnlyAssigned ? "rgba(238, 187, 195, 1)" : "rgba(238, 187, 195, 0.1)",
-                    borderColor: "#eebbc3",
+                    backgroundColor: showOnlyAssigned ? "rgba(238, 187, 195, 1)" : "rgba(139, 92, 246, 0.08)",
+                    borderColor: "#8b5cf6",
                   },
                   fontWeight: 600,
                   textTransform: "none",
@@ -304,8 +304,8 @@ const JobList = ({ accessLevel, userId }) => {
               <Chip
                 label={`${filteredJobs.length} results`}
                 sx={{
-                  backgroundColor: "rgba(79, 140, 255, 0.2)",
-                  color: "#4f8cff",
+                  backgroundColor: "rgba(37, 99, 235, 0.12)",
+                  color: "#2563eb",
                 }}
               />
             )}
@@ -319,7 +319,7 @@ const JobList = ({ accessLevel, userId }) => {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ color: "#b8c5d6", mr: 1 }} />,
+            startAdornment: <SearchIcon sx={{ color: "#64748b", mr: 1 }} />,
           }}
           sx={{
             width: "100%",
@@ -327,10 +327,10 @@ const JobList = ({ accessLevel, userId }) => {
             "& .MuiOutlinedInput-root": {
               "& fieldset": { borderColor: "rgba(255, 255, 255, 0.3)" },
               "&:hover fieldset": { borderColor: "rgba(238, 187, 195, 0.5)" },
-              "&.Mui-focused fieldset": { borderColor: "#eebbc3" },
+              "&.Mui-focused fieldset": { borderColor: "#8b5cf6" },
             },
-            "& .MuiInputLabel-root": { color: "#b8c5d6" },
-            "& .MuiInputBase-input": { color: "#f5f7fa" },
+            "& .MuiInputLabel-root": { color: "#64748b" },
+            "& .MuiInputBase-input": { color: "#1e293b" },
           }}
         />
       </Paper>
@@ -354,8 +354,8 @@ const JobList = ({ accessLevel, userId }) => {
             top: "72px", // Account for header height
             width: 400,
             height: "calc(100vh - 72px)",
-            background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-            borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+            borderRight: "1px solid rgba(0, 0, 0, 0.05)",
             overflowY: "auto",
             p: 2,
             zIndex: 5,
@@ -398,7 +398,7 @@ const JobList = ({ accessLevel, userId }) => {
                   onClick={() => setShowFilters(true)}
                   sx={{
                     backgroundColor: "rgba(238, 187, 195, 0.9)",
-                    color: "#1a1a2e",
+                    color: "#f8fafc",
                     width: 48,
                     height: 48,
                     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
@@ -425,20 +425,20 @@ const JobList = ({ accessLevel, userId }) => {
                 justifyContent: "center",
                 height: "100%",
                 minHeight: "400px",
-                color: "#b8c5d6",
+                color: "#64748b",
               }}
             >
               <CircularProgress
                 size={60}
                 sx={{
-                  color: "#eebbc3",
+                  color: "#8b5cf6",
                   mb: 3,
                 }}
               />
-              <Typography variant="h6" sx={{ mb: 1, color: "#f5f7fa" }}>
+              <Typography variant="h6" sx={{ mb: 1, color: "#1e293b" }}>
                 Loading Jobs...
               </Typography>
-              <Typography variant="body2" sx={{ color: "#b8c5d6" }}>
+              <Typography variant="body2" sx={{ color: "#64748b" }}>
                 Please wait while we fetch the job listings
               </Typography>
             </Box>
@@ -450,7 +450,7 @@ const JobList = ({ accessLevel, userId }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 height: "100%",
-                color: "#b8c5d6",
+                color: "#64748b",
               }}
             >
               <Typography variant="h6" sx={{ mb: 2 }}>
@@ -464,8 +464,8 @@ const JobList = ({ accessLevel, userId }) => {
             <TableContainer
               component={Paper}
               sx={{
-                background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
                 borderRadius: 3,
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
               }}
@@ -474,13 +474,13 @@ const JobList = ({ accessLevel, userId }) => {
                 <TableHead>
                   <TableRow
                     sx={{
-                      background: "rgba(238, 187, 195, 0.1)",
+                      background: "rgba(139, 92, 246, 0.08)",
                       borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                         py: 2,
@@ -490,7 +490,7 @@ const JobList = ({ accessLevel, userId }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -499,7 +499,7 @@ const JobList = ({ accessLevel, userId }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -509,7 +509,7 @@ const JobList = ({ accessLevel, userId }) => {
                     <TableCell
                       align="center"
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -524,7 +524,7 @@ const JobList = ({ accessLevel, userId }) => {
                       <TableRow
                         onClick={() => handleExpandClick(job._id)}
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                          borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                           transition: "all 0.3s ease",
                           cursor: "pointer",
                           "&:hover": {
@@ -536,7 +536,7 @@ const JobList = ({ accessLevel, userId }) => {
                           <Typography
                             variant="h6"
                             sx={{
-                              color: "#f5f7fa",
+                              color: "#1e293b",
                               fontWeight: 600,
                               fontSize: "1rem",
                             }}
@@ -548,7 +548,7 @@ const JobList = ({ accessLevel, userId }) => {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#b8c5d6",
+                              color: "#64748b",
                             }}
                           >
                             {job.organization}
@@ -558,7 +558,7 @@ const JobList = ({ accessLevel, userId }) => {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#b8c5d6",
+                              color: "#64748b",
                             }}
                           >
                             {job.location}
@@ -569,10 +569,10 @@ const JobList = ({ accessLevel, userId }) => {
                             <IconButton
                               onClick={() => handleExpandClick(job._id)}
                               sx={{
-                                color: "#4f8cff",
+                                color: "#2563eb",
                                 backgroundColor: "rgba(79, 140, 255, 0.1)",
                                 "&:hover": {
-                                  backgroundColor: "rgba(79, 140, 255, 0.2)",
+                                  backgroundColor: "rgba(37, 99, 235, 0.12)",
                                   transform: "scale(1.1)",
                                 },
                               }}
@@ -595,7 +595,7 @@ const JobList = ({ accessLevel, userId }) => {
                             py: 0,
                             borderBottom:
                               expandedJobId === job._id
-                                ? "1px solid rgba(255, 255, 255, 0.1)"
+                                ? "1px solid rgba(0, 0, 0, 0.05)"
                                 : "none",
                           }}
                         >

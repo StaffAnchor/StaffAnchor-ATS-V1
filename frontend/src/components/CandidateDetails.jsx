@@ -216,7 +216,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   };
 
   return (
-    <Box sx={{p: 2, background: 'var(--color-bg-dark)', borderRadius: 2, boxShadow: 3, color: '#f5f7fa', border: '1px solid #444'}}>
+    <Box sx={{p: 2, background: 'var(--color-bg-dark)', borderRadius: 2, boxShadow: 3, color: '#1e293b', border: '1px solid #e2e8f0'}}>
       <Stack spacing={2}>
         {editMode ? (
           <>
@@ -227,7 +227,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               value={editCandidate.name}
               onChange={handleEditChange}
               fullWidth
-              sx={{ '& .MuiInputBase-input': { color: '#f5f7fa' }, '& .MuiInputLabel-root': { color: '#b8c5d6' } }}
+              sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
             <TextField
               label="Email"
@@ -235,7 +235,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               value={editCandidate.email}
               onChange={handleEditChange}
               fullWidth
-              sx={{ '& .MuiInputBase-input': { color: '#f5f7fa' }, '& .MuiInputLabel-root': { color: '#b8c5d6' } }}
+              sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
             <TextField
               label="Phone"
@@ -243,7 +243,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               value={editCandidate.phone}
               onChange={handleEditChange}
               fullWidth
-              sx={{ '& .MuiInputBase-input': { color: '#f5f7fa' }, '& .MuiInputLabel-root': { color: '#b8c5d6' } }}
+              sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
             <Autocomplete
               multiple
@@ -263,7 +263,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     ...params.InputProps,
                     startAdornment: (
                       <>
-                        <StarIcon sx={{ color: '#b8c5d6', mr: 1 }} />
+                        <StarIcon sx={{ color: '#64748b', mr: 1 }} />
                         {params.InputProps.startAdornment}
                       </>
                     ),
@@ -272,10 +272,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                       '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                     },
-                    '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                    '& .MuiInputBase-input': { color: '#f5f7fa' },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
                   }}
                 />
               )}
@@ -286,17 +286,17 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     key={option}
                     label={option}
                     sx={{ 
-                      backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                      color: '#4f8cff',
+                      backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                      color: '#2563eb',
                       textTransform: 'capitalize',
-                      '& .MuiChip-deleteIcon': { color: '#4f8cff' }
+                      '& .MuiChip-deleteIcon': { color: '#2563eb' }
                     }}
                   />
                 ))
               }
               sx={{
-                '& .MuiAutocomplete-popupIndicator': { color: '#b8c5d6' },
-                '& .MuiAutocomplete-clearIndicator': { color: '#b8c5d6' },
+                '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
+                '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
               }}
             />
             <TextField
@@ -305,7 +305,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               value={editCandidate.linkedin}
               onChange={handleEditChange}
               fullWidth
-              sx={{ '& .MuiInputBase-input': { color: '#f5f7fa' }, '& .MuiInputLabel-root': { color: '#b8c5d6' } }}
+              sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
             <TextField
               label="X (Twitter)"
@@ -313,30 +313,30 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               value={editCandidate.x}
               onChange={handleEditChange}
               fullWidth
-              sx={{ '& .MuiInputBase-input': { color: '#f5f7fa' }, '& .MuiInputLabel-root': { color: '#b8c5d6' } }}
+              sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
           </>
         ) : (
           <>
             <Typography variant="h6" sx={{fontWeight: 600}}>Candidate Details</Typography>
-            <TableContainer component={Paper} sx={{background: '#232946', borderRadius: 2}}>
+            <TableContainer component={Paper} sx={{background: '#ffffff', borderRadius: 2}}>
               <Table size="small">
                 <TableBody>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Name</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.name}</TableCell>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.name}</TableCell>
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Email</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.email}</TableCell>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.email}</TableCell>
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Phone</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.phone || 'Not provided'}</TableCell>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.phone || 'Not provided'}</TableCell>
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Skills</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
                       {candidate.skills && candidate.skills.length > 0 ? (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           {candidate.skills.map((skill, idx) => (
@@ -346,7 +346,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                               size="small"
                               sx={{ 
                                 backgroundColor: 'rgba(238, 187, 195, 0.2)', 
-                                color: '#eebbc3',
+                                color: '#8b5cf6',
                                 fontSize: '0.8rem'
                               }}
                             />
@@ -359,7 +359,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>LinkedIn</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
                       {candidate.linkedin ? (
                         <Link href={`https://linkedin.com/in/${candidate.linkedin}`} target="_blank" rel="noopener" sx={{color:'#4fc3f7'}}>
                           {candidate.linkedin}
@@ -371,7 +371,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>X (Twitter)</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
                       {candidate.x ? (
                         <Link href={`https://twitter.com/${candidate.x}`} target="_blank" rel="noopener" sx={{color:'#4fc3f7'}}>
                           @{candidate.x}
@@ -383,11 +383,11 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: 'none'}}>Resume</TableCell>
-                    <TableCell sx={{color: '#f5f7fa', borderBottom: 'none'}}>
+                    <TableCell sx={{color: '#1e293b', borderBottom: 'none'}}>
                       {candidate.resume && candidate.resume.url ? (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <FileIcon sx={{ color: '#4f8cff', fontSize: 20 }} />
+                            <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
                             <Link 
                               href={candidate.resume.url} 
                               target="_blank" 
@@ -397,7 +397,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                               {candidate.resume.fileName || 'View Resume'}
                             </Link>
                             {candidate.resume.fileSize && (
-                              <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                              <Typography variant="caption" sx={{ color: '#64748b' }}>
                                 ({(candidate.resume.fileSize / 1024).toFixed(2)} KB)
                               </Typography>
                             )}
@@ -419,8 +419,8 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                                   startIcon={<CloudUploadIcon />}
                                   disabled={uploadingResume}
                                   sx={{
-                                    borderColor: '#4f8cff',
-                                    color: '#4f8cff',
+                                    borderColor: '#2563eb',
+                                    color: '#2563eb',
                                     '&:hover': { borderColor: '#3a7bd5', backgroundColor: 'rgba(79, 140, 255, 0.1)' }
                                   }}
                                 >
@@ -443,7 +443,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                         </Box>
                       ) : (
                         <Box>
-                          <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+                          <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
                             No resume uploaded
                           </Typography>
                           {(accessLevel === 1 || accessLevel === 2) && (
@@ -463,8 +463,8 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                                   startIcon={<CloudUploadIcon />}
                                   disabled={uploadingResume}
                                   sx={{
-                                    borderColor: '#4f8cff',
-                                    color: '#4f8cff',
+                                    borderColor: '#2563eb',
+                                    color: '#2563eb',
                                     '&:hover': { borderColor: '#3a7bd5', backgroundColor: 'rgba(79, 140, 255, 0.1)' }
                                   }}
                                 >
@@ -484,35 +484,35 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
             {/* Experience Section */}
             {candidate.experience && candidate.experience.length > 0 && (
               <>
-                <Divider sx={{my: 1, borderColor: '#444'}} />
+                <Divider sx={{my: 1, borderColor: '#e2e8f0'}} />
                 <Typography variant="h6" sx={{fontWeight: 600}}>Experience</Typography>
-                <TableContainer component={Paper} sx={{background: '#232946', borderRadius: 2}}>
+                <TableContainer component={Paper} sx={{background: '#ffffff', borderRadius: 2}}>
                   <Table size="small">
                     <TableBody>
                       {candidate.experience.map((exp, idx) => (
                         <React.Fragment key={idx}>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Company</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{exp.company}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{exp.company}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Position</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{exp.position}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{exp.position}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Role</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{exp.role}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{exp.role}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>CTC</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{exp.ctc ? `₹ ${exp.ctc}` : '-'}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{exp.ctc ? `₹ ${exp.ctc}` : '-'}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Duration</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{exp.start} - {exp.end}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{exp.start} - {exp.end}</TableCell>
                           </TableRow>
                           {idx < candidate.experience.length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#444'}} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#e2e8f0'}} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -525,27 +525,27 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
             {/* Education Section */}
             {candidate.education && candidate.education.length > 0 && (
               <>
-                <Divider sx={{my: 1, borderColor: '#444'}} />
+                <Divider sx={{my: 1, borderColor: '#e2e8f0'}} />
                 <Typography variant="h6" sx={{fontWeight: 600}}>Education</Typography>
-                <TableContainer component={Paper} sx={{background: '#232946', borderRadius: 2}}>
+                <TableContainer component={Paper} sx={{background: '#ffffff', borderRadius: 2}}>
                   <Table size="small">
                     <TableBody>
                       {candidate.education.map((edu, idx) => (
                         <React.Fragment key={idx}>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>College</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{edu.clg}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{edu.clg}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Course</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{edu.course}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{edu.course}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Duration</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{edu.start} - {edu.end}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{edu.start} - {edu.end}</TableCell>
                           </TableRow>
                           {idx < candidate.education.length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#444'}} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#e2e8f0'}} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -558,24 +558,24 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
             {/* Certifications Section */}
             {candidate.certifications && candidate.certifications.length > 0 && (
               <>
-                <Divider sx={{my: 1, borderColor: '#444'}} />
+                <Divider sx={{my: 1, borderColor: '#e2e8f0'}} />
                 <Typography variant="h6" sx={{fontWeight: 600}}>Certifications</Typography>
-                <TableContainer component={Paper} sx={{background: '#232946', borderRadius: 2}}>
+                <TableContainer component={Paper} sx={{background: '#ffffff', borderRadius: 2}}>
                   <Table size="small">
                     <TableBody>
                       {candidate.certifications.map((cert, idx) => (
                         <React.Fragment key={idx}>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Name</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{cert.name}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{cert.name}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Organization</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>{cert.organization}</TableCell>
+                            <TableCell sx={{color: '#1e293b'}}>{cert.organization}</TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>Link</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>
+                            <TableCell sx={{color: '#1e293b'}}>
                               {cert.link ? (
                                 <Link href={cert.link} target="_blank" rel="noopener" sx={{color:'#4fc3f7'}}>
                                   View Certificate
@@ -586,7 +586,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                             </TableCell>
                           </TableRow>
                           {idx < candidate.certifications.length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#444'}} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#e2e8f0'}} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -599,16 +599,16 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
             {/* Additional Links Section */}
             {candidate.additionalLinks && candidate.additionalLinks.length > 0 && (
               <>
-                <Divider sx={{my: 1, borderColor: '#444'}} />
+                <Divider sx={{my: 1, borderColor: '#e2e8f0'}} />
                 <Typography variant="h6" sx={{fontWeight: 600}}>Additional Links</Typography>
-                <TableContainer component={Paper} sx={{background: '#232946', borderRadius: 2}}>
+                <TableContainer component={Paper} sx={{background: '#ffffff', borderRadius: 2}}>
                   <Table size="small">
                     <TableBody>
                       {candidate.additionalLinks.map((link, idx) => (
                         <React.Fragment key={idx}>
                           <TableRow>
                             <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120}}>{link.name || 'Link'}</TableCell>
-                            <TableCell sx={{color: '#f5f7fa'}}>
+                            <TableCell sx={{color: '#1e293b'}}>
                               {link.link ? (
                                 <Link href={link.link} target="_blank" rel="noopener" sx={{color:'#4fc3f7'}}>
                                   {link.link}
@@ -619,7 +619,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                             </TableCell>
                           </TableRow>
                           {idx < candidate.additionalLinks.length - 1 && (
-                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#444'}} /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Divider sx={{my: 1, borderColor: '#e2e8f0'}} /></TableCell></TableRow>
                           )}
                         </React.Fragment>
                       ))}
@@ -630,7 +630,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
             )}
           </>
         )}
-        <Divider sx={{my: 1, borderColor: '#444'}} />
+        <Divider sx={{my: 1, borderColor: '#e2e8f0'}} />
         <Box>
           {editMode && (accessLevel === 1 || accessLevel === 2) ? (
             <Button variant="contained" color="success" onClick={handleSave}>Save</Button>
@@ -661,14 +661,14 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
         
         {/* Show matching results summary */}
         {matchingResults && (
-          <Box sx={{ p: 2, background: 'rgba(79, 140, 255, 0.1)', borderRadius: 2, border: '1px solid rgba(79, 140, 255, 0.3)' }}>
-            <Typography variant="h6" sx={{ color: '#4f8cff', mb: 1 }}>
+          <Box sx={{ p: 2, background: 'rgba(79, 140, 255, 0.1)', borderRadius: 2, border: '1px solid rgba(37, 99, 235, 0.18)' }}>
+            <Typography variant="h6" sx={{ color: '#2563eb', mb: 1 }}>
               Matching Results
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
               Found {matchingResults.suitableJobs.length} suitable jobs out of {matchingResults.totalJobs} total jobs.
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem' }}>
+            <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem' }}>
               Top matches are displayed below, sorted by relevance score.
             </Typography>
           </Box>
@@ -676,7 +676,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
         
         {showJobs && (
           <Box>
-            <Typography variant="h6" sx={{ mb: 2, color: '#eebbc3' }}>
+            <Typography variant="h6" sx={{ mb: 2, color: '#8b5cf6' }}>
               Suitable Jobs (Top {jobs.length})
             </Typography>
             {jobs.map((job, index) => (
@@ -685,7 +685,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                 mb: 2, 
                 background: 'rgba(255, 255, 255, 0.05)', 
                 borderRadius: 2, 
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
                 position: 'relative'
               }}>
                 {/* Score badge */}
@@ -693,7 +693,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   position: 'absolute', 
                   top: 10, 
                   right: 10, 
-                  background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                   color: '#fff',
                   px: 2,
                   py: 0.5,
@@ -704,10 +704,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   Score: {job.score}
                 </Box>
                 
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1 }}>
                   {index + 1}. {job.title}
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+                <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
                   {job.organization}
                 </Typography>
                 
@@ -723,8 +723,8 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                         label={detail} 
                         size="small"
                         sx={{ 
-                          backgroundColor: 'rgba(79, 140, 255, 0.2)', 
-                          color: '#4f8cff',
+                          backgroundColor: 'rgba(37, 99, 235, 0.12)', 
+                          color: '#2563eb',
                           fontSize: '0.8rem'
                         }}
                       />
@@ -737,17 +737,17 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   <Typography variant="body2" sx={{ color: '#90caf9', mb: 0.5, fontWeight: 600 }}>
                     Job Details:
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                     Location: {job.location} {job.remote && '(Remote)'}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                     Experience: {job.experience} years
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                     Industry: {job.industry}
                   </Typography>
                   {job.ctc && (
-                    <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem', mb: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                       CTC: ₹ {job.ctc}
                     </Typography>
                   )}
@@ -759,7 +759,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     <Typography variant="body2" sx={{ color: '#90caf9', mb: 0.5, fontWeight: 600 }}>
                       Description:
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem' }}>
+                    <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem' }}>
                       {job.description.length > 200 ? `${job.description.substring(0, 200)}...` : job.description}
                     </Typography>
                   </Box>

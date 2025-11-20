@@ -39,3 +39,16 @@ exports.listSubordinates = async (req, res) => {
     res.status(500).json({ error: 'Fetch subordinates failed' });
   }
 };
+
+exports.validateToken = async (req, res) => {
+  try {
+    // If we reach here, the authenticateToken middleware has already validated the token
+    // and attached the user to req.user
+    res.json({ 
+      valid: true, 
+      user: req.user 
+    });
+  } catch (err) {
+    res.status(401).json({ error: 'Token validation failed' });
+  }
+};

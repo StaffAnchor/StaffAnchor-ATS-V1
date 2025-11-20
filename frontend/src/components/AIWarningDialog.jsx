@@ -26,24 +26,24 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           borderRadius: 2,
         }
       }}
     >
       <DialogTitle
         sx={{
-          color: '#f5f7fa',
+          color: '#1e293b',
           fontWeight: 700,
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
           pb: 2,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
         }}
       >
-        <AIIcon sx={{ fontSize: 32, color: '#4f8cff' }} />
+        <AIIcon sx={{ fontSize: 32, color: '#2563eb' }} />
         AI-Powered Feature
       </DialogTitle>
 
@@ -69,20 +69,20 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
           <Typography
             variant="body1"
             sx={{
-              color: '#f5f7fa',
+              color: '#1e293b',
               mb: 2,
               lineHeight: 1.7,
               fontSize: '1rem'
             }}
           >
-            You are about to use <strong style={{ color: '#4f8cff' }}>{featureName}</strong>, 
+            You are about to use <strong style={{ color: '#2563eb' }}>{featureName}</strong>, 
             an AI-powered feature that leverages machine learning algorithms to analyze and match profiles.
           </Typography>
 
           <Typography
             variant="body2"
             sx={{
-              color: '#b8c5d6',
+              color: '#64748b',
               mb: 2,
               lineHeight: 1.6
             }}
@@ -97,13 +97,13 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
               p: 2,
               background: 'rgba(79, 140, 255, 0.1)',
               borderRadius: 1,
-              border: '1px solid rgba(79, 140, 255, 0.2)'
+              border: '1px solid rgba(37, 99, 235, 0.12)'
             }}
           >
             <Typography
               variant="body2"
               sx={{
-                color: '#4f8cff',
+                color: '#2563eb',
                 fontWeight: 600,
                 mb: 1
               }}
@@ -113,7 +113,7 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
             <Typography
               variant="body2"
               sx={{
-                color: '#b8c5d6',
+                color: '#64748b',
                 fontSize: '0.9rem'
               }}
             >
@@ -132,7 +132,7 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
           pb: 3,
           pt: 2,
           gap: 2,
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+          borderTop: '1px solid rgba(0, 0, 0, 0.05)'
         }}
       >
         <Button
@@ -140,7 +140,7 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
           variant="outlined"
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#f5f7fa',
+            color: '#1e293b',
             px: 3,
             py: 1,
             fontWeight: 600,
@@ -157,12 +157,12 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
           onClick={handleProceed}
           variant="contained"
           sx={{
-            background: 'linear-gradient(135deg, #4f8cff 0%, #3a7bd5 100%)',
+            background: 'linear-gradient(135deg, #2563eb 0%, #3a7bd5 100%)',
             color: '#fff',
             px: 4,
             py: 1,
             fontWeight: 700,
-            boxShadow: '0 4px 12px rgba(79, 140, 255, 0.3)',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.18)',
             '&:hover': {
               background: 'linear-gradient(135deg, #3a7bd5 0%, #2d5fa8 100%)',
               transform: 'translateY(-2px)',
@@ -178,4 +178,5 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
 };
 
 export default AIWarningDialog;
+
 

@@ -58,16 +58,16 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           borderRadius: 2,
         }
       }}
     >
       <DialogTitle sx={{ 
-        color: '#f5f7fa', 
+        color: '#1e293b', 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2
       }}>
         {title}
@@ -75,7 +75,7 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
       
       <DialogContent sx={{ pt: 3 }}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 2 }}>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 2 }}>
             How many results would you like to see?
           </Typography>
           
@@ -89,7 +89,7 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
             inputProps={{ 
               min: 1, 
               max: maxResults,
-              style: { color: '#f5f7fa' }
+              style: { color: '#1e293b' }
             }}
             sx={{
               maxWidth: 200,
@@ -101,10 +101,10 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
                   borderColor: error ? '#f44336' : 'rgba(238, 187, 195, 0.5)' 
                 },
                 '&.Mui-focused fieldset': { 
-                  borderColor: error ? '#f44336' : '#eebbc3' 
+                  borderColor: error ? '#f44336' : '#8b5cf6' 
                 },
-                '& input': { color: '#f5f7fa' },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                '& input': { color: '#1e293b' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiFormHelperText-root': { 
                   color: error ? '#f44336' : '#8b9dc3' 
                 },
@@ -121,7 +121,7 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
       <DialogActions sx={{ 
         p: 3, 
         pt: 1,
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         justifyContent: 'center',
         gap: 2
       }}>
@@ -130,10 +130,10 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
           variant="outlined"
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
             },
           }}
         >
@@ -143,7 +143,7 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
           onClick={handleConfirm}
           variant="contained"
           sx={{
-            backgroundColor: '#4f8cff',
+            backgroundColor: '#2563eb',
             color: '#ffffff',
             '&:hover': {
               backgroundColor: '#3d7be8',

@@ -90,8 +90,8 @@ const TalentPools = ({ user }) => {
   // Helper function to get category color
   const getCategoryColor = (category) => {
     const colors = [
-      { bg: 'rgba(79, 140, 255, 0.2)', text: '#4f8cff' },
-      { bg: 'rgba(238, 187, 195, 0.2)', text: '#eebbc3' },
+      { bg: 'rgba(37, 99, 235, 0.12)', text: '#2563eb' },
+      { bg: 'rgba(238, 187, 195, 0.2)', text: '#8b5cf6' },
       { bg: 'rgba(255, 193, 7, 0.2)', text: '#ffc107' },
       { bg: 'rgba(76, 175, 80, 0.2)', text: '#4caf50' },
       { bg: 'rgba(156, 39, 176, 0.2)', text: '#9c27b0' },
@@ -302,16 +302,16 @@ const TalentPools = ({ user }) => {
         <Box>
           <Typography variant="h4" sx={{ 
             fontWeight: 700, 
-            color: '#f5f7fa',
+            color: '#1e293b',
             mb: 1,
             display: 'flex',
             alignItems: 'center',
             gap: 2
           }}>
-            <GroupIcon sx={{ fontSize: 40, color: '#eebbc3' }} />
+            <GroupIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
             Talent Pools & Skills
           </Typography>
-          <Typography variant="body1" sx={{ color: '#b8c5d6' }}>
+          <Typography variant="body1" sx={{ color: '#64748b' }}>
             Organize and manage your candidate talent pools and skills
           </Typography>
         </Box>
@@ -321,8 +321,8 @@ const TalentPools = ({ user }) => {
             startIcon={<StarIcon />}
             onClick={() => setOpenCreateSkillDialog(true)}
             sx={{
-              borderColor: '#4f8cff',
-              color: '#4f8cff',
+              borderColor: '#2563eb',
+              color: '#2563eb',
               fontWeight: 600,
               px: 2,
               py: 1.5,
@@ -340,14 +340,14 @@ const TalentPools = ({ user }) => {
             startIcon={<VisibilityIcon />}
             onClick={() => setOpenViewSkillsDialog(true)}
             sx={{
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
               fontWeight: 600,
               px: 2,
               py: 1.5,
               '&:hover': {
                 borderColor: '#d4a5ac',
-                backgroundColor: 'rgba(238, 187, 195, 0.1)',
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
                 transform: 'translateY(-2px)'
               }
             }}
@@ -359,7 +359,7 @@ const TalentPools = ({ user }) => {
             startIcon={<AddIcon />}
             onClick={() => setOpenCreateDialog(true)}
               sx={{
-                background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                 color: '#fff',
                 fontWeight: 600,
                 px: 3,
@@ -367,7 +367,7 @@ const TalentPools = ({ user }) => {
                 '&:hover': {
                   background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)'
+                  boxShadow: '0 8px 16px rgba(37, 99, 235, 0.18)'
                 }
               }}
             >
@@ -392,13 +392,13 @@ const TalentPools = ({ user }) => {
             size={60}
             thickness={4}
             sx={{
-              color: "#eebbc3",
+              color: "#8b5cf6",
             }}
           />
           <Typography
             variant="h6"
             sx={{
-              color: "#b8c5d6",
+              color: "#64748b",
               fontWeight: 500,
             }}
           >
@@ -410,16 +410,16 @@ const TalentPools = ({ user }) => {
           {/* Talent Pools Table */}
           {talentPools.length === 0 ? (
             <Card sx={{
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
               textAlign: 'center',
               py: 8
             }}>
-              <GroupIcon sx={{ fontSize: 80, color: '#b8c5d6', mb: 2, opacity: 0.5 }} />
-              <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 1 }}>
+              <GroupIcon sx={{ fontSize: 80, color: '#64748b', mb: 2, opacity: 0.5 }} />
+              <Typography variant="h6" sx={{ color: '#64748b', mb: 1 }}>
                 No Talent Pools Yet
               </Typography>
-              <Typography variant="body2" sx={{ color: '#b8c5d6', opacity: 0.7 }}>
+              <Typography variant="body2" sx={{ color: '#64748b', opacity: 0.7 }}>
                 Create your first talent pool to organize candidates
               </Typography>
             </Card>
@@ -427,8 +427,8 @@ const TalentPools = ({ user }) => {
             <TableContainer
               component={Paper}
               sx={{
-                background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+                border: "1px solid rgba(0, 0, 0, 0.05)",
                 borderRadius: 3,
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
               }}
@@ -437,13 +437,13 @@ const TalentPools = ({ user }) => {
                 <TableHead>
                   <TableRow
                     sx={{
-                      background: "rgba(238, 187, 195, 0.1)",
+                      background: "rgba(139, 92, 246, 0.08)",
                       borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
                     }}
                   >
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                         py: 2,
@@ -453,7 +453,7 @@ const TalentPools = ({ user }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -462,7 +462,7 @@ const TalentPools = ({ user }) => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -472,7 +472,7 @@ const TalentPools = ({ user }) => {
                     <TableCell
                       align="center"
                       sx={{
-                        color: "#eebbc3",
+                        color: "#8b5cf6",
                         fontWeight: 700,
                         fontSize: "0.95rem",
                       }}
@@ -486,7 +486,7 @@ const TalentPools = ({ user }) => {
                     <React.Fragment key={pool._id}>
                       <TableRow
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                          borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                           transition: "all 0.3s ease",
                           "&:hover": {
                             background: "rgba(238, 187, 195, 0.05)",
@@ -497,7 +497,7 @@ const TalentPools = ({ user }) => {
                           <Typography
                             variant="h6"
                             sx={{
-                              color: "#f5f7fa",
+                              color: "#1e293b",
                               fontWeight: 600,
                             }}
                           >
@@ -508,7 +508,7 @@ const TalentPools = ({ user }) => {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#b8c5d6",
+                              color: "#64748b",
                             }}
                           >
                             {pool.description}
@@ -520,8 +520,8 @@ const TalentPools = ({ user }) => {
                             label={`${pool.candidates?.length || 0} Candidates`}
                             size="small"
                             sx={{
-                              backgroundColor: "rgba(79, 140, 255, 0.2)",
-                              color: "#4f8cff",
+                              backgroundColor: "rgba(37, 99, 235, 0.12)",
+                              color: "#2563eb",
                               fontWeight: 600,
                             }}
                           />
@@ -532,8 +532,8 @@ const TalentPools = ({ user }) => {
                               <IconButton
                                 onClick={() => handleExpandPool(pool._id)}
                                 sx={{
-                                  color: "#eebbc3",
-                                  backgroundColor: "rgba(238, 187, 195, 0.1)",
+                                  color: "#8b5cf6",
+                                  backgroundColor: "rgba(139, 92, 246, 0.08)",
                                   "&:hover": {
                                     backgroundColor: "rgba(238, 187, 195, 0.2)",
                                     transform: "scale(1.1)",
@@ -576,7 +576,7 @@ const TalentPools = ({ user }) => {
                             py: 0,
                             borderBottom:
                               expandedPoolId === pool._id
-                                ? "1px solid rgba(255, 255, 255, 0.1)"
+                                ? "1px solid rgba(0, 0, 0, 0.05)"
                                 : "none",
                           }}
                         >
@@ -589,7 +589,7 @@ const TalentPools = ({ user }) => {
                               <Typography
                                 variant="h6"
                                 sx={{
-                                  color: "#eebbc3",
+                                  color: "#8b5cf6",
                                   fontWeight: 600,
                                   mb: 2,
                                   display: "flex",
@@ -617,13 +617,13 @@ const TalentPools = ({ user }) => {
                                     size={40}
                                     thickness={4}
                                     sx={{
-                                      color: "#4f8cff",
+                                      color: "#2563eb",
                                     }}
                                   />
                                   <Typography
                                     variant="body2"
                                     sx={{
-                                      color: "#b8c5d6",
+                                      color: "#64748b",
                                     }}
                                   >
                                     Loading candidates...
@@ -642,19 +642,19 @@ const TalentPools = ({ user }) => {
                                     <TableHead>
                                       <TableRow>
                                         <TableCell
-                                          sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                          sx={{ color: "#2563eb", fontWeight: 600 }}
                                         >
                                           Name
                                         </TableCell>
                                         <TableCell
-                                          sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                          sx={{ color: "#2563eb", fontWeight: 600 }}
                                         >
                                           Email
                                         </TableCell>
                                         {user.accessLevel === 2 && (
                                           <TableCell
                                             sx={{
-                                              color: "#4f8cff",
+                                              color: "#2563eb",
                                               fontWeight: 600,
                                               width: 50,
                                             }}
@@ -667,10 +667,10 @@ const TalentPools = ({ user }) => {
                                     <TableBody>
                                       {pool.candidates.map((candidate) => (
                                         <TableRow key={candidate._id}>
-                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                          <TableCell sx={{ color: "#1e293b" }}>
                                             {candidate.name}
                                           </TableCell>
-                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                          <TableCell sx={{ color: "#64748b" }}>
                                             {candidate.email}
                                           </TableCell>
                                           {user.accessLevel === 2 && (
@@ -707,14 +707,14 @@ const TalentPools = ({ user }) => {
                                   sx={{
                                     textAlign: "center",
                                     py: 4,
-                                    color: "#b8c5d6",
+                                    color: "#64748b",
                                     background: "rgba(255, 255, 255, 0.05)",
                                     borderRadius: 2,
-                                    border: "1px dashed rgba(255, 255, 255, 0.2)",
+                                    border: "1px dashed rgba(0, 0, 0, 0.08)",
                                   }}
                                 >
                                   <PeopleIcon
-                                    sx={{ fontSize: 40, color: "#b8c5d6", mb: 1 }}
+                                    sx={{ fontSize: 40, color: "#64748b", mb: 1 }}
                                   />
                                   <Typography variant="body2">
                                     No candidates in this pool
@@ -742,12 +742,12 @@ const TalentPools = ({ user }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
           }
         }}
       >
-        <DialogTitle sx={{ color: '#eebbc3', fontWeight: 600 }}>
+        <DialogTitle sx={{ color: '#8b5cf6', fontWeight: 600 }}>
           Create New Talent Pool
         </DialogTitle>
         <DialogContent>
@@ -764,10 +764,10 @@ const TalentPools = ({ user }) => {
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' }
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' }
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' }
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' }
               }}
             />
 
@@ -785,15 +785,15 @@ const TalentPools = ({ user }) => {
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' }
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' }
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' }
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' }
               }}
             />
 
             {/* Select Candidates */}
-            <Typography variant="subtitle1" sx={{ color: '#eebbc3', mb: 2, fontWeight: 600 }}>
+            <Typography variant="subtitle1" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
               Select Candidates (Optional)
             </Typography>
             <Box sx={{
@@ -804,7 +804,7 @@ const TalentPools = ({ user }) => {
               p: 2
             }}>
               {candidates.length === 0 ? (
-                <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+                <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>
                   No candidates available
                 </Typography>
               ) : (
@@ -816,17 +816,17 @@ const TalentPools = ({ user }) => {
                         checked={formData.selectedCandidates.includes(candidate._id)}
                         onChange={() => handleToggleCandidateSelection(candidate._id)}
                         sx={{
-                          color: '#b8c5d6',
-                          '&.Mui-checked': { color: '#eebbc3' }
+                          color: '#64748b',
+                          '&.Mui-checked': { color: '#8b5cf6' }
                         }}
                       />
                     }
                     label={
                       <Box>
-                        <Typography variant="body2" sx={{ color: '#f5f7fa' }}>
+                        <Typography variant="body2" sx={{ color: '#1e293b' }}>
                           {candidate.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                        <Typography variant="caption" sx={{ color: '#64748b' }}>
                           {candidate.email}
                         </Typography>
                       </Box>
@@ -841,7 +841,7 @@ const TalentPools = ({ user }) => {
         <DialogActions sx={{ p: 3 }}>
           <Button 
             onClick={() => setOpenCreateDialog(false)}
-            sx={{ color: '#b8c5d6' }}
+            sx={{ color: '#64748b' }}
           >
             Cancel
           </Button>
@@ -850,7 +850,7 @@ const TalentPools = ({ user }) => {
             disabled={loading}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
               color: '#fff',
               fontWeight: 600,
               '&:hover': {
@@ -871,12 +871,12 @@ const TalentPools = ({ user }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
           }
         }}
       >
-        <DialogTitle sx={{ color: '#4f8cff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ color: '#2563eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
           <StarIcon />
           Create New Skill
         </DialogTitle>
@@ -894,25 +894,25 @@ const TalentPools = ({ user }) => {
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover fieldset': { borderColor: 'rgba(79, 140, 255, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#4f8cff' }
+                  '&.Mui-focused fieldset': { borderColor: '#2563eb' }
                 },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
-                '& .MuiInputBase-input': { color: '#f5f7fa' }
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b' }
               }}
             />
             
             <FormControl fullWidth>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Category</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Category</InputLabel>
               <Select
                 value={skillCategory}
                 onChange={(e) => setSkillCategory(e.target.value)}
                 label="Category"
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(79, 140, 255, 0.5)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#4f8cff' },
-                  '& .MuiSvgIcon-root': { color: '#b8c5d6' }
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563eb' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' }
                 }}
               >
                 <MenuItem value="sales-and-business-development">Sales and Business Development</MenuItem>
@@ -935,7 +935,7 @@ const TalentPools = ({ user }) => {
         <DialogActions sx={{ p: 3 }}>
           <Button 
             onClick={() => setOpenCreateSkillDialog(false)}
-            sx={{ color: '#b8c5d6' }}
+            sx={{ color: '#64748b' }}
           >
             Cancel
           </Button>
@@ -944,7 +944,7 @@ const TalentPools = ({ user }) => {
             disabled={skillLoading}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #4f8cff 0%, #3a7bd5 100%)',
+              background: 'linear-gradient(135deg, #2563eb 0%, #3a7bd5 100%)',
               color: '#fff',
               fontWeight: 600,
               '&:hover': {
@@ -965,12 +965,12 @@ const TalentPools = ({ user }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
           }
         }}
       >
-        <DialogTitle sx={{ color: '#eebbc3', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ color: '#8b5cf6', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
           <StarIcon />
           All Skills ({skills.length})
         </DialogTitle>
@@ -991,13 +991,13 @@ const TalentPools = ({ user }) => {
                   size={50}
                   thickness={4}
                   sx={{
-                    color: "#4f8cff",
+                    color: "#2563eb",
                   }}
                 />
                 <Typography
                   variant="body1"
                   sx={{
-                    color: "#b8c5d6",
+                    color: "#64748b",
                   }}
                 >
                   Loading skills...
@@ -1005,11 +1005,11 @@ const TalentPools = ({ user }) => {
               </Box>
             ) : skills.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
-                <StarIcon sx={{ fontSize: 60, color: '#b8c5d6', mb: 2, opacity: 0.5 }} />
-                <Typography variant="h6" sx={{ color: '#b8c5d6', mb: 1 }}>
+                <StarIcon sx={{ fontSize: 60, color: '#64748b', mb: 2, opacity: 0.5 }} />
+                <Typography variant="h6" sx={{ color: '#64748b', mb: 1 }}>
                   No Skills Created Yet
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#b8c5d6', opacity: 0.7 }}>
+                <Typography variant="body2" sx={{ color: '#64748b', opacity: 0.7 }}>
                   Create your first skill to get started
                 </Typography>
               </Box>
@@ -1022,34 +1022,34 @@ const TalentPools = ({ user }) => {
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ 
-                        background: '#1a1a2e',
-                        color: '#4f8cff', 
+                        background: '#f8fafc',
+                        color: '#2563eb', 
                         fontWeight: 600,
-                        borderBottom: '2px solid rgba(79, 140, 255, 0.3)'
+                        borderBottom: '2px solid rgba(37, 99, 235, 0.18)'
                       }}>
                         Skill Name
                       </TableCell>
                       <TableCell sx={{ 
-                        background: '#1a1a2e',
-                        color: '#4f8cff', 
+                        background: '#f8fafc',
+                        color: '#2563eb', 
                         fontWeight: 600,
-                        borderBottom: '2px solid rgba(79, 140, 255, 0.3)'
+                        borderBottom: '2px solid rgba(37, 99, 235, 0.18)'
                       }}>
                         Category
                       </TableCell>
                       <TableCell sx={{ 
-                        background: '#1a1a2e',
-                        color: '#4f8cff', 
+                        background: '#f8fafc',
+                        color: '#2563eb', 
                         fontWeight: 600,
-                        borderBottom: '2px solid rgba(79, 140, 255, 0.3)'
+                        borderBottom: '2px solid rgba(37, 99, 235, 0.18)'
                       }}>
                         Usage Count
                       </TableCell>
                       <TableCell sx={{ 
-                        background: '#1a1a2e',
-                        color: '#4f8cff', 
+                        background: '#f8fafc',
+                        color: '#2563eb', 
                         fontWeight: 600,
-                        borderBottom: '2px solid rgba(79, 140, 255, 0.3)',
+                        borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                         width: 100
                       }}>
                         Actions
@@ -1066,7 +1066,7 @@ const TalentPools = ({ user }) => {
                           }
                         }}
                       >
-                        <TableCell sx={{ color: '#f5f7fa', textTransform: 'capitalize' }}>
+                        <TableCell sx={{ color: '#1e293b', textTransform: 'capitalize' }}>
                           {skill.name}
                         </TableCell>
                         <TableCell>
@@ -1079,7 +1079,7 @@ const TalentPools = ({ user }) => {
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ color: '#b8c5d6' }}>
+                        <TableCell sx={{ color: '#64748b' }}>
                           {skill.usageCount || 0}
                         </TableCell>
                         <TableCell>
@@ -1111,7 +1111,7 @@ const TalentPools = ({ user }) => {
             onClick={() => setOpenViewSkillsDialog(false)}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
               color: '#fff',
               fontWeight: 600,
               '&:hover': {

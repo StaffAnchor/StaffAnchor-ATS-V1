@@ -85,27 +85,27 @@ const Login = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <EmailIcon sx={{ color: '#b8c5d6' }} />
+                      <EmailIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      borderColor: '#e2e8f0',
                     },
                     '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
+                      borderColor: '#2563eb',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
+                      borderColor: '#2563eb',
                     },
                   },
                   '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
+                    color: '#64748b',
                   },
                   '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                   },
                 }}
               />
@@ -121,7 +121,7 @@ const Login = ({ setUser }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockIcon sx={{ color: '#b8c5d6' }} />
+                      <LockIcon sx={{ color: '#64748b' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -129,7 +129,7 @@ const Login = ({ setUser }) => {
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
-                        sx={{ color: '#b8c5d6' }}
+                        sx={{ color: '#64748b' }}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
@@ -139,20 +139,20 @@ const Login = ({ setUser }) => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      borderColor: '#e2e8f0',
                     },
                     '&:hover fieldset': {
-                      borderColor: 'rgba(238, 187, 195, 0.5)',
+                      borderColor: '#2563eb',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#eebbc3',
+                      borderColor: '#2563eb',
                     },
                   },
                   '& .MuiInputLabel-root': {
-                    color: '#b8c5d6',
+                    color: '#64748b',
                   },
                   '& .MuiInputBase-input': {
-                    color: '#f5f7fa',
+                    color: '#1e293b',
                   },
                 }}
               />
@@ -164,21 +164,22 @@ const Login = ({ setUser }) => {
                 disabled={loading}
                 className="auth-submit-button"
                 sx={{
-                  background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                   color: '#fff',
                   fontWeight: 600,
                   fontSize: '1rem',
                   padding: '12px',
                   borderRadius: '8px',
                   textTransform: 'none',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
+                    background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)',
+                    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.4)',
                   },
                   '&:disabled': {
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: 'rgba(255, 255, 255, 0.5)',
+                    background: '#e2e8f0',
+                    color: '#94a3b8',
                   },
                 }}
               >

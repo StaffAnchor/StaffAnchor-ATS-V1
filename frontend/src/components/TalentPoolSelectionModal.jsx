@@ -110,13 +110,13 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)'
         }
       }}
     >
       <DialogTitle sx={{ 
-        color: '#eebbc3', 
+        color: '#8b5cf6', 
         fontWeight: 600,
         display: 'flex',
         alignItems: 'center',
@@ -127,16 +127,16 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
       </DialogTitle>
       <DialogContent>
         <Box sx={{ mt: 2 }}>
-          <Typography variant="body1" sx={{ color: '#f5f7fa', mb: 2 }}>
+          <Typography variant="body1" sx={{ color: '#1e293b', mb: 2 }}>
             Select talent pools for <strong>{candidateName}</strong>
           </Typography>
 
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress sx={{ color: '#eebbc3' }} />
+              <CircularProgress sx={{ color: '#8b5cf6' }} />
             </Box>
           ) : talentPools.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic', py: 2 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic', py: 2 }}>
               No talent pools available. Create a talent pool first.
             </Typography>
           ) : (
@@ -155,20 +155,20 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
                       checked={selectedPools.includes(pool._id)}
                       onChange={() => handleTogglePool(pool._id)}
                       sx={{
-                        color: '#b8c5d6',
-                        '&.Mui-checked': { color: '#eebbc3' }
+                        color: '#64748b',
+                        '&.Mui-checked': { color: '#8b5cf6' }
                       }}
                     />
                   }
                   label={
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+                      <Typography variant="body2" sx={{ color: '#1e293b', fontWeight: 600 }}>
                         {pool.name}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#b8c5d6' }}>
+                      <Typography variant="caption" sx={{ color: '#64748b' }}>
                         {pool.description}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#4f8cff', display: 'block' }}>
+                      <Typography variant="caption" sx={{ color: '#2563eb', display: 'block' }}>
                         {pool.candidates?.length || 0} candidates
                       </Typography>
                     </Box>
@@ -184,7 +184,7 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
         <Button 
           onClick={() => onClose(false)}
           disabled={submitting}
-          sx={{ color: '#b8c5d6' }}
+          sx={{ color: '#64748b' }}
         >
           Cancel
         </Button>
@@ -193,14 +193,14 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
           disabled={submitting || loading}
           variant="contained"
           sx={{
-            background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+            background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
             color: '#fff',
             fontWeight: 600,
             '&:hover': {
               background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)'
             },
             '&:disabled': {
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'rgba(0, 0, 0, 0.05)',
               color: 'rgba(255, 255, 255, 0.5)'
             }
           }}

@@ -262,7 +262,7 @@ const Workflows = ({ user }) => {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '50vh',
-        color: '#b8c5d6'
+        color: '#64748b'
       }}>
         <Typography variant="h6">Loading workflows...</Typography>
       </Box>
@@ -281,12 +281,12 @@ const Workflows = ({ user }) => {
         borderBottom: '2px solid rgba(238, 187, 195, 0.3)'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <WorkflowIcon sx={{ fontSize: 40, color: '#eebbc3' }} />
+          <WorkflowIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
           <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: '#eebbc3' }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
               Workflows
             </Typography>
-            <Typography variant="body1" sx={{ color: '#b8c5d6' }}>
+            <Typography variant="body1" sx={{ color: '#64748b' }}>
               Manage your recruitment workflows
             </Typography>
           </Box>
@@ -297,7 +297,7 @@ const Workflows = ({ user }) => {
           variant="contained"
           onClick={() => setShowWorkflowModal(true)}
           sx={{
-            backgroundColor: '#4f8cff',
+            backgroundColor: '#2563eb',
             color: '#ffffff',
             '&:hover': { backgroundColor: '#3d7be8' }
           }}
@@ -321,28 +321,28 @@ const Workflows = ({ user }) => {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               sx={{
-                '& .MuiInputBase-input': { color: '#f5f7fa' },
-                '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                '& .MuiInputBase-input': { color: '#1e293b' },
+                '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                   '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                  '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                 }
               }}
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Status</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               >
@@ -356,16 +356,16 @@ const Workflows = ({ user }) => {
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel sx={{ color: '#b8c5d6' }}>Priority</InputLabel>
+              <InputLabel sx={{ color: '#64748b' }}>Priority</InputLabel>
               <Select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
                 sx={{
-                  color: '#f5f7fa',
+                  color: '#1e293b',
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               >
@@ -384,11 +384,11 @@ const Workflows = ({ user }) => {
               onClick={() => setShowOnlyMyWorkflows(!showOnlyMyWorkflows)}
               sx={{
                 backgroundColor: showOnlyMyWorkflows ? "rgba(238, 187, 195, 0.9)" : "transparent",
-                color: showOnlyMyWorkflows ? "#1a1a2e" : "#eebbc3",
-                borderColor: "#eebbc3",
+                color: showOnlyMyWorkflows ? "#f8fafc" : "#8b5cf6",
+                borderColor: "#8b5cf6",
                 "&:hover": {
-                  backgroundColor: showOnlyMyWorkflows ? "rgba(238, 187, 195, 1)" : "rgba(238, 187, 195, 0.1)",
-                  borderColor: "#eebbc3",
+                  backgroundColor: showOnlyMyWorkflows ? "rgba(238, 187, 195, 1)" : "rgba(139, 92, 246, 0.08)",
+                  borderColor: "#8b5cf6",
                 },
                 fontWeight: 600,
                 textTransform: "none",
@@ -406,12 +406,12 @@ const Workflows = ({ user }) => {
                  <Box sx={{ 
            textAlign: 'center', 
            py: 8,
-           color: '#b8c5d6',
+           color: '#64748b',
            background: 'rgba(255, 255, 255, 0.05)',
            borderRadius: 2,
-           border: '1px dashed rgba(255, 255, 255, 0.2)'
+           border: '1px dashed rgba(0, 0, 0, 0.08)'
          }}>
-           <WorkflowIcon sx={{ fontSize: 60, color: '#b8c5d6', mb: 2 }} />
+           <WorkflowIcon sx={{ fontSize: 60, color: '#64748b', mb: 2 }} />
            <Typography variant="h6" sx={{ mb: 1 }}>
              {filter ? 'No workflows found' : 'No workflows yet'}
            </Typography>
@@ -424,7 +424,7 @@ const Workflows = ({ user }) => {
               variant="contained"
               onClick={() => setShowWorkflowModal(true)}
               sx={{
-                backgroundColor: '#4f8cff',
+                backgroundColor: '#2563eb',
                 color: '#ffffff',
                 '&:hover': { backgroundColor: '#3d7be8' }
               }}
@@ -437,8 +437,8 @@ const Workflows = ({ user }) => {
         <TableContainer
           component={Paper}
           sx={{
-            background: "linear-gradient(135deg, #1a1a2e 0%, #232946 100%)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
             borderRadius: 3,
             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
           }}
@@ -447,13 +447,13 @@ const Workflows = ({ user }) => {
             <TableHead>
               <TableRow
                 sx={{
-                  background: "rgba(238, 187, 195, 0.1)",
+                  background: "rgba(139, 92, 246, 0.08)",
                   borderBottom: "2px solid rgba(238, 187, 195, 0.3)",
                 }}
               >
                 <TableCell
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                     py: 2,
@@ -463,7 +463,7 @@ const Workflows = ({ user }) => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -472,7 +472,7 @@ const Workflows = ({ user }) => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -481,7 +481,7 @@ const Workflows = ({ user }) => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -491,7 +491,7 @@ const Workflows = ({ user }) => {
                 <TableCell
                   align="center"
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -501,7 +501,7 @@ const Workflows = ({ user }) => {
                 <TableCell
                   align="center"
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -511,7 +511,7 @@ const Workflows = ({ user }) => {
                 <TableCell
                   align="center"
                   sx={{
-                    color: "#eebbc3",
+                    color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                   }}
@@ -526,7 +526,7 @@ const Workflows = ({ user }) => {
                   <TableRow
                     onClick={() => setExpandedWorkflowId(expandedWorkflowId === workflow._id ? null : workflow._id)}
                     sx={{
-                      borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                       transition: "all 0.3s ease",
                       cursor: "pointer",
                       "&:hover": {
@@ -538,7 +538,7 @@ const Workflows = ({ user }) => {
                       <Typography
                         variant="h6"
                         sx={{
-                          color: "#f5f7fa",
+                          color: "#1e293b",
                           fontWeight: 600,
                           fontSize: "1rem",
                         }}
@@ -550,7 +550,7 @@ const Workflows = ({ user }) => {
                       <Typography
                         variant="body2"
                         sx={{
-                          color: "#b8c5d6",
+                          color: "#64748b",
                         }}
                       >
                         {workflow.organization}
@@ -582,7 +582,7 @@ const Workflows = ({ user }) => {
                       <Typography
                         variant="body1"
                         sx={{
-                          color: "#eebbc3",
+                          color: "#8b5cf6",
                           fontWeight: 700,
                         }}
                       >
@@ -593,7 +593,7 @@ const Workflows = ({ user }) => {
                       <Typography
                         variant="body1"
                         sx={{
-                          color: "#4f8cff",
+                          color: "#2563eb",
                           fontWeight: 700,
                         }}
                       >
@@ -606,10 +606,10 @@ const Workflows = ({ user }) => {
                           <IconButton
                             onClick={() => setExpandedWorkflowId(expandedWorkflowId === workflow._id ? null : workflow._id)}
                             sx={{
-                              color: "#4f8cff",
+                              color: "#2563eb",
                               backgroundColor: "rgba(79, 140, 255, 0.1)",
                               "&:hover": {
-                                backgroundColor: "rgba(79, 140, 255, 0.2)",
+                                backgroundColor: "rgba(37, 99, 235, 0.12)",
                                 transform: "scale(1.1)",
                               },
                             }}
@@ -630,14 +630,14 @@ const Workflows = ({ user }) => {
                               }}
                               disabled={user.accessLevel === 1 && workflow.createdBy._id !== user._id}
                               sx={{
-                                color: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? '#666' : '#eebbc3',
-                                backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(238, 187, 195, 0.1)',
+                                color: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? '#475569' : '#8b5cf6',
+                                backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(139, 92, 246, 0.08)',
                                 "&:hover": {
                                   backgroundColor: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'transparent' : 'rgba(238, 187, 195, 0.2)',
                                   transform: user.accessLevel === 1 && workflow.createdBy._id !== user._id ? 'none' : 'scale(1.1)',
                                 },
                                 '&.Mui-disabled': {
-                                  color: '#666',
+                                  color: '#475569',
                                 }
                               }}
                             >
@@ -677,7 +677,7 @@ const Workflows = ({ user }) => {
                         py: 0,
                         borderBottom:
                           expandedWorkflowId === workflow._id
-                            ? "1px solid rgba(255, 255, 255, 0.1)"
+                            ? "1px solid rgba(0, 0, 0, 0.05)"
                             : "none",
                       }}
                     >
@@ -690,7 +690,7 @@ const Workflows = ({ user }) => {
                           <Typography
                             variant="h6"
                             sx={{
-                              color: "#eebbc3",
+                              color: "#8b5cf6",
                               fontWeight: 600,
                               mb: 2,
                             }}
@@ -712,33 +712,33 @@ const Workflows = ({ user }) => {
                                 <TableHead>
                                   <TableRow>
                                     <TableCell
-                                      sx={{ color: "#4f8cff", fontWeight: 600, width: "5%" }}
+                                      sx={{ color: "#2563eb", fontWeight: 600, width: "5%" }}
                                     >
                                       
                                     </TableCell>
                                     <TableCell
-                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                      sx={{ color: "#2563eb", fontWeight: 600 }}
                                     >
                                       Phase
                                     </TableCell>
                                     <TableCell
-                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                      sx={{ color: "#2563eb", fontWeight: 600 }}
                                     >
                                       Name
                                     </TableCell>
                                     <TableCell
-                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                      sx={{ color: "#2563eb", fontWeight: 600 }}
                                     >
                                       Type
                                     </TableCell>
                                     <TableCell
-                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                      sx={{ color: "#2563eb", fontWeight: 600 }}
                                     >
                                       Status
                                     </TableCell>
                                     <TableCell
                                       align="center"
-                                      sx={{ color: "#4f8cff", fontWeight: 600 }}
+                                      sx={{ color: "#2563eb", fontWeight: 600 }}
                                     >
                                       Candidates
                                     </TableCell>
@@ -761,14 +761,14 @@ const Workflows = ({ user }) => {
                                           }}
                                         >
                                           <TableCell>
-                                            <IconButton size="small" sx={{ color: "#4f8cff" }}>
+                                            <IconButton size="small" sx={{ color: "#2563eb" }}>
                                               {isPhaseExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                             </IconButton>
                                           </TableCell>
-                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                          <TableCell sx={{ color: "#1e293b" }}>
                                             Phase {phase.phaseNumber}
                                           </TableCell>
-                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                          <TableCell sx={{ color: "#1e293b" }}>
                                             {phase.phaseName}
                                           </TableCell>
                                           <TableCell>
@@ -793,33 +793,33 @@ const Workflows = ({ user }) => {
                                               }}
                                             />
                                           </TableCell>
-                                          <TableCell align="center" sx={{ color: "#4f8cff", fontWeight: 700 }}>
+                                          <TableCell align="center" sx={{ color: "#2563eb", fontWeight: 700 }}>
                                             {phase.candidates?.length || 0}
                                           </TableCell>
                                         </TableRow>
 
                                         {/* Expanded Candidates in Phase */}
                                         <TableRow>
-                                          <TableCell colSpan={6} sx={{ py: 0, borderBottom: isPhaseExpanded ? "1px solid rgba(255, 255, 255, 0.1)" : "none" }}>
+                                          <TableCell colSpan={6} sx={{ py: 0, borderBottom: isPhaseExpanded ? "1px solid rgba(0, 0, 0, 0.05)" : "none" }}>
                                             <Collapse in={isPhaseExpanded} timeout="auto" unmountOnExit>
                                               <Box sx={{ p: 2, background: "rgba(255, 255, 255, 0.02)" }}>
                                                 {phase.candidates && phase.candidates.length > 0 ? (
                                                   <Table size="small">
                                                     <TableHead>
                                                       <TableRow>
-                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                        <TableCell sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                                           Name
                                                         </TableCell>
-                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                        <TableCell sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                                           Email
                                                         </TableCell>
-                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                        <TableCell sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                                           Phone
                                                         </TableCell>
-                                                        <TableCell sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                        <TableCell sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                                           Status
                                                         </TableCell>
-                                                        <TableCell align="center" sx={{ color: "#eebbc3", fontWeight: 600 }}>
+                                                        <TableCell align="center" sx={{ color: "#8b5cf6", fontWeight: 600 }}>
                                                           Action
                                                         </TableCell>
                                                       </TableRow>
@@ -835,17 +835,17 @@ const Workflows = ({ user }) => {
                                                           sx={{
                                                             cursor: "pointer",
                                                             "&:hover": {
-                                                              background: "rgba(238, 187, 195, 0.1)",
+                                                              background: "rgba(139, 92, 246, 0.08)",
                                                             },
                                                           }}
                                                         >
-                                                          <TableCell sx={{ color: "#f5f7fa" }}>
+                                                          <TableCell sx={{ color: "#1e293b" }}>
                                                             {candidate.name}
                                                           </TableCell>
-                                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                                          <TableCell sx={{ color: "#64748b" }}>
                                                             {candidate.email}
                                                           </TableCell>
-                                                          <TableCell sx={{ color: "#b8c5d6" }}>
+                                                          <TableCell sx={{ color: "#64748b" }}>
                                                             {candidate.phone || "N/A"}
                                                           </TableCell>
                                                           <TableCell>
@@ -868,7 +868,7 @@ const Workflows = ({ user }) => {
                                                                   handleCandidateClick(candidate._id);
                                                                 }}
                                                                 sx={{
-                                                                  color: "#4f8cff",
+                                                                  color: "#2563eb",
                                                                   "&:hover": {
                                                                     backgroundColor: "rgba(79, 140, 255, 0.1)",
                                                                   },
@@ -886,7 +886,7 @@ const Workflows = ({ user }) => {
                                                   <Typography
                                                     variant="body2"
                                                     sx={{
-                                                      color: "#b8c5d6",
+                                                      color: "#64748b",
                                                       textAlign: "center",
                                                       py: 2,
                                                     }}
@@ -909,10 +909,10 @@ const Workflows = ({ user }) => {
                               sx={{
                                 textAlign: "center",
                                 py: 4,
-                                color: "#b8c5d6",
+                                color: "#64748b",
                                 background: "rgba(255, 255, 255, 0.05)",
                                 borderRadius: 2,
-                                border: "1px dashed rgba(255, 255, 255, 0.2)",
+                                border: "1px dashed rgba(0, 0, 0, 0.08)",
                               }}
                             >
                               <Typography variant="body2">
@@ -954,34 +954,34 @@ const Workflows = ({ user }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
             borderRadius: 2,
             maxHeight: '90vh'
           }
         }}
       >
         <DialogTitle sx={{ 
-          color: '#f5f7fa', 
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          color: '#1e293b', 
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
           pb: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           position: 'sticky',
           top: 0,
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
           zIndex: 1
         }}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#eebbc3' }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
               Workflow Overview
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mt: 1 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
               {selectedWorkflow?.jobTitle} - {selectedWorkflow?.organization}
             </Typography>
           </Box>
-          <IconButton onClick={() => setShowViewModal(false)} sx={{ color: '#b8c5d6' }}>
+          <IconButton onClick={() => setShowViewModal(false)} sx={{ color: '#64748b' }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -1011,15 +1011,15 @@ const Workflows = ({ user }) => {
                   label={`${selectedWorkflow.phases?.length || 0} Phases`}
                   sx={{
                     backgroundColor: 'rgba(238, 187, 195, 0.2)',
-                    color: '#eebbc3',
+                    color: '#8b5cf6',
                     fontWeight: 600
                   }}
                 />
                 <Chip 
                   label={`${selectedWorkflow.totalCandidates || 0} Total Candidates`}
                   sx={{
-                    backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                    color: '#4f8cff',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                    color: '#2563eb',
                     fontWeight: 600
                   }}
                 />
@@ -1027,7 +1027,7 @@ const Workflows = ({ user }) => {
 
               {/* Detailed Phase Information - Table Format */}
               <Box>
-                <Typography variant="h6" sx={{ color: '#eebbc3', mb: 3, fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 3, fontWeight: 600 }}>
                   Phase Details
                 </Typography>
                 
@@ -1040,22 +1040,22 @@ const Workflows = ({ user }) => {
                     {/* Table Header */}
                     <TableBody>
                       <TableRow sx={{
-                        background: 'rgba(238, 187, 195, 0.1)',
+                        background: 'rgba(139, 92, 246, 0.08)',
                         borderBottom: '2px solid rgba(238, 187, 195, 0.3)'
                       }}>
-                        <TableCell sx={{ color: '#eebbc3', fontWeight: 700, width: '5%', textAlign: 'center', py: 2 }}>
+                        <TableCell sx={{ color: '#8b5cf6', fontWeight: 700, width: '5%', textAlign: 'center', py: 2 }}>
                           #
                         </TableCell>
-                        <TableCell sx={{ color: '#eebbc3', fontWeight: 700, width: '30%', py: 2 }}>
+                        <TableCell sx={{ color: '#8b5cf6', fontWeight: 700, width: '30%', py: 2 }}>
                           Phase Name
                         </TableCell>
-                        <TableCell sx={{ color: '#eebbc3', fontWeight: 700, width: '20%', py: 2 }}>
+                        <TableCell sx={{ color: '#8b5cf6', fontWeight: 700, width: '20%', py: 2 }}>
                           Phase Type
                         </TableCell>
-                        <TableCell sx={{ color: '#eebbc3', fontWeight: 700, width: '15%', py: 2 }}>
+                        <TableCell sx={{ color: '#8b5cf6', fontWeight: 700, width: '15%', py: 2 }}>
                           State
                         </TableCell>
-                        <TableCell sx={{ color: '#eebbc3', fontWeight: 700, width: '15%', textAlign: 'center', py: 2 }}>
+                        <TableCell sx={{ color: '#8b5cf6', fontWeight: 700, width: '15%', textAlign: 'center', py: 2 }}>
                           Candidates
                         </TableCell>
                       </TableRow>
@@ -1074,7 +1074,7 @@ const Workflows = ({ user }) => {
                               '&:hover': {
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 '& td:first-of-type': {
-                                  borderLeft: '3px solid #eebbc3'
+                                  borderLeft: '3px solid #8b5cf6'
                                 }
                               },
                               transition: 'all 0.2s ease'
@@ -1095,7 +1095,7 @@ const Workflows = ({ user }) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontWeight: 700,
-                                color: '#1a1a2e',
+                                color: '#f8fafc',
                                 fontSize: '0.9rem',
                                 mx: 'auto'
                               }}>
@@ -1106,7 +1106,7 @@ const Workflows = ({ user }) => {
                             {/* Phase Name */}
                             <TableCell sx={{ 
                               borderBottom: (phase.customFields && phase.customFields.length > 0) ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
-                              color: '#f5f7fa',
+                              color: '#1e293b',
                               fontWeight: 600,
                               py: 2
                             }}>
@@ -1163,11 +1163,11 @@ const Workflows = ({ user }) => {
                                   display: 'inline-block',
                                   px: 2,
                                   py: 0.5,
-                                  background: 'rgba(79, 140, 255, 0.15)',
+                                  background: 'rgba(37, 99, 235, 0.1)',
                                   borderRadius: 1,
-                                  border: '1px solid rgba(79, 140, 255, 0.3)'
+                                  border: '1px solid rgba(37, 99, 235, 0.18)'
                                 }}>
-                                  <Typography variant="h6" sx={{ color: '#4f8cff', fontWeight: 700, fontSize: '1.1rem' }}>
+                                  <Typography variant="h6" sx={{ color: '#2563eb', fontWeight: 700, fontSize: '1.1rem' }}>
                                     {phase.candidates?.length || 0}
                                   </Typography>
                                 </Box>
@@ -1175,7 +1175,7 @@ const Workflows = ({ user }) => {
                                   <Box sx={{ 
                                     display: 'flex',
                                     alignItems: 'center',
-                                    color: '#4f8cff'
+                                    color: '#2563eb'
                                   }}>
                                     {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                   </Box>
@@ -1207,12 +1207,12 @@ const Workflows = ({ user }) => {
                                           key={fieldIndex}
                                           sx={{
                                             '&:hover': {
-                                              background: 'rgba(238, 187, 195, 0.1)'
+                                              background: 'rgba(139, 92, 246, 0.08)'
                                             }
                                           }}
                                         >
                                           <TableCell sx={{ 
-                                            color: '#eebbc3', 
+                                            color: '#8b5cf6', 
                                             fontWeight: 600,
                                             fontSize: '0.8rem',
                                             width: '30%',
@@ -1222,7 +1222,7 @@ const Workflows = ({ user }) => {
                                             {field.key}
                                           </TableCell>
                                           <TableCell sx={{ 
-                                            color: '#b8c5d6',
+                                            color: '#64748b',
                                             fontSize: '0.8rem',
                                             borderBottom: fieldIndex === phase.customFields.length - 1 ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
                                             py: 1
@@ -1251,7 +1251,7 @@ const Workflows = ({ user }) => {
                                 }}
                               >
                                 <Box>
-                                  <Typography variant="subtitle1" sx={{ color: '#4f8cff', fontWeight: 600, mb: 2 }}>
+                                  <Typography variant="subtitle1" sx={{ color: '#2563eb', fontWeight: 600, mb: 2 }}>
                                     Candidates in {phase.phaseName} ({phase.candidates?.length || 0})
                                   </Typography>
                                   
@@ -1276,13 +1276,13 @@ const Workflows = ({ user }) => {
                                                 }
                                               }}
                                             >
-                                              <TableCell sx={{ color: '#f5f7fa', fontWeight: 600, width: '40%' }}>
+                                              <TableCell sx={{ color: '#1e293b', fontWeight: 600, width: '40%' }}>
                                                 {candidate.name || 'Unknown'}
                                               </TableCell>
-                                              <TableCell sx={{ color: '#b8c5d6', width: '35%' }}>
+                                              <TableCell sx={{ color: '#64748b', width: '35%' }}>
                                                 {candidate.email || 'No email'}
                                               </TableCell>
-                                              <TableCell sx={{ color: '#b8c5d6', width: '25%' }}>
+                                              <TableCell sx={{ color: '#64748b', width: '25%' }}>
                                                 {candidate.phone || 'No phone'}
                                               </TableCell>
                                             </TableRow>
@@ -1291,7 +1291,7 @@ const Workflows = ({ user }) => {
                                       </Table>
                                     </TableContainer>
                                   ) : (
-                                    <Typography variant="body2" sx={{ color: '#b8c5d6', fontStyle: 'italic' }}>
+                                    <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>
                                       No candidates in this phase
                                     </Typography>
                                   )}
@@ -1312,18 +1312,18 @@ const Workflows = ({ user }) => {
         <DialogActions sx={{ 
           p: 3, 
           pt: 2,
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          borderTop: '1px solid rgba(0, 0, 0, 0.05)',
           justifyContent: 'center',
           position: 'sticky',
           bottom: 0,
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
           zIndex: 1
         }}>
           <Button 
             onClick={() => setShowViewModal(false)}
             variant="contained"
             sx={{
-              backgroundColor: '#4f8cff',
+              backgroundColor: '#2563eb',
               color: '#ffffff',
               '&:hover': {
                 backgroundColor: '#3d7be8'
@@ -1343,15 +1343,15 @@ const Workflows = ({ user }) => {
         fullWidth
         PaperProps={{
           sx: {
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
             borderRadius: 2
           }
         }}
       >
         <DialogTitle sx={{ 
-          color: '#f5f7fa', 
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          color: '#1e293b', 
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
           pb: 2,
           display: 'flex',
           alignItems: 'center',
@@ -1364,11 +1364,11 @@ const Workflows = ({ user }) => {
         </DialogTitle>
         
         <DialogContent sx={{ pt: 3 }}>
-          <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 2 }}>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 2 }}>
             Are you sure you want to delete this workflow?
           </Typography>
           {workflowToDelete && (
-            <Typography variant="body2" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+            <Typography variant="body2" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
               "{workflowToDelete.jobTitle} - {workflowToDelete.organization}"
             </Typography>
           )}
@@ -1383,10 +1383,10 @@ const Workflows = ({ user }) => {
             variant="outlined"
             sx={{
               borderColor: 'rgba(255, 255, 255, 0.3)',
-              color: '#b8c5d6',
+              color: '#64748b',
               '&:hover': {
-                borderColor: '#eebbc3',
-                color: '#eebbc3',
+                borderColor: '#8b5cf6',
+                color: '#8b5cf6',
               }
             }}
           >

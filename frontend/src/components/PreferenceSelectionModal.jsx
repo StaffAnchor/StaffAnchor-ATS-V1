@@ -65,16 +65,16 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          border: '1px solid rgba(0, 0, 0, 0.05)',
           borderRadius: 2,
         }
       }}
     >
       <DialogTitle sx={{ 
-        color: '#f5f7fa', 
+        color: '#1e293b', 
         textAlign: 'center',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2
       }}>
         {title}
@@ -82,7 +82,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
       
       <DialogContent sx={{ pt: 3 }}>
         <Box sx={{ mb: 3 }}>
-          <Typography variant="body1" sx={{ color: '#b8c5d6', mb: 3, textAlign: 'center' }}>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 3, textAlign: 'center' }}>
             Adjust the sliders to set your preference levels for different matching criteria. 
             Higher values mean more importance in the candidate matching process.
           </Typography>
@@ -97,10 +97,10 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                 <Box sx={{ minWidth: '200px', flexShrink: 0 }}>
-                  <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1 }}>
+                  <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1 }}>
                     Skills vs Description
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
                     How much should candidate skills match the job description?
                   </Typography>
                 </Box>
@@ -124,7 +124,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
                         height: 6,
                       },
                       '& .MuiSlider-rail': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
                         height: 6,
                       },
                     }}
@@ -152,10 +152,10 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                 <Box sx={{ minWidth: '200px', flexShrink: 0 }}>
-                  <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1 }}>
+                  <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1 }}>
                     Experience vs Description
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
                     How much should work experience match the job description?
                   </Typography>
                 </Box>
@@ -179,7 +179,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
                         height: 6,
                       },
                       '& .MuiSlider-rail': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
                         height: 6,
                       },
                     }}
@@ -207,10 +207,10 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                 <Box sx={{ minWidth: '200px', flexShrink: 0 }}>
-                  <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1 }}>
+                  <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1 }}>
                     Years of Experience
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
                     How important is the exact years of experience match?
                   </Typography>
                 </Box>
@@ -234,7 +234,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
                         height: 6,
                       },
                       '& .MuiSlider-rail': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
                         height: 6,
                       },
                     }}
@@ -262,10 +262,10 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                 <Box sx={{ minWidth: '200px', flexShrink: 0 }}>
-                  <Typography variant="h6" sx={{ color: '#eebbc3', mb: 1 }}>
+                  <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 1 }}>
                     Location Match
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
                     How important is location compatibility?
                   </Typography>
                 </Box>
@@ -289,7 +289,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
                         height: 6,
                       },
                       '& .MuiSlider-rail': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
                         height: 6,
                       },
                     }}
@@ -314,7 +314,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
       <DialogActions sx={{ 
         p: 3, 
         pt: 1,
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         justifyContent: 'center',
         gap: 2
       }}>
@@ -323,10 +323,10 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
           variant="outlined"
           sx={{
             borderColor: 'rgba(255, 255, 255, 0.3)',
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': {
-              borderColor: '#eebbc3',
-              color: '#eebbc3',
+              borderColor: '#8b5cf6',
+              color: '#8b5cf6',
             },
           }}
         >
@@ -336,7 +336,7 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
           onClick={handleConfirm}
           variant="contained"
           sx={{
-            backgroundColor: '#4f8cff',
+            backgroundColor: '#2563eb',
             color: '#ffffff',
             '&:hover': {
               backgroundColor: '#3d7be8',

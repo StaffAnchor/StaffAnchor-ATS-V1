@@ -32,7 +32,7 @@ const AuthorizedJobs = ({ userId }) => {
   };
 
   return (
-    <Box sx={{padding: 2, background: '#232946', borderRadius: 2, border: '1px solid #444', color: '#f5f7fa'}}>
+    <Box sx={{padding: 2, background: '#ffffff', borderRadius: 2, border: '1px solid #e2e8f0', color: '#1e293b'}}>
       <Typography variant="h4" sx={{fontWeight: 700, mb: 2, color: '#90caf9'}}>Authorized Jobs</Typography>
       {jobs.map(job => (
         <JobDetails 

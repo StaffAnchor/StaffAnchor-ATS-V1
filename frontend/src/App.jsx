@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
 import Login from './pages/Login.jsx';
@@ -9,6 +9,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Subordinates from './pages/Subordinates.jsx';
 import PublicJobApplication from './pages/PublicJobApplication.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { setupAxiosInterceptors } from './utils/axiosConfig.js';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -24,11 +26,7 @@ function App() {
     }
   }, [navigate]);
   
-  // Always dark mode
-  useEffect(() => {
-    document.body.classList.add('dark');
-    return () => document.body.classList.remove('dark');
-  }, []);
+  // Light mode is now the default theme
 
   // Auto-login with JWT from localStorage
   useEffect(() => {
@@ -49,11 +47,17 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
-  };
+    navigate('/login');
+  }, [navigate]);
+
+  // Setup axios interceptors with navigate and logout
+  useEffect(() => {
+    setupAxiosInterceptors(navigate, handleLogout);
+  }, [navigate, handleLogout]);
 
   // Show loading screen while checking authentication
   if (loading) {
@@ -63,8 +67,10 @@ function App() {
         justifyContent: 'center', 
         alignItems: 'center', 
         height: '100vh', 
-        background: '#1a1a2e',
-        color: '#f5f7fa' 
+        background: '#f8fafc',
+        color: '#1e293b',
+        fontSize: '1.2rem',
+        fontWeight: 600
       }}>
         Loading...
       </div>
@@ -73,7 +79,7 @@ function App() {
 
   return (
     <>
-      <ToastContainer position="top-center" autoClose={3000} theme="dark" />
+      <ToastContainer position="top-center" autoClose={3000} theme="light" />
       <Routes>
         {/* Public route - no header, no authentication */}
         <Route path="/apply/:jobId" element={<PublicJobApplication />} />
@@ -87,10 +93,35 @@ function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login setUser={handleSetUser} />} />
                 <Route path="/signup" element={<Signup setUser={handleSetUser} />} />
-                <Route path="/dashboard" element={user ? <Dashboard user={user} setUser={handleSetUser} onLogout={handleLogout} /> : <LandingPage />} />
-                {user && user.accessLevel === 2 && (
-                  <Route path="/subordinates" element={<Subordinates user={user} />} />
-                )}
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      <Dashboard user={user} setUser={handleSetUser} onLogout={handleLogout} />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/subordinates" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      {user && user.accessLevel === 2 ? (
+                        <Subordinates user={user} />
+                      ) : (
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          height: '100vh',
+                          color: '#1e293b',
+                          fontSize: '1.5rem'
+                        }}>
+                          Access Denied: Admin Only
+                        </div>
+                      )}
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </div>
           </>

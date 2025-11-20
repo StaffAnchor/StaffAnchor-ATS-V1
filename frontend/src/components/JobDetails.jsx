@@ -308,10 +308,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       onClick={onExpandClick}
       sx={{
         p: 3, 
-        background: 'linear-gradient(135deg, #232946 0%, #1a1a2e 100%)',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         borderRadius: 1,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-        color: '#f5f7fa', 
+        color: '#1e293b', 
         border: '1px solid rgba(255, 255, 255, 0.08)',
         transition: 'all 0.3s ease',
         cursor: 'pointer',
@@ -341,24 +341,24 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               }}
               sx={{
                 borderColor: 'rgba(255, 255, 255, 0.3)',
-                color: '#b8c5d6',
+                color: '#64748b',
                 fontSize: '0.75rem',
                 padding: '4px 8px',
                 minWidth: 'auto',
                 borderRadius: 1,
                 '&:hover': {
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
+                  borderColor: '#8b5cf6',
+                  color: '#8b5cf6',
                 },
               }}
             >
               {expanded ? 'Hide' : 'View'}
             </Button>
-            <Typography variant="h5" sx={{fontWeight: 700, color: '#eebbc3'}}>
+            <Typography variant="h5" sx={{fontWeight: 700, color: '#8b5cf6'}}>
               {job.title}
             </Typography>
           </Box>
-          <Typography variant="body2" sx={{color: '#b8c5d6'}}>
+          <Typography variant="body2" sx={{color: '#64748b'}}>
             {job.organization}
           </Typography>
         </Box>
@@ -366,23 +366,23 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         {/* Show basic info when collapsed */}
         {!expanded && !editMode && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Typography variant="body1" sx={{color: '#f5f7fa'}}>
+            <Typography variant="body1" sx={{color: '#1e293b'}}>
               <strong>Location:</strong> {job.location}
             </Typography>
-            <Typography variant="body1" sx={{color: '#f5f7fa'}}>
+            <Typography variant="body1" sx={{color: '#1e293b'}}>
               <strong>Experience:</strong> {job.experience} years
             </Typography>
             {job.ctc && (
-              <Typography variant="body1" sx={{color: '#f5f7fa'}}>
+              <Typography variant="body1" sx={{color: '#1e293b'}}>
                 <strong>CTC:</strong> ₹ {job.ctc} LPA
               </Typography>
             )}
             {job.industry && (
-              <Typography variant="body1" sx={{color: '#f5f7fa'}}>
+              <Typography variant="body1" sx={{color: '#1e293b'}}>
                 <strong>Industry:</strong> {job.industry}
               </Typography>
             )}
-            <Typography variant="body1" sx={{color: '#f5f7fa'}}>
+            <Typography variant="body1" sx={{color: '#1e293b'}}>
               <strong>Remote:</strong> {job.remote ? 'Available' : 'Not Available'}
             </Typography>
           </Box>
@@ -402,8 +402,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                   }}
                   sx={{ 
                     borderColor: 'rgba(255, 255, 255, 0.3)', 
-                    color: '#b8c5d6',
-                    '&:hover': { borderColor: '#eebbc3', color: '#eebbc3' }
+                    color: '#64748b',
+                    '&:hover': { borderColor: '#8b5cf6', color: '#8b5cf6' }
                   }}
                 >
                   Edit
@@ -417,10 +417,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 }}
                 disabled={isLoading}
                 sx={{ 
-                  backgroundColor: '#4f8cff', 
+                  backgroundColor: '#2563eb', 
                   color: '#ffffff',
                   '&:hover': { backgroundColor: '#3d7be8' },
-                  '&:disabled': { backgroundColor: '#666' }
+                  '&:disabled': { backgroundColor: '#475569' }
                 }}
               >
                 {isLoading ? 'Finding...' : 'Find Suitable Candidates'}
@@ -434,10 +434,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 startIcon={<PeopleIcon />}
                 sx={{ 
                   borderColor: 'rgba(238, 187, 195, 0.5)', 
-                  color: '#eebbc3',
+                  color: '#8b5cf6',
                   '&:hover': { 
-                    borderColor: '#eebbc3', 
-                    backgroundColor: 'rgba(238, 187, 195, 0.1)' 
+                    borderColor: '#8b5cf6', 
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)' 
                   }
                 }}
               >
@@ -508,7 +508,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       Location
                     </TableCell>
                     <TableCell sx={{ 
-                      color: '#f5f7fa', 
+                      color: '#1e293b', 
                       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                       py: 2
                     }}>
@@ -527,7 +527,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       Years of Experience
                     </TableCell>
                     <TableCell sx={{ 
-                      color: '#f5f7fa', 
+                      color: '#1e293b', 
                       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                       py: 2
                     }}>
@@ -547,7 +547,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         CTC
                       </TableCell>
                       <TableCell sx={{ 
-                        color: '#f5f7fa', 
+                        color: '#1e293b', 
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         py: 2
                       }}>
@@ -568,7 +568,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         Industry
                       </TableCell>
                       <TableCell sx={{ 
-                        color: '#f5f7fa', 
+                        color: '#1e293b', 
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         py: 2
                       }}>
@@ -588,7 +588,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       Remote Work
                     </TableCell>
                     <TableCell sx={{ 
-                      color: '#f5f7fa', 
+                      color: '#1e293b', 
                       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                       py: 2
                     }}>
@@ -609,7 +609,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         Job Description
                       </TableCell>
                       <TableCell sx={{ 
-                        color: '#f5f7fa', 
+                        color: '#1e293b', 
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         lineHeight: 1.6,
                         py: 2
@@ -632,7 +632,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         Recruiters ({job.recruiters.length})
                       </TableCell>
                       <TableCell sx={{ 
-                        color: '#f5f7fa', 
+                        color: '#1e293b', 
                         borderBottom: 'none',
                         py: 2
                       }}>
@@ -644,19 +644,19 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                                 p: 2,
                                 background: 'rgba(255, 255, 255, 0.05)',
                                 borderRadius: 1,
-                                border: '1px solid rgba(255, 255, 255, 0.1)'
+                                border: '1px solid rgba(0, 0, 0, 0.05)'
                               }}
                             >
-                              <Typography variant="body2" sx={{ color: '#f5f7fa', mb: 0.5 }}>
+                              <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}>
                                 <strong>Name:</strong> {recruiter.name}
                               </Typography>
                               {recruiter.email && (
-                                <Typography variant="body2" sx={{ color: '#f5f7fa', mb: 0.5 }}>
+                                <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}>
                                   <strong>Email:</strong> {recruiter.email}
                                 </Typography>
                               )}
                               {recruiter.phone && (
-                                <Typography variant="body2" sx={{ color: '#f5f7fa' }}>
+                                <Typography variant="body2" sx={{ color: '#1e293b' }}>
                                   <strong>Phone:</strong> {recruiter.phone}
                                 </Typography>
                               )}
@@ -681,7 +681,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               pb: 2,
               borderBottom: '2px solid rgba(238, 187, 195, 0.3)'
             }}>
-              <Typography variant="h5" sx={{fontWeight: 700, color: '#eebbc3'}}>Edit Job</Typography>
+              <Typography variant="h5" sx={{fontWeight: 700, color: '#8b5cf6'}}>Edit Job</Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button 
                   variant="outlined" 
@@ -690,9 +690,9 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                     setEditMode(false);
                   }}
                   sx={{ 
-                    borderColor: '#666', 
-                    color: '#b8c5d6',
-                    '&:hover': { borderColor: '#eebbc3', color: '#eebbc3' }
+                    borderColor: '#475569', 
+                    color: '#64748b',
+                    '&:hover': { borderColor: '#8b5cf6', color: '#8b5cf6' }
                   }}
                 >
                   Cancel
@@ -704,8 +704,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                     handleSave();
                   }}
                   sx={{ 
-                    backgroundColor: '#eebbc3', 
-                    color: '#1a1a2e',
+                    backgroundColor: '#8b5cf6', 
+                    color: '#f8fafc',
                     '&:hover': { backgroundColor: '#d4a5ac' }
                   }}
                 >
@@ -724,12 +724,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -742,12 +742,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -760,12 +760,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -779,12 +779,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -797,12 +797,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -815,12 +815,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onChange={handleEditChange}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -833,13 +833,13 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                     onChange={handleEditChange}
                     name="remote"
                     sx={{
-                      color: '#eebbc3',
-                      '&.Mui-checked': { color: '#eebbc3' }
+                      color: '#8b5cf6',
+                      '&.Mui-checked': { color: '#8b5cf6' }
                     }}
                   />
                 }
                 label="Remote Work Available"
-                sx={{ color: '#f5f7fa', mt: 1 }}
+                sx={{ color: '#1e293b', mt: 1 }}
               />
               
               {/* Description */}
@@ -852,12 +852,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 rows={4}
                 fullWidth
                 sx={{ 
-                  '& .MuiInputBase-input': { color: '#f5f7fa' }, 
-                  '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                  '& .MuiInputBase-input': { color: '#1e293b' }, 
+                  '& .MuiInputLabel-root': { color: '#64748b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                   }
                 }}
               />
@@ -865,7 +865,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               {/* Recruiters Section */}
               <Box sx={{ mt: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                  <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                     Recruiters ({recruiters.length})
                   </Typography>
                   <Button
@@ -896,7 +896,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       p: 2,
                       mb: 2,
                       background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(0, 0, 0, 0.05)',
                       borderRadius: 2
                     }}
                   >
@@ -914,7 +914,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         sx={{
                           color: '#ff6b6b',
                           '&:hover': { backgroundColor: 'rgba(255, 107, 107, 0.1)' },
-                          '&.Mui-disabled': { color: '#666' }
+                          '&.Mui-disabled': { color: '#475569' }
                         }}
                       >
                         <DeleteIcon />
@@ -930,12 +930,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                           fullWidth
                           required
                           sx={{
-                            '& .MuiInputBase-input': { color: '#f5f7fa' },
-                            '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                            '& .MuiInputBase-input': { color: '#1e293b' },
+                            '& .MuiInputLabel-root': { color: '#64748b' },
                             '& .MuiOutlinedInput-root': {
-                              '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                              '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                               '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                              '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                              '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                             }
                           }}
                         />
@@ -948,12 +948,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                           onChange={(e) => handleRecruiterChange(index, 'email', e.target.value)}
                           fullWidth
                           sx={{
-                            '& .MuiInputBase-input': { color: '#f5f7fa' },
-                            '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                            '& .MuiInputBase-input': { color: '#1e293b' },
+                            '& .MuiInputLabel-root': { color: '#64748b' },
                             '& .MuiOutlinedInput-root': {
-                              '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                              '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                               '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                              '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                              '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                             }
                           }}
                         />
@@ -965,12 +965,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                           onChange={(e) => handleRecruiterChange(index, 'phone', e.target.value)}
                           fullWidth
                           sx={{
-                            '& .MuiInputBase-input': { color: '#f5f7fa' },
-                            '& .MuiInputLabel-root': { color: '#b8c5d6' },
+                            '& .MuiInputBase-input': { color: '#1e293b' },
+                            '& .MuiInputLabel-root': { color: '#64748b' },
                             '& .MuiOutlinedInput-root': {
-                              '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                              '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                               '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                              '&.Mui-focused fieldset': { borderColor: '#eebbc3' },
+                              '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
                             }
                           }}
                         />
@@ -985,14 +985,14 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         
         {/* Show matching results summary */}
         {matchingResults && (
-          <Box sx={{ p: 2, background: 'rgba(79, 140, 255, 0.1)', borderRadius: 2, border: '1px solid rgba(79, 140, 255, 0.3)' }}>
-            <Typography variant="h6" sx={{ color: '#4f8cff', mb: 1 }}>
+          <Box sx={{ p: 2, background: 'rgba(79, 140, 255, 0.1)', borderRadius: 2, border: '1px solid rgba(37, 99, 235, 0.18)' }}>
+            <Typography variant="h6" sx={{ color: '#2563eb', mb: 1 }}>
               Matching Results
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
               Found {matchingResults.suitableCandidates.length} suitable candidates out of {matchingResults.totalCandidates} total candidates.
             </Typography>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', fontSize: '0.9rem' }}>
+            <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem' }}>
               Top matches are displayed below, sorted by relevance score.
             </Typography>
           </Box>
@@ -1001,7 +1001,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         {showCandidates && (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#eebbc3' }}>
+              <Typography variant="h6" sx={{ color: '#8b5cf6' }}>
                 Suitable Candidates (Top {candidates.length})
               </Typography>
               <Button
@@ -1009,8 +1009,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 onClick={handleLinkAICandidatesToJob}
                 disabled={linkingCandidates}
                 sx={{
-                  backgroundColor: '#eebbc3',
-                  color: '#1a1a2e',
+                  backgroundColor: '#8b5cf6',
+                  color: '#f8fafc',
                   fontWeight: 600,
                   textTransform: 'none',
                   '&:hover': {
@@ -1025,14 +1025,14 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 {linkingCandidates ? 'Linking...' : 'Link Candidates to Job'}
               </Button>
             </Box>
-            <Paper sx={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: 2, border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Paper sx={{ background: 'rgba(255, 255, 255, 0.03)', borderRadius: 2, border: '1px solid rgba(0, 0, 0, 0.05)' }}>
               <List>
                 {candidates.map((candidate, index) => (
                   <ListItem
                     key={candidate._id}
                     disablePadding
                     sx={{
-                      borderBottom: index < candidates.length - 1 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+                      borderBottom: index < candidates.length - 1 ? '1px solid rgba(0, 0, 0, 0.05)' : 'none',
                       '&:hover': {
                         background: 'rgba(255, 255, 255, 0.05)'
                       }
@@ -1053,7 +1053,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       <ListItemText
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="h6" sx={{ color: '#eebbc3', fontWeight: 600 }}>
+                            <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                               {index + 1}. {candidate.name}
                             </Typography>
                             <Chip
@@ -1069,11 +1069,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         }
                         secondary={
                           <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                            <Typography variant="body2" sx={{ color: '#64748b' }}>
                               {candidate.email}
                             </Typography>
                             {candidate.phone && (
-                              <Typography variant="body2" sx={{ color: '#b8c5d6' }}>
+                              <Typography variant="body2" sx={{ color: '#64748b' }}>
                                 {candidate.phone}
                               </Typography>
                             )}
@@ -1085,8 +1085,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                                     label={detail}
                                     size="small"
                                     sx={{
-                                      backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                                      color: '#4f8cff',
+                                      backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                                      color: '#2563eb',
                                       fontSize: '0.75rem'
                                     }}
                                   />

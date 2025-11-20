@@ -12,10 +12,10 @@ const Header = ({ user, onLogout }) => {
 
   return (
     <AppBar position="fixed" sx={{ 
-      background: 'rgba(15, 15, 35, 0.95)', 
+      background: 'rgba(255, 255, 255, 0.98)', 
       backdropFilter: 'blur(10px)',
-      boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)', 
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', 
+      borderBottom: '1px solid #e2e8f0',
       zIndex: 1000
     }} elevation={0}>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', minHeight: 72, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
@@ -48,9 +48,9 @@ const Header = ({ user, onLogout }) => {
           />
           <Typography variant="h5" sx={{ 
             fontWeight: 700, 
-            color: '#f5f7fa', 
+            color: '#1e293b', 
             letterSpacing: 1,
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #eebbc3 100%)',
+            background: 'linear-gradient(135deg, #1e293b 0%, #2563eb 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -67,13 +67,13 @@ const Header = ({ user, onLogout }) => {
                 variant="outlined" 
                 color="inherit" 
                 sx={{ 
-                  borderColor: '#f5f7fa', 
-                  color: '#f5f7fa', 
+                  borderColor: '#2563eb', 
+                  color: '#2563eb', 
                   fontWeight: 600,
                   '&:hover': {
-                    borderColor: '#eebbc3',
-                    color: '#eebbc3',
-                    background: 'rgba(238, 187, 195, 0.1)'
+                    borderColor: '#1d4ed8',
+                    color: '#1d4ed8',
+                    background: 'rgba(37, 99, 235, 0.05)'
                   }
                 }}
               >
@@ -84,13 +84,14 @@ const Header = ({ user, onLogout }) => {
                 to="/signup" 
                 variant="contained" 
                 sx={{ 
-                  background: 'linear-gradient(135deg, #4f8cff 0%, #eebbc3 100%)',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                   color: '#fff',
                   fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #3a7bd5 0%, #d4a5ac 100%)',
+                    background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 16px rgba(79, 140, 255, 0.3)'
+                    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.4)'
                   }
                 }}
               >
@@ -105,11 +106,13 @@ const Header = ({ user, onLogout }) => {
               variant="outlined" 
               color="inherit" 
               sx={{ 
-                borderColor: '#eebbc3', 
-                color: '#eebbc3', 
+                borderColor: '#8b5cf6', 
+                color: '#8b5cf6', 
                 fontWeight: 600,
                 '&:hover': {
-                  background: 'rgba(238, 187, 195, 0.1)'
+                  borderColor: '#7c3aed',
+                  color: '#7c3aed',
+                  background: 'rgba(139, 92, 246, 0.05)'
                 }
               }}
             >
@@ -122,13 +125,13 @@ const Header = ({ user, onLogout }) => {
               variant="outlined" 
               color="inherit" 
               sx={{ 
-                borderColor: '#f5f7fa', 
-                color: '#f5f7fa', 
+                borderColor: '#64748b', 
+                color: '#475569', 
                 fontWeight: 600,
                 '&:hover': {
-                  borderColor: '#eebbc3',
-                  color: '#eebbc3',
-                  background: 'rgba(238, 187, 195, 0.1)'
+                  borderColor: '#475569',
+                  color: '#1e293b',
+                  background: 'rgba(100, 116, 139, 0.05)'
                 }
               }}
             >

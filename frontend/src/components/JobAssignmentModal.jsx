@@ -164,9 +164,9 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
-          color: '#f5f7fa',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          color: '#1e293b',
+          border: '1px solid rgba(0, 0, 0, 0.05)'
         }
       }}
     >
@@ -174,11 +174,11 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
         display: 'flex', 
         alignItems: 'center', 
         gap: 1,
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         pb: 2
       }}>
-        <AssignmentIcon sx={{ color: '#eebbc3' }} />
-        <Typography variant="h6" sx={{ color: '#f5f7fa', fontWeight: 600 }}>
+        <AssignmentIcon sx={{ color: '#8b5cf6' }} />
+        <Typography variant="h6" sx={{ color: '#1e293b', fontWeight: 600 }}>
           Assign Job: {job?.title}
         </Typography>
       </DialogTitle>
@@ -199,22 +199,22 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
         {/* Currently Assigned Subordinates */}
         {assignedSubordinates.length > 0 && (
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
               <CheckIcon sx={{ fontSize: 20 }} />
               Currently Assigned
             </Typography>
             <List sx={{ 
               background: 'rgba(255, 255, 255, 0.05)', 
               borderRadius: 2, 
-              border: '1px solid rgba(255, 255, 255, 0.1)' 
+              border: '1px solid rgba(0, 0, 0, 0.05)' 
             }}>
               {assignedSubordinates.map((sub) => (
-                <ListItem key={sub._id} sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <ListItem key={sub._id} sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.05)' }}>
                   <ListItemText
                     primary={sub.fullName}
                     secondary={sub.email}
-                    primaryTypographyProps={{ color: '#f5f7fa', fontWeight: 600 }}
-                    secondaryTypographyProps={{ color: '#b8c5d6' }}
+                    primaryTypographyProps={{ color: '#1e293b', fontWeight: 600 }}
+                    secondaryTypographyProps={{ color: '#64748b' }}
                   />
                   <ListItemSecondaryAction>
                     <Button
@@ -243,34 +243,34 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
 
         {/* Available Subordinates */}
         <Box>
-          <Typography variant="h6" sx={{ color: '#eebbc3', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <PersonIcon sx={{ fontSize: 20 }} />
             Available Subordinates
           </Typography>
           <List sx={{ 
             background: 'rgba(255, 255, 255, 0.05)', 
             borderRadius: 2, 
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
             maxHeight: 300,
             overflow: 'auto'
           }}>
             {subordinates
               .filter(sub => !isAssigned(sub._id))
               .map((sub) => (
-                <ListItem key={sub._id} sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <ListItem key={sub._id} sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.05)' }}>
                   <Checkbox
                     checked={selectedSubordinates.includes(sub._id)}
                     onChange={() => handleSubordinateToggle(sub._id)}
                     sx={{ 
-                      color: '#eebbc3',
-                      '&.Mui-checked': { color: '#eebbc3' }
+                      color: '#8b5cf6',
+                      '&.Mui-checked': { color: '#8b5cf6' }
                     }}
                   />
                   <ListItemText
                     primary={sub.fullName}
                     secondary={`${sub.email} • ${sub.organization}`}
-                    primaryTypographyProps={{ color: '#f5f7fa', fontWeight: 600 }}
-                    secondaryTypographyProps={{ color: '#b8c5d6' }}
+                    primaryTypographyProps={{ color: '#1e293b', fontWeight: 600 }}
+                    secondaryTypographyProps={{ color: '#64748b' }}
                   />
                 </ListItem>
               ))}
@@ -279,7 +279,7 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
 
         {selectedSubordinates.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" sx={{ color: '#b8c5d6', mb: 1 }}>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>
               Selected for assignment:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -290,8 +290,8 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
                   onDelete={() => handleSubordinateToggle(subId)}
                   sx={{
                     backgroundColor: 'rgba(238, 187, 195, 0.2)',
-                    color: '#eebbc3',
-                    '& .MuiChip-deleteIcon': { color: '#eebbc3' }
+                    color: '#8b5cf6',
+                    '& .MuiChip-deleteIcon': { color: '#8b5cf6' }
                   }}
                 />
               ))}
@@ -301,13 +301,13 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
       </DialogContent>
 
       <DialogActions sx={{ 
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)', 
+        borderTop: '1px solid rgba(0, 0, 0, 0.05)', 
         pt: 2, 
         px: 3 
       }}>
         <Button 
           onClick={handleClose} 
-          sx={{ color: '#b8c5d6' }}
+          sx={{ color: '#64748b' }}
           disabled={loading}
         >
           Cancel
@@ -317,8 +317,8 @@ const JobAssignmentModal = ({ open, onClose, job, onAssignmentSuccess }) => {
           variant="contained"
           disabled={loading || selectedSubordinates.length === 0}
           sx={{
-            backgroundColor: '#eebbc3',
-            color: '#1a1a2e',
+            backgroundColor: '#8b5cf6',
+            color: '#f8fafc',
             fontWeight: 600,
             '&:hover': { backgroundColor: '#d4a5a8' },
             '&:disabled': { backgroundColor: 'rgba(238, 187, 195, 0.3)' }

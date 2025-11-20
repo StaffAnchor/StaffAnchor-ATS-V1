@@ -110,14 +110,14 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #232946 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
           borderRadius: 2,
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          border: '1px solid rgba(0, 0, 0, 0.05)'
         }
       }}
     >
       <DialogTitle sx={{
-        background: 'linear-gradient(135deg, #4f8cff 0%, #3d7be8 100%)',
+        background: 'linear-gradient(135deg, #2563eb 0%, #3d7be8 100%)',
         color: '#fff',
         display: 'flex',
         alignItems: 'center',
@@ -144,12 +144,12 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
           <Typography variant="subtitle2" sx={{ color: '#90caf9', fontWeight: 600, mb: 1 }}>
             Subject:
           </Typography>
-          <Typography variant="body1" sx={{ color: '#f5f7fa', fontWeight: 500 }}>
+          <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
             {emailData.subject}
           </Typography>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', mb: 3 }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)', mb: 3 }} />
 
         {/* Recipients Selection */}
         <Box sx={{ mb: 3 }}>
@@ -160,7 +160,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
           {/* Default Recipients */}
           {emailData.recipients && emailData.recipients.length > 0 && (
             <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" sx={{ color: '#b8c5d6', mb: 1, display: 'block' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', mb: 1, display: 'block' }}>
                 Select recipients to send email:
               </Typography>
               <Stack spacing={1}>
@@ -172,15 +172,15 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
                         checked={selectedRecipients.includes(email)}
                         onChange={() => handleToggleRecipient(email)}
                         sx={{
-                          color: '#4f8cff',
-                          '&.Mui-checked': { color: '#4f8cff' }
+                          color: '#2563eb',
+                          '&.Mui-checked': { color: '#2563eb' }
                         }}
                       />
                     }
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <PersonIcon sx={{ fontSize: 16, color: '#90caf9' }} />
-                        <Typography sx={{ color: '#f5f7fa' }}>{email}</Typography>
+                        <Typography sx={{ color: '#1e293b' }}>{email}</Typography>
                       </Box>
                     }
                   />
@@ -191,7 +191,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
 
           {/* Additional Recipients */}
           <Box sx={{ mt: 2 }}>
-            <Typography variant="caption" sx={{ color: '#b8c5d6', mb: 1, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#64748b', mb: 1, display: 'block' }}>
               Add additional recipients:
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -203,11 +203,11 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
                 onKeyPress={(e) => e.key === 'Enter' && handleAddEmail()}
                 fullWidth
                 sx={{
-                  '& .MuiInputBase-input': { color: '#f5f7fa' },
+                  '& .MuiInputBase-input': { color: '#1e293b' },
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
                     '&:hover fieldset': { borderColor: 'rgba(79, 140, 255, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#4f8cff' }
+                    '&.Mui-focused fieldset': { borderColor: '#2563eb' }
                   }
                 }}
               />
@@ -215,10 +215,10 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
                 variant="outlined"
                 onClick={handleAddEmail}
                 sx={{
-                  borderColor: '#4f8cff',
-                  color: '#4f8cff',
+                  borderColor: '#2563eb',
+                  color: '#2563eb',
                   '&:hover': {
-                    borderColor: '#4f8cff',
+                    borderColor: '#2563eb',
                     backgroundColor: 'rgba(79, 140, 255, 0.1)'
                   }
                 }}
@@ -236,10 +236,10 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
                     label={email}
                     onDelete={() => handleRemoveEmail(email)}
                     sx={{
-                      backgroundColor: 'rgba(79, 140, 255, 0.2)',
-                      color: '#4f8cff',
+                      backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                      color: '#2563eb',
                       '& .MuiChip-deleteIcon': {
-                        color: '#4f8cff',
+                        color: '#2563eb',
                         '&:hover': { color: '#3d7be8' }
                       }
                     }}
@@ -250,7 +250,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', mb: 2 }} />
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)', mb: 2 }} />
 
         {/* Email Preview Toggle */}
         <Box>
@@ -258,8 +258,8 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
             startIcon={showPreview ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             onClick={() => setShowPreview(!showPreview)}
             sx={{
-              color: '#eebbc3',
-              '&:hover': { backgroundColor: 'rgba(238, 187, 195, 0.1)' }
+              color: '#8b5cf6',
+              '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.08)' }
             }}
           >
             {showPreview ? 'Hide' : 'Show'} Email Preview
@@ -272,7 +272,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
                 p: 2,
                 background: 'rgba(255, 255, 255, 0.03)',
                 borderRadius: 1,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
                 maxHeight: '400px',
                 overflowY: 'auto'
               }}
@@ -288,7 +288,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
           onClick={handleCancel}
           disabled={sending}
           sx={{
-            color: '#b8c5d6',
+            color: '#64748b',
             '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.05)' }
           }}
         >
@@ -306,7 +306,7 @@ const EmailConfirmationModal = ({ open, onClose, emailData, onConfirm }) => {
               background: 'linear-gradient(135deg, #40c057 0%, #37b24d 100%)'
             },
             '&:disabled': {
-              background: '#666',
+              background: '#475569',
               color: '#ccc'
             }
           }}
