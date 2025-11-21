@@ -81,21 +81,46 @@ exports.getLinkedCandidates = async (req, res) => {
 
     const links = await CandidateJobLink.find({ jobId })
       .populate('candidateId')
-      .populate('linkedBy', 'fullName email')
+      .populate({
+        path: 'linkedBy',
+        select: 'fullName email',
+        strictPopulate: false
+      })
       .sort({ createdAt: -1 });
 
+    console.log(`Found ${links.length} links for job ${jobId}`);
+
     // Format response with candidate details and link info
-    const linkedCandidates = links.map(link => ({
-      ...link.candidateId.toObject(),
-      linkInfo: {
-        source: link.source,
-        linkedBy: link.linkedBy,
-        linkedAt: link.createdAt,
-        status: link.status,
-        notes: link.notes,
-        linkId: link._id
-      }
-    }));
+    // Filter out links where candidateId is null (deleted candidates)
+    const linkedCandidates = links
+      .filter(link => {
+        if (!link.candidateId) {
+          console.log('Skipping link with null candidateId:', link._id);
+          return false;
+        }
+        return true;
+      })
+      .map(link => {
+        try {
+          return {
+            ...link.candidateId.toObject(),
+            linkInfo: {
+              source: link.source,
+              linkedBy: link.linkedBy,
+              linkedAt: link.createdAt,
+              status: link.status,
+              notes: link.notes,
+              linkId: link._id
+            }
+          };
+        } catch (err) {
+          console.error('Error mapping link:', link._id, err);
+          return null;
+        }
+      })
+      .filter(c => c !== null);
+
+    console.log(`Returning ${linkedCandidates.length} linked candidates`);
 
     res.json({
       success: true,
@@ -104,7 +129,11 @@ exports.getLinkedCandidates = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching linked candidates:', error);
-    res.status(500).json({ error: 'Failed to fetch linked candidates' });
+    console.error('Error details:', error.message, error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch linked candidates',
+      details: error.message 
+    });
   }
 };
 

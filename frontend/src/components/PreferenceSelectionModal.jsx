@@ -63,6 +63,8 @@ const PreferenceSelectionModal = ({ open, onClose, onConfirm, title }) => {
       onClose={handleClose}
       maxWidth="md"
       fullWidth
+      disableEscapeKeyDown={false}
+      onClick={(e) => e.stopPropagation()}
       PaperProps={{
         sx: {
           background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',

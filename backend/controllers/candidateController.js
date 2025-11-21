@@ -48,6 +48,17 @@ const saveSkillsToDatabase = async (skills, userId, organization) => {
 
 exports.addCandidate = async (req, res) => {
   try {
+    // Check if candidate with same email already exists
+    const existingCandidate = await Candidate.findOne({ 
+      email: req.body.email?.toLowerCase().trim() 
+    });
+    
+    if (existingCandidate) {
+      return res.status(400).json({ 
+        error: 'A candidate with this email already exists' 
+      });
+    }
+    
     const candidate = new Candidate(req.body);
     await candidate.save();
     
@@ -58,6 +69,13 @@ exports.addCandidate = async (req, res) => {
     
     res.json(candidate);
   } catch (err) {
+    // Handle duplicate key error from MongoDB
+    if (err.code === 11000) {
+      return res.status(400).json({ 
+        error: 'A candidate with this email already exists' 
+      });
+    }
+    console.error('Error adding candidate:', err);
     res.status(500).json({ error: 'Add candidate failed' });
   }
 };
@@ -563,14 +581,11 @@ exports.submitPublicJobApplication = async (req, res) => {
     let candidate = await Candidate.findOne({ email: req.body.email });
     
     if (candidate) {
-      // Update existing candidate and add job to appliedJobs if not already there
-      Object.assign(candidate, req.body);
-      
+      // Candidate exists - just link to the job, don't update their data
       if (!candidate.appliedJobs.includes(jobId)) {
         candidate.appliedJobs.push(jobId);
+        await candidate.save();
       }
-      
-      await candidate.save();
     } else {
       // Create new candidate with applied job
       candidate = new Candidate({

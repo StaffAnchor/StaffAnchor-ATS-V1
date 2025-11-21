@@ -56,6 +56,8 @@ const ResultsLimitPopup = ({ open, onClose, onConfirm, title, maxResults = 100 }
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      disableEscapeKeyDown={false}
+      onClick={(e) => e.stopPropagation()}
       PaperProps={{
         sx: {
           background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',

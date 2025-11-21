@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import API_URL from '../config/api';
 import { 
   TextField, 
   Button, 
@@ -35,7 +36,7 @@ const Login = ({ setUser }) => {
     setError('');
     
     try {
-      const res = await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/login', { email, password });
+      const res = await axios.post(`${API_URL}/api/auth/login`, { email, password });
       setUser(res.data.user, res.data.token);
       toast.success('Login successful!');
       navigate('/dashboard');

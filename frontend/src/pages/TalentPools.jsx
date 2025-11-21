@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import ConfirmDialog from '../components/ConfirmDialog';
 import {
   Box,
   Typography,
@@ -44,6 +45,7 @@ import {
   Star as StarIcon,
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
+import API_URL from '../config/api';
 
 const TalentPools = ({ user }) => {
   const [talentPools, setTalentPools] = useState([]);
@@ -66,6 +68,10 @@ const TalentPools = ({ user }) => {
   const [newSkillName, setNewSkillName] = useState('');
   const [skillCategory, setSkillCategory] = useState('sales-and-business-development');
   const [skillLoading, setSkillLoading] = useState(true);
+  const [showDeletePoolConfirm, setShowDeletePoolConfirm] = useState(false);
+  const [poolToDelete, setPoolToDelete] = useState(null);
+  const [showDeleteSkillConfirm, setShowDeleteSkillConfirm] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState(null);
 
   // Helper function to format category label
   const formatCategoryLabel = (category) => {
@@ -119,7 +125,7 @@ const TalentPools = ({ user }) => {
     try {
       setPoolsLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
+      const response = await axios.get(`${API_URL}/api/talent-pools`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTalentPools(response.data);
@@ -134,7 +140,7 @@ const TalentPools = ({ user }) => {
   const fetchCandidates = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
+      const response = await axios.get(`${API_URL}/api/candidates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCandidates(response.data);
@@ -152,7 +158,7 @@ const TalentPools = ({ user }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
+      await axios.post(`${API_URL}/api/talent-pools`, {
         name: formData.name,
         description: formData.description,
         candidateIds: formData.selectedCandidates
@@ -171,28 +177,32 @@ const TalentPools = ({ user }) => {
     }
   };
 
-  const handleDeletePool = async (poolId) => {
-    if (!window.confirm('Are you sure you want to delete this talent pool?')) {
-      return;
-    }
+  const handleDeletePool = async () => {
+    if (!poolToDelete) return;
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}`, {
+      await axios.delete(`${API_URL}/api/talent-pools/${poolToDelete}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Talent pool deleted successfully!');
       fetchTalentPools();
+      setPoolToDelete(null);
     } catch (error) {
       console.error('Error deleting talent pool:', error);
       toast.error('Failed to delete talent pool');
     }
   };
 
+  const openDeletePoolConfirm = (poolId) => {
+    setPoolToDelete(poolId);
+    setShowDeletePoolConfirm(true);
+  };
+
   const handleRemoveCandidateFromPool = async (poolId, candidateId) => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
+      await axios.delete(`${API_URL}/api/talent-pools/${poolId}/candidates`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { candidateId }
       });
@@ -233,7 +243,7 @@ const TalentPools = ({ user }) => {
     try {
       setSkillLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
+      const response = await axios.get(`${API_URL}/api/skills`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSkills(response.data);
@@ -253,7 +263,7 @@ const TalentPools = ({ user }) => {
     setSkillLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post('https://staffanchor-ats-v1.onrender.com/api/skills', {
+      await axios.post(`${API_URL}/api/skills`, {
         name: newSkillName.trim(),
         category: skillCategory
       }, {
@@ -272,22 +282,26 @@ const TalentPools = ({ user }) => {
     }
   };
 
-  const handleDeleteSkill = async (skillId) => {
-    if (!window.confirm('Are you sure you want to delete this skill?')) {
-      return;
-    }
+  const handleDeleteSkill = async () => {
+    if (!skillToDelete) return;
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/skills/${skillId}`, {
+      await axios.delete(`${API_URL}/api/skills/${skillToDelete}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Skill deleted successfully!');
       fetchSkills();
+      setSkillToDelete(null);
     } catch (error) {
       console.error('Error deleting skill:', error);
       toast.error('Failed to delete skill');
     }
+  };
+
+  const openDeleteSkillConfirm = (skillId) => {
+    setSkillToDelete(skillId);
+    setShowDeleteSkillConfirm(true);
   };
 
   return (
@@ -485,9 +499,11 @@ const TalentPools = ({ user }) => {
                   {talentPools.map((pool) => (
                     <React.Fragment key={pool._id}>
                       <TableRow
+                        onClick={() => handleExpandPool(pool._id)}
                         sx={{
                           borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                           transition: "all 0.3s ease",
+                          cursor: "pointer",
                           "&:hover": {
                             background: "rgba(238, 187, 195, 0.05)",
                           },
@@ -526,7 +542,7 @@ const TalentPools = ({ user }) => {
                             }}
                           />
                         </TableCell>
-                        <TableCell align="center">
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                           <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                             <Tooltip title={expandedPoolId === pool._id ? "Hide Candidates" : "View Candidates"}>
                               <IconButton
@@ -550,7 +566,7 @@ const TalentPools = ({ user }) => {
                             {user.accessLevel === 2 && (
                               <Tooltip title="Delete Pool">
                                 <IconButton
-                                  onClick={() => handleDeletePool(pool._id)}
+                                  onClick={() => openDeletePoolConfirm(pool._id)}
                                   sx={{
                                     color: "#ff6b6b",
                                     backgroundColor: "rgba(255, 107, 107, 0.1)",
@@ -1086,7 +1102,7 @@ const TalentPools = ({ user }) => {
                           <Tooltip title="Delete Skill">
                             <IconButton
                               size="small"
-                              onClick={() => handleDeleteSkill(skill._id)}
+                              onClick={() => openDeleteSkillConfirm(skill._id)}
                               sx={{
                                 color: '#ff6b6b',
                                 '&:hover': {
@@ -1123,6 +1139,34 @@ const TalentPools = ({ user }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Talent Pool Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeletePoolConfirm}
+        onClose={() => {
+          setShowDeletePoolConfirm(false);
+          setPoolToDelete(null);
+        }}
+        onConfirm={handleDeletePool}
+        title="Delete Talent Pool"
+        message="Are you sure you want to delete this talent pool? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      {/* Delete Skill Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteSkillConfirm}
+        onClose={() => {
+          setShowDeleteSkillConfirm(false);
+          setSkillToDelete(null);
+        }}
+        onConfirm={handleDeleteSkill}
+        title="Delete Skill"
+        message="Are you sure you want to delete this skill? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </Box>
   );
 };

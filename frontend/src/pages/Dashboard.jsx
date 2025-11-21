@@ -4,46 +4,24 @@ import JobList from '../components/JobList.jsx';
 import CandidateList from '../components/CandidateList.jsx';
 import AddJob from '../components/AddJob.jsx';
 import AddCandidate from '../components/AddCandidate.jsx';
-import AuthorizedJobs from '../components/AuthorizedJobs.jsx';
 import Workflows from './Workflows.jsx';
 import TalentPools from './TalentPools.jsx';
 import axios from 'axios';
-import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon } from '@mui/icons-material';
+import API_URL from '../config/api';
 
-const Dashboard = ({ user, setUser, onLogout }) => {
-  // Set initial view - all users see jobs by default
-  const [view, setView] = useState('jobs');
+const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
+  // View is now managed by App.jsx and passed through Header
   const [candidates, setCandidates] = useState([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const handleAddJob = () => {
-    setView('addJob');
-    handleCloseMenu();
-  };
-
-  const handleAddCandidate = () => {
-    setView('addCandidate');
-    handleCloseMenu();
-  };
-
   useEffect(() => {
     // Check if there's a view state from navigation
-    if (location.state?.view) {
+    if (location.state?.view && setView) {
       setView(location.state.view);
     }
-  }, [location.state]);
+  }, [location.state, setView]);
 
   useEffect(() => {
     if (view === 'candidates') {
@@ -51,7 +29,7 @@ const Dashboard = ({ user, setUser, onLogout }) => {
         try {
           setLoadingCandidates(true);
           const token = localStorage.getItem('jwt');
-          const res = await axios.get('https://staffanchor-ats-v1.onrender.com/api/candidates', {
+          const res = await axios.get(`${API_URL}/api/candidates`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setCandidates(res.data);
@@ -68,24 +46,68 @@ const Dashboard = ({ user, setUser, onLogout }) => {
   // Listen for workflow creation event from LinkedCandidates
   useEffect(() => {
     const handleCreateWorkflowEvent = () => {
-      setView('workflows');
+      if (setView) {
+        setView('workflows');
+      }
     };
 
     window.addEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
     return () => {
       window.removeEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
     };
+  }, [setView]);
+
+  // Listen for candidate deletion event
+  useEffect(() => {
+    const handleCandidateDeleted = (event) => {
+      const { candidateId } = event.detail;
+      setCandidates(prevCandidates => 
+        prevCandidates.filter(candidate => candidate._id !== candidateId)
+      );
+    };
+
+    window.addEventListener('candidateDeleted', handleCandidateDeleted);
+    return () => {
+      window.removeEventListener('candidateDeleted', handleCandidateDeleted);
+    };
   }, []);
 
-  // Accent color for active tab in light mode
-  const getTabStyle = (active) =>
-    active
-      ? { background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)', color: '#ffffff', fontWeight: 700, border: '2px solid transparent', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }
-      : { background: '#ffffff', color: '#475569', border: '2px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' };
+  // Listen for candidate addition event
+  useEffect(() => {
+    const handleCandidateAdded = (event) => {
+      const { candidate } = event.detail;
+      setCandidates(prevCandidates => [candidate, ...prevCandidates]);
+    };
 
-  const handleSubordinatesTab = () => {
-    navigate('/subordinates');
-  };
+    window.addEventListener('candidateAdded', handleCandidateAdded);
+    return () => {
+      window.removeEventListener('candidateAdded', handleCandidateAdded);
+    };
+  }, []);
+
+  // Listen for candidate update event (e.g., resume upload/deletion)
+  useEffect(() => {
+    const handleCandidateUpdated = async (event) => {
+      const { candidateId } = event.detail;
+      // Refetch the specific candidate to get updated data
+      try {
+        const token = localStorage.getItem('jwt');
+        const response = await axios.get(`${API_URL}/api/candidates/${candidateId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCandidates(prevCandidates => 
+          prevCandidates.map(c => c._id === candidateId ? response.data : c)
+        );
+      } catch (error) {
+        console.error('Error fetching updated candidate:', error);
+      }
+    };
+
+    window.addEventListener('candidateUpdated', handleCandidateUpdated);
+    return () => {
+      window.removeEventListener('candidateUpdated', handleCandidateUpdated);
+    };
+  }, []);
 
   return (
     <div className="dashboard card" style={{
@@ -95,97 +117,7 @@ const Dashboard = ({ user, setUser, onLogout }) => {
       border: 'none', 
       padding: '0 20px'
     }}>
-      <div style={{
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '2em',
-        paddingTop: '20px'
-      }}>
-        <h1>Dashboard</h1>
-        <div style={{
-          display: 'flex', 
-          gap: '1em', 
-          flexWrap: 'wrap',
-          alignItems: 'center'
-        }}>
-          <button className="button" style={getTabStyle(view==='jobs')} onClick={() => setView('jobs')}>Jobs</button>
-          <button className="button" style={getTabStyle(view==='candidates')} onClick={() => setView('candidates')}>Candidates</button>
-          <button className="button" style={getTabStyle(view==='workflows')} onClick={() => setView('workflows')}>Workflows</button>
-          {user.accessLevel === 2 && <button className="button" style={getTabStyle(false)} onClick={handleSubordinatesTab}>Subordinates</button>}
-          <button className="button" style={getTabStyle(view==='talentPools')} onClick={() => setView('talentPools')}>Talent Pools</button>
-          
-          {/* Add button with dropdown */}
-          <IconButton
-            onClick={handleOpenMenu}
-            sx={{
-              backgroundColor: view === 'addJob' || view === 'addCandidate' ? '#10b981' : '#ffffff',
-              color: view === 'addJob' || view === 'addCandidate' ? '#ffffff' : '#475569',
-              border: '2px solid',
-              borderColor: view === 'addJob' || view === 'addCandidate' ? '#10b981' : '#e2e8f0',
-              borderRadius: '8px',
-              width: '40px',
-              height: '40px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
-              '&:hover': {
-                backgroundColor: view === 'addJob' || view === 'addCandidate' ? '#059669' : '#f8fafc',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-              }
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-          
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
-            PaperProps={{
-              sx: {
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: 2,
-                minWidth: '200px',
-                mt: 1,
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
-              }
-            }}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          >
-            <MenuItem 
-              onClick={handleAddJob}
-              sx={{
-                color: '#1e293b',
-                py: 1.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                }
-              }}
-            >
-              <ListItemIcon>
-                <WorkIcon sx={{ color: '#2563eb' }} />
-              </ListItemIcon>
-              <ListItemText>Add Job</ListItemText>
-            </MenuItem>
-            <MenuItem 
-              onClick={handleAddCandidate}
-              sx={{
-                color: '#1e293b',
-                py: 1.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
-                }
-              }}
-            >
-              <ListItemIcon>
-                <PersonIcon sx={{ color: '#8b5cf6' }} />
-              </ListItemIcon>
-              <ListItemText>Add Candidate</ListItemText>
-            </MenuItem>
-          </Menu>
-        </div>
-      </div>
+      {/* Navigation is now in the Header component */}
       <div>
         {view === 'jobs' && <JobList accessLevel={user.accessLevel} userId={user._id} />}
         {view === 'candidates' && <CandidateList candidates={candidates} accessLevel={user.accessLevel} loading={loadingCandidates} />}

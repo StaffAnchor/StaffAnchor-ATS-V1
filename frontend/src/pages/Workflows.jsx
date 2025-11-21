@@ -28,7 +28,8 @@ import {
   TableContainer,
   TableRow,
   TableHead,
-  Collapse
+  Collapse,
+  Menu
 } from '@mui/material';
 import {
   AccountTree as WorkflowIcon,
@@ -43,14 +44,18 @@ import {
   Work as WorkIcon,
   LocationOn as LocationIcon,
   ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon
+  ExpandLess as ExpandLessIcon,
+  FilterList as FilterIcon,
+  Check as CheckIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import WorkflowCreationModal from '../components/WorkflowCreationModal';
+import WorkflowFilterModal from '../components/WorkflowFilterModal';
 import useEmailNotification from '../hooks/useEmailNotification';
 import EmailConfirmationModal from '../components/EmailConfirmationModal';
 import CandidateDetailsModal from '../components/CandidateDetailsModal';
+import API_URL from '../config/api';
 
 const Workflows = ({ user }) => {
   const [workflows, setWorkflows] = useState([]);
@@ -58,9 +63,14 @@ const Workflows = ({ user }) => {
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [filter, setFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [priorityFilter, setPriorityFilter] = useState('All');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    organization: '',
+    jobTitle: '',
+    status: []
+  });
+  const [statusFilterAnchorEl, setStatusFilterAnchorEl] = useState(null);
+  const [currentStatusFilter, setCurrentStatusFilter] = useState('All Statuses');
   const [showOnlyMyWorkflows, setShowOnlyMyWorkflows] = useState(false);
   const [expandedPhases, setExpandedPhases] = useState({});
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -109,7 +119,7 @@ const Workflows = ({ user }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/workflows', {
+      const response = await axios.get(`${API_URL}/api/workflows`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWorkflows(response.data);
@@ -141,7 +151,7 @@ const Workflows = ({ user }) => {
       }
       
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/workflows/${workflowToDelete._id}`, {
+      await axios.delete(`${API_URL}/api/workflows/${workflowToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { userId: user._id }
       });
@@ -188,7 +198,7 @@ const Workflows = ({ user }) => {
   const handleCandidateClick = async (candidateId) => {
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateId}`, {
+      const response = await axios.get(`${API_URL}/api/candidates/${candidateId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSelectedCandidate(response.data);
@@ -221,14 +231,41 @@ const Workflows = ({ user }) => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'Low': return { bg: 'rgba(76, 175, 80, 0.2)', color: '#4caf50' };
-      case 'Medium': return { bg: 'rgba(255, 152, 0, 0.2)', color: '#ff9800' };
-      case 'High': return { bg: 'rgba(244, 67, 54, 0.2)', color: '#f44336' };
-      case 'Urgent': return { bg: 'rgba(156, 39, 176, 0.2)', color: '#9c27b0' };
-      default: return { bg: 'rgba(158, 158, 158, 0.2)', color: '#9e9e9e' };
+  const updateWorkflowStatus = async (workflowId, newStatus) => {
+    try {
+      const token = localStorage.getItem('jwt');
+      await axios.patch(
+        `${API_URL}/api/workflows/${workflowId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Status updated successfully!');
+      setWorkflows(prevWorkflows =>
+        prevWorkflows.map(workflow =>
+          workflow._id === workflowId ? { ...workflow, status: newStatus } : workflow
+        )
+      );
+    } catch (error) {
+      console.error('Error updating workflow status:', error);
+      toast.error('Failed to update status');
     }
+  };
+
+  const handleStatusFilterClick = (event) => {
+    setStatusFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleStatusFilterClose = () => {
+    setStatusFilterAnchorEl(null);
+  };
+
+  const handleStatusFilterChange = (status) => {
+    setCurrentStatusFilter(status);
+    setActiveFilters(prev => ({
+      ...prev,
+      status: status === 'All Statuses' ? [] : [status]
+    }));
+    handleStatusFilterClose();
   };
 
   const getStatusColor = (status) => {
@@ -241,17 +278,57 @@ const Workflows = ({ user }) => {
     }
   };
 
+  const getStatusBackgroundColor = (status) => {
+    switch (status) {
+      case 'Active': return 'rgba(76, 175, 80, 0.12)';
+      case 'Completed': return 'rgba(33, 150, 243, 0.12)';
+      case 'On Hold': return 'rgba(255, 152, 0, 0.12)';
+      case 'Cancelled': return 'rgba(244, 67, 54, 0.12)';
+      default: return 'transparent';
+    }
+  };
+
+  const applyFilters = (filters) => {
+    setActiveFilters(filters);
+  };
+
+  const clearFilters = () => {
+    setActiveFilters({
+      organization: '',
+      jobTitle: '',
+      status: []
+    });
+  };
+
+  const hasActiveFilters = 
+    activeFilters.organization || 
+    activeFilters.jobTitle || 
+    (activeFilters.status && activeFilters.status.length > 0);
+
   const filteredWorkflows = workflows.filter(workflow => {
-    const matchesFilter = workflow.jobTitle?.toLowerCase().includes(filter.toLowerCase()) ||
-                         workflow.organization?.toLowerCase().includes(filter.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || workflow.status === statusFilter;
-    const matchesPriority = priorityFilter === 'All' || workflow.priority === priorityFilter;
+    // Organization filter
+    if (activeFilters.organization && 
+        !workflow.organization?.toLowerCase().includes(activeFilters.organization.toLowerCase())) {
+      return false;
+    }
+    
+    // Job Title filter
+    if (activeFilters.jobTitle && 
+        !workflow.jobTitle?.toLowerCase().includes(activeFilters.jobTitle.toLowerCase())) {
+      return false;
+    }
+    
+    // Status filter
+    if (activeFilters.status && activeFilters.status.length > 0 && 
+        !activeFilters.status.includes(workflow.status)) {
+      return false;
+    }
     
     // For subordinates with "My workflows" toggle enabled
     const matchesCreator = !showOnlyMyWorkflows || 
                           (workflow.createdBy && workflow.createdBy._id === user._id);
     
-    return matchesFilter && matchesStatus && matchesPriority && matchesCreator;
+    return matchesCreator;
   });
 
 
@@ -270,155 +347,115 @@ const Workflows = ({ user }) => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: '100%' }}>
-      {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        mb: 4,
-        pb: 2,
-        borderBottom: '2px solid rgba(238, 187, 195, 0.3)'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <WorkflowIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
-              Workflows
-            </Typography>
-            <Typography variant="body1" sx={{ color: '#64748b' }}>
-              Manage your recruitment workflows
-            </Typography>
-          </Box>
-        </Box>
-        
-        <Button
-          startIcon={<AddIcon />}
-          variant="contained"
-          onClick={() => setShowWorkflowModal(true)}
+    <Box sx={{ height: "calc(100vh - 72px)", display: "flex", flexDirection: "column" }}>
+      {/* Fixed Header */}
+      <Paper
+        elevation={3}
+        sx={{
+          position: "sticky",
+          top: "72px",
+          zIndex: 100,
+          background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          borderRadius: 0,
+          p: 3,
+          color: "#1e293b",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Box
           sx={{
-            backgroundColor: '#2563eb',
-            color: '#ffffff',
-            '&:hover': { backgroundColor: '#3d7be8' }
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          Create New Workflow
-        </Button>
-      </Box>
-
-      {/* Filters */}
-      <Paper sx={{ 
-        p: 3, 
-        mb: 3, 
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.05)'
-      }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              placeholder="Search workflows..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              sx={{
-                '& .MuiInputBase-input': { color: '#1e293b' },
-                '& .MuiInputLabel-root': { color: '#64748b' },
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+          {/* Left side - Title */}
+          <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
+            Workflow Listings
+          </Typography>
+          
+          {/* Right side - Controls */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {hasActiveFilters && (
+              <Chip
+                label={`${filteredWorkflows.length} results`}
                 sx={{
-                  color: '#1e293b',
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                  }
+                  backgroundColor: "rgba(37, 99, 235, 0.12)",
+                  color: "#2563eb",
+                  fontWeight: 600,
+                }}
+              />
+            )}
+            <Tooltip title="Filter Workflows">
+              <IconButton
+                onClick={() => setShowFilterModal(true)}
+                sx={{
+                  backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.15)" : "rgba(139, 92, 246, 0.12)",
+                  color: hasActiveFilters ? "#2563eb" : "#8b5cf6",
+                  border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.3)" : "2px solid rgba(139, 92, 246, 0.3)",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.25)" : "rgba(139, 92, 246, 0.2)",
+                    border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.5)" : "2px solid rgba(139, 92, 246, 0.5)",
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                <MenuItem value="All">All Statuses</MenuItem>
-                <MenuItem value="Active">Active</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
-                <MenuItem value="On Hold">On Hold</MenuItem>
-                <MenuItem value="Cancelled">Cancelled</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: '#64748b' }}>Priority</InputLabel>
-              <Select
-                value={priorityFilter}
-                onChange={(e) => setPriorityFilter(e.target.value)}
+                <FilterIcon sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Create New Workflow">
+              <IconButton
+                onClick={() => setShowWorkflowModal(true)}
                 sx={{
-                  color: '#1e293b',
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                  }
+                  backgroundColor: "rgba(139, 92, 246, 0.12)",
+                  color: "#8b5cf6",
+                  border: "2px solid rgba(139, 92, 246, 0.3)",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "rgba(139, 92, 246, 0.2)",
+                    border: "2px solid rgba(139, 92, 246, 0.5)",
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                <MenuItem value="All">All Priorities</MenuItem>
-                <MenuItem value="Low">Low</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="High">High</MenuItem>
-                <MenuItem value="Urgent">Urgent</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Button
-              fullWidth
-              variant={showOnlyMyWorkflows ? "contained" : "outlined"}
-              onClick={() => setShowOnlyMyWorkflows(!showOnlyMyWorkflows)}
-              sx={{
-                backgroundColor: showOnlyMyWorkflows ? "rgba(238, 187, 195, 0.9)" : "transparent",
-                color: showOnlyMyWorkflows ? "#f8fafc" : "#8b5cf6",
-                borderColor: "#8b5cf6",
-                "&:hover": {
-                  backgroundColor: showOnlyMyWorkflows ? "rgba(238, 187, 195, 1)" : "rgba(139, 92, 246, 0.08)",
-                  borderColor: "#8b5cf6",
-                },
-                fontWeight: 600,
-                textTransform: "none",
-                height: '56px',
-              }}
-            >
-              My workflows
-            </Button>
-          </Grid>
-        </Grid>
+                <AddIcon sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
       </Paper>
 
+      {/* Workflows Content */}
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          background: "var(--color-bg-dark)",
+          p: 2,
+        }}
+      >
       {/* Workflows Grid */}
       {filteredWorkflows.length === 0 ? (
-                 <Box sx={{ 
-           textAlign: 'center', 
-           py: 8,
-           color: '#64748b',
-           background: 'rgba(255, 255, 255, 0.05)',
-           borderRadius: 2,
-           border: '1px dashed rgba(0, 0, 0, 0.08)'
-         }}>
-           <WorkflowIcon sx={{ fontSize: 60, color: '#64748b', mb: 2 }} />
-           <Typography variant="h6" sx={{ mb: 1 }}>
-             {filter ? 'No workflows found' : 'No workflows yet'}
-           </Typography>
-          <Typography variant="body2" sx={{ mb: 3 }}>
-            {filter ? 'Try adjusting your search criteria' : 'Create your first workflow to get started'}
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 8,
+          color: '#64748b',
+          background: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: 2,
+          border: '1px dashed rgba(0, 0, 0, 0.08)'
+        }}>
+          <WorkflowIcon sx={{ fontSize: 60, color: '#64748b', mb: 2 }} />
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            {hasActiveFilters ? 'No workflows found' : 'No workflows yet'}
           </Typography>
-          {!filter && (
+          <Typography variant="body2" sx={{ mb: 3 }}>
+            {hasActiveFilters ? 'Try adjusting your search criteria' : 'Create your first workflow to get started'}
+          </Typography>
+          {!hasActiveFilters && (
             <Button
               startIcon={<AddIcon />}
               variant="contained"
@@ -471,22 +508,33 @@ const Workflows = ({ user }) => {
                   Organization
                 </TableCell>
                 <TableCell
+                  align="center"
                   sx={{
                     color: "#8b5cf6",
                     fontWeight: 700,
                     fontSize: "0.95rem",
+                    cursor: "pointer",
+                    userSelect: "none"
                   }}
+                  onClick={handleStatusFilterClick}
                 >
-                  Status
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#8b5cf6",
-                    fontWeight: 700,
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  Priority
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                    Status
+                    {currentStatusFilter !== 'All Statuses' && (
+                      <Chip 
+                        label="Filtered" 
+                        size="small" 
+                        sx={{ 
+                          ml: 1, 
+                          backgroundColor: '#2563eb', 
+                          color: '#fff',
+                          height: '20px',
+                          fontSize: '0.7rem'
+                        }} 
+                      />
+                    )}
+                    <ExpandMoreIcon fontSize="small" sx={{ verticalAlign: 'middle' }} />
+                  </Box>
                 </TableCell>
                 <TableCell
                   align="center"
@@ -526,11 +574,12 @@ const Workflows = ({ user }) => {
                   <TableRow
                     onClick={() => setExpandedWorkflowId(expandedWorkflowId === workflow._id ? null : workflow._id)}
                     sx={{
+                      backgroundColor: getStatusBackgroundColor(workflow.status || 'Active'),
                       borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                       transition: "all 0.3s ease",
                       cursor: "pointer",
                       "&:hover": {
-                        background: "rgba(238, 187, 195, 0.05)",
+                        background: "rgba(238, 187, 195, 0.08)",
                       },
                     }}
                   >
@@ -556,27 +605,50 @@ const Workflows = ({ user }) => {
                         {workflow.organization}
                       </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={workflow.status}
-                        size="small"
-                        sx={{
-                          backgroundColor: getStatusColor(workflow.status).bg,
-                          color: getStatusColor(workflow.status).color,
-                          fontWeight: 600,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={workflow.priority}
-                        size="small"
-                        sx={{
-                          backgroundColor: getPriorityColor(workflow.priority).bg,
-                          color: getPriorityColor(workflow.priority).color,
-                          fontWeight: 600,
-                        }}
-                      />
+                    <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                      <FormControl variant="outlined" size="small" sx={{ minWidth: 130 }}>
+                        <Select
+                          value={workflow.status || 'Active'}
+                          onChange={(e) => updateWorkflowStatus(workflow._id, e.target.value)}
+                          displayEmpty
+                          inputProps={{ 'aria-label': 'Without label' }}
+                          sx={{
+                            color: getStatusColor(workflow.status || 'Active').color,
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            '& .MuiOutlinedInput-notchedOutline': { 
+                              borderColor: getStatusColor(workflow.status || 'Active').color,
+                              borderWidth: '2px'
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': { 
+                              borderColor: getStatusColor(workflow.status || 'Active').color,
+                              borderWidth: '2px'
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { 
+                              borderColor: getStatusColor(workflow.status || 'Active').color,
+                              borderWidth: '2px'
+                            },
+                            '& .MuiSvgIcon-root': { 
+                              color: getStatusColor(workflow.status || 'Active').color 
+                            },
+                            backgroundColor: getStatusColor(workflow.status || 'Active').bg,
+                          }}
+                        >
+                          {['Active', 'Completed', 'On Hold', 'Cancelled'].map((statusOption) => (
+                            <MenuItem 
+                              key={statusOption} 
+                              value={statusOption} 
+                              sx={{ 
+                                color: getStatusColor(statusOption).color, 
+                                fontWeight: 600,
+                                fontSize: '0.875rem'
+                              }}
+                            >
+                              {statusOption}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </TableCell>
                     <TableCell align="center">
                       <Typography
@@ -597,7 +669,14 @@ const Workflows = ({ user }) => {
                           fontWeight: 700,
                         }}
                       >
-                        {workflow.totalCandidates || 0}
+                        {(() => {
+                          // Get candidates from the last phase
+                          if (workflow.phases && workflow.phases.length > 0) {
+                            const lastPhase = workflow.phases[workflow.phases.length - 1];
+                            return lastPhase.candidates?.length || 0;
+                          }
+                          return 0;
+                        })()}
                       </Typography>
                     </TableCell>
                     <TableCell align="center" onClick={(e) => e.stopPropagation()}>
@@ -930,6 +1009,7 @@ const Workflows = ({ user }) => {
           </Table>
         </TableContainer>
       )}
+      </Box>
 
       {/* Workflow Creation Modal */}
       <WorkflowCreationModal
@@ -996,14 +1076,6 @@ const Workflows = ({ user }) => {
                   sx={{
                     backgroundColor: getStatusColor(selectedWorkflow.status).bg,
                     color: getStatusColor(selectedWorkflow.status).color,
-                    fontWeight: 600
-                  }}
-                />
-                <Chip 
-                  label={selectedWorkflow.priority}
-                  sx={{
-                    backgroundColor: getPriorityColor(selectedWorkflow.priority).bg,
-                    color: getPriorityColor(selectedWorkflow.priority).color,
                     fontWeight: 600
                   }}
                 />
@@ -1423,6 +1495,51 @@ const Workflows = ({ user }) => {
         }}
         candidate={selectedCandidate}
         preferences={null}
+      />
+
+      {/* Status Filter Menu */}
+      <Menu
+        anchorEl={statusFilterAnchorEl}
+        open={Boolean(statusFilterAnchorEl)}
+        onClose={handleStatusFilterClose}
+        PaperProps={{
+          sx: {
+            background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <MenuItem onClick={() => handleStatusFilterChange('All Statuses')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <Typography sx={{ fontWeight: 600 }}>All Statuses</Typography>
+            {currentStatusFilter === 'All Statuses' && <CheckIcon sx={{ ml: 2, color: '#2563eb' }} />}
+          </Box>
+        </MenuItem>
+        {['Active', 'Completed', 'On Hold', 'Cancelled'].map((statusOption) => (
+          <MenuItem
+            key={statusOption}
+            onClick={() => handleStatusFilterChange(statusOption)}
+            sx={{ 
+              color: getStatusColor(statusOption).color, 
+              fontWeight: 600 
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <Typography sx={{ fontWeight: 600 }}>{statusOption}</Typography>
+              {currentStatusFilter === statusOption && <CheckIcon sx={{ ml: 2, color: '#2563eb' }} />}
+            </Box>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* Workflow Filter Modal */}
+      <WorkflowFilterModal
+        open={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        filters={activeFilters}
+        onApplyFilters={applyFilters}
+        onClearFilters={clearFilters}
       />
     </Box>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import JobDetails from './JobDetails.jsx';
 import { Box, Typography } from '@mui/material';
+import API_URL from '../config/api';
 
 const AuthorizedJobs = ({ userId }) => {
   const [jobs, setJobs] = useState([]);
@@ -11,7 +12,7 @@ const AuthorizedJobs = ({ userId }) => {
     const fetchJobs = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const res = await axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
+        const res = await axios.get(`${API_URL}/api/jobs`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setJobs(

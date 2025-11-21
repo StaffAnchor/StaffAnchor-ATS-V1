@@ -8,13 +8,17 @@ import Header from './components/Header.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Subordinates from './pages/Subordinates.jsx';
+import Banners from './pages/Banners.jsx';
 import PublicJobApplication from './pages/PublicJobApplication.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ActiveBanner from './components/ActiveBanner.jsx';
 import { setupAxiosInterceptors } from './utils/axiosConfig.js';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState('jobs'); // Dashboard view state
+  const [bannerHeight, setBannerHeight] = useState(0);
   const navigate = useNavigate();
   
   // Handle redirect from 404.html
@@ -80,6 +84,7 @@ function App() {
   return (
     <>
       <ToastContainer position="top-center" autoClose={3000} theme="light" />
+      {user && <ActiveBanner onHeightChange={setBannerHeight} />}
       <Routes>
         {/* Public route - no header, no authentication */}
         <Route path="/apply/:jobId" element={<PublicJobApplication />} />
@@ -87,17 +92,25 @@ function App() {
         {/* Authenticated routes */}
         <Route path="/*" element={
           <>
-            <Header user={user} onLogout={handleLogout} />
-            <div style={{ paddingTop: user ? '72px' : '0' }}>
+            <Header 
+              user={user} 
+              onLogout={handleLogout} 
+              view={view} 
+              setView={setView}
+              accessLevel={user?.accessLevel}
+              bannerHeight={bannerHeight}
+              setUser={handleSetUser}
+            />
+            <div style={{ paddingTop: user ? `${72 + bannerHeight}px` : '0' }}>
               <Routes>
-                <Route path="/" element={<LandingPage />} />
+                <Route path="/" element={<Login setUser={handleSetUser} />} />
                 <Route path="/login" element={<Login setUser={handleSetUser} />} />
                 <Route path="/signup" element={<Signup setUser={handleSetUser} />} />
                 <Route 
                   path="/dashboard" 
                   element={
                     <ProtectedRoute user={user}>
-                      <Dashboard user={user} setUser={handleSetUser} onLogout={handleLogout} />
+                      <Dashboard user={user} setUser={handleSetUser} onLogout={handleLogout} view={view} setView={setView} />
                     </ProtectedRoute>
                   } 
                 />
@@ -107,6 +120,27 @@ function App() {
                     <ProtectedRoute user={user}>
                       {user && user.accessLevel === 2 ? (
                         <Subordinates user={user} />
+                      ) : (
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          height: '100vh',
+                          color: '#1e293b',
+                          fontSize: '1.5rem'
+                        }}>
+                          Access Denied: Admin Only
+                        </div>
+                      )}
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/banners" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      {user && user.accessLevel === 2 ? (
+                        <Banners user={user} />
                       ) : (
                         <div style={{ 
                           display: 'flex', 

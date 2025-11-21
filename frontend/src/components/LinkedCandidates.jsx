@@ -40,6 +40,7 @@ import {
   FilterList as FilterListIcon,
   Comment as CommentIcon,
 } from '@mui/icons-material';
+import API_URL from '../config/api';
 
 const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const [linkedCandidates, setLinkedCandidates] = useState([]);
@@ -91,7 +92,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/job/${jobId}/candidates`, {
+      const response = await axios.get(`${API_URL}/api/candidate-job-links/job/${jobId}/candidates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -108,7 +109,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     try {
       setUnlinking(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link/${linkId}`, {
+      await axios.delete(`${API_URL}/api/candidate-job-links/link/${linkId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -127,7 +128,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     try {
       setUpdatingStatus(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
-      await axios.patch(`https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link/${linkId}`, {
+      await axios.patch(`${API_URL}/api/candidate-job-links/link/${linkId}`, {
         status: newStatus
       }, {
         headers: { Authorization: `Bearer ${token}` }

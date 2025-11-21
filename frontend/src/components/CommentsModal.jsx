@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import ConfirmDialog from './ConfirmDialog';
 import {
   Dialog,
   DialogTitle,
@@ -24,6 +25,7 @@ import {
   Person as PersonIcon,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import API_URL from '../config/api';
 
 const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserId, userAccessLevel }) => {
   const [comments, setComments] = useState([]);
@@ -32,6 +34,8 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
   const [submitting, setSubmitting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
   useEffect(() => {
     if (open && candidateId) {
@@ -43,13 +47,13 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/comments/candidate/${candidateId}`, {
+      const response = await axios.get(`${API_URL}/api/comments/candidate/${candidateId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComments(response.data);
     } catch (error) {
-      console.error('Error fetching comments:', error);
-      toast.error('Failed to fetch comments');
+      console.error('Error fetching reviews:', error);
+      toast.error('Failed to fetch reviews');
     } finally {
       setLoading(false);
     }
@@ -57,7 +61,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
-      toast.error('Please enter a comment');
+      toast.error('Please enter a review');
       return;
     }
 
@@ -65,16 +69,16 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
       setSubmitting(true);
       const token = localStorage.getItem('jwt');
       const response = await axios.post(
-        `https://staffanchor-ats-v1.onrender.com/api/comments/candidate/${candidateId}`,
+        `${API_URL}/api/comments/candidate/${candidateId}`,
         { text: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setComments([response.data, ...comments]);
       setNewComment('');
-      toast.success('Comment added successfully');
+      toast.success('Review added successfully');
     } catch (error) {
-      console.error('Error adding comment:', error);
-      toast.error('Failed to add comment');
+      console.error('Error adding review:', error);
+      toast.error('Failed to add review');
     } finally {
       setSubmitting(false);
     }
@@ -82,43 +86,48 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
 
   const handleUpdateComment = async (commentId) => {
     if (!editText.trim()) {
-      toast.error('Comment cannot be empty');
+      toast.error('Review cannot be empty');
       return;
     }
 
     try {
       const token = localStorage.getItem('jwt');
       const response = await axios.put(
-        `https://staffanchor-ats-v1.onrender.com/api/comments/${commentId}`,
+        `${API_URL}/api/comments/${commentId}`,
         { text: editText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setComments(comments.map(c => c._id === commentId ? response.data : c));
       setEditingCommentId(null);
       setEditText('');
-      toast.success('Comment updated successfully');
+      toast.success('Review updated successfully');
     } catch (error) {
-      console.error('Error updating comment:', error);
-      toast.error('Failed to update comment');
+      console.error('Error updating review:', error);
+      toast.error('Failed to update review');
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) {
-      return;
-    }
+  const handleDeleteComment = async () => {
+    if (!commentToDelete) return;
 
     try {
+      const commentId = commentToDelete;
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/comments/${commentId}`, {
+      await axios.delete(`${API_URL}/api/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComments(comments.filter(c => c._id !== commentId));
-      toast.success('Comment deleted successfully');
+      toast.success('Review deleted successfully');
+      setCommentToDelete(null);
     } catch (error) {
-      console.error('Error deleting comment:', error);
-      toast.error('Failed to delete comment');
+      console.error('Error deleting review:', error);
+      toast.error('Failed to delete review');
     }
+  };
+
+  const openDeleteConfirm = (commentId) => {
+    setCommentToDelete(commentId);
+    setShowDeleteConfirm(true);
   };
 
   const formatDate = (dateString) => {
@@ -159,7 +168,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
       >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
-            Comments
+            Recruiter Review
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
             {candidateName}
@@ -182,13 +191,13 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
       </DialogTitle>
 
       <DialogContent sx={{ p: 3 }}>
-        {/* Add Comment Section */}
+        {/* Add Review Section */}
         <Box sx={{ mb: 3 }}>
           <TextField
             fullWidth
             multiline
             rows={3}
-            placeholder="Add a comment..."
+            placeholder="Add your review..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             onClick={(e) => e.stopPropagation()}
@@ -239,7 +248,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
         ) : comments.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="body1" sx={{ color: '#64748b' }}>
-              No comments yet. Be the first to comment!
+              No reviews yet. Be the first to add a review!
             </Typography>
           </Box>
         ) : (
@@ -289,7 +298,7 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
                           size="small"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteComment(comment._id);
+                            openDeleteConfirm(comment._id);
                           }}
                           sx={{ color: '#ff6b6b' }}
                         >
@@ -383,6 +392,20 @@ const CommentsModal = ({ open, onClose, candidateId, candidateName, currentUserI
           Close
         </Button>
       </DialogActions>
+
+      {/* Delete Review Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setCommentToDelete(null);
+        }}
+        onConfirm={handleDeleteComment}
+        title="Delete Review"
+        message="Are you sure you want to delete this review? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </Dialog>
   );
 };

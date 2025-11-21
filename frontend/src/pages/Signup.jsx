@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import API_URL from '../config/api';
 import { 
   TextField, 
   Button, 
@@ -23,7 +24,8 @@ import {
   Business as BusinessIcon,
   Lock as LockIcon, 
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  VpnKey as VpnKeyIcon
 } from '@mui/icons-material';
 import officePic03 from '../assets/officepic03.jpg';
 import './AuthPages.css';
@@ -32,11 +34,12 @@ const Signup = ({ setUser }) => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
-    phone: '+91',
+    phone: '',
     password: '',
     confirmPassword: '',
     accessLevel: '1',
-    organization: ''
+    organization: 'StaffAnchor',
+    securityKey: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -45,16 +48,24 @@ const Signup = ({ setUser }) => {
   const navigate = useNavigate();
 
   const validate = () => {
-    const phoneRegex = /^\+91\d{10}$/;
+    const phoneRegex = /^\d{10}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
-    if (!phoneRegex.test(form.phone)) return 'Phone must be +91 followed by 10 digits.';
+    if (!phoneRegex.test(form.phone)) return 'Phone must be 10 digits.';
     if (!passwordRegex.test(form.password)) return 'Password must be 8+ chars, upper/lowercase, number, special char.';
     if (form.password !== form.confirmPassword) return 'Passwords do not match.';
     return '';
   };
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // For phone, only allow digits and limit to 10
+    if (name === 'phone') {
+      const digits = value.replace(/\D/g, '').slice(0, 10);
+      setForm({ ...form, [name]: digits });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async e => {
@@ -71,15 +82,18 @@ const Signup = ({ setUser }) => {
     }
     
     try {
-      await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/signup', form);
+      // Send phone with +91 prefix to backend
+      const signupData = { ...form, phone: `+91${form.phone}` };
+      await axios.post(`${API_URL}/api/auth/signup`, signupData);
       // After signup, immediately log in to get user object
-      const loginRes = await axios.post('https://staffanchor-ats-v1.onrender.com/api/auth/login', { email: form.email, password: form.password });
+      const loginRes = await axios.post(`${API_URL}/api/auth/login`, { email: form.email, password: form.password });
       setUser(loginRes.data.user, loginRes.data.token);
       toast.success('Signup successful!');
       navigate('/dashboard');
     } catch (err) {
-      setError('Signup failed. Please try again.');
-      toast.error('Signup failed');
+      const errorMessage = err.response?.data?.error || 'Signup failed. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -176,11 +190,17 @@ const Signup = ({ setUser }) => {
                 value={form.phone}
                 onChange={handleChange}
                 required
+                placeholder="10 digit mobile number"
                 className="auth-input"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PhoneIcon sx={{ color: '#64748b' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <PhoneIcon sx={{ color: '#64748b' }} />
+                        <Typography sx={{ color: '#1e293b', fontWeight: 500, userSelect: 'none' }}>
+                          +91
+                        </Typography>
+                      </Box>
                     </InputAdornment>
                   ),
                 }}
@@ -192,7 +212,7 @@ const Signup = ({ setUser }) => {
                 label="Organization"
                 name="organization"
                 value={form.organization}
-                onChange={handleChange}
+                disabled
                 className="auth-input"
                 InputProps={{
                   startAdornment: (
@@ -201,7 +221,16 @@ const Signup = ({ setUser }) => {
                     </InputAdornment>
                   ),
                 }}
-                sx={textFieldStyles}
+                sx={{
+                  ...textFieldStyles,
+                  '& .MuiInputBase-input.Mui-disabled': {
+                    WebkitTextFillColor: '#1e293b',
+                    color: '#1e293b',
+                  },
+                  '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e2e8f0',
+                  },
+                }}
               />
 
               <FormControl fullWidth className="auth-input">
@@ -252,6 +281,26 @@ const Signup = ({ setUser }) => {
                   <MenuItem value="2">Level 2 - Admin</MenuItem>
                 </Select>
               </FormControl>
+
+              <TextField
+                fullWidth
+                label="Security Key"
+                name="securityKey"
+                type="password"
+                value={form.securityKey}
+                onChange={handleChange}
+                required
+                placeholder="Enter account creation security key"
+                className="auth-input"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <VpnKeyIcon sx={{ color: '#64748b' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldStyles}
+              />
 
               <TextField
                 fullWidth

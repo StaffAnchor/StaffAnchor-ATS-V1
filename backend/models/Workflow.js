@@ -85,12 +85,7 @@ const workflowSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
-  description: String,
-  priority: {
-    type: String,
-    default: 'Medium',
-    enum: ['Low', 'Medium', 'High', 'Urgent']
-  }
+  description: String
 }, { timestamps: true });
 
 // Index for efficient queries

@@ -10,6 +10,7 @@ import AIWarningDialog from './AIWarningDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon } from '@mui/icons-material';
+import API_URL from '../config/api';
 
 const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showCandidates, setShowCandidates] = useState(false);
@@ -30,6 +31,50 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [linkingCandidates, setLinkingCandidates] = useState(false);
   const [showLinkedCandidatesModal, setShowLinkedCandidatesModal] = useState(false);
   const [showAIWarning, setShowAIWarning] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(job.status || 'New');
+
+  // Update currentStatus when job prop changes
+  useEffect(() => {
+    setCurrentStatus(job.status || 'New');
+  }, [job.status]);
+
+  const handleQuickStatusChange = async (newStatus) => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.put(
+        `${API_URL}/api/jobs/${job._id}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Update local state
+      setCurrentStatus(newStatus);
+      
+      // Update the job prop (for parent component sync)
+      Object.assign(job, response.data);
+      
+      // Emit event to update job list
+      window.dispatchEvent(new CustomEvent('jobUpdated', { 
+        detail: { jobId: job._id, updatedJob: response.data } 
+      }));
+      
+      toast.success('Status updated successfully!');
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      toast.error('Failed to update status');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'New': return '#3b82f6';
+      case 'In Progress': return '#f59e0b';
+      case 'Halted': return '#ef4444';
+      case 'Withdrawn': return '#6b7280';
+      case 'Completed': return '#10b981';
+      default: return '#64748b';
+    }
+  };
 
   // Debug: Log job data when expanded to verify recruiter fields
   useEffect(() => {
@@ -46,7 +91,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   useEffect(() => {
     if (editMode) {
       const token = localStorage.getItem('jwt');
-      axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
+      axios.get(`${API_URL}/api/auth/subordinates`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => setSubordinates(res.data));
     }
@@ -77,7 +122,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   };
 
   const handleAIWarningProceed = () => {
-    setShowPreferenceModal(true);
+    // Close AI warning first
+    setShowAIWarning(false);
+    // Open preference modal after a brief delay to ensure proper state update
+    setTimeout(() => {
+      setShowPreferenceModal(true);
+    }, 100);
   };
 
   const handlePreferenceConfirm = (preferences) => {
@@ -97,7 +147,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       const token = localStorage.getItem('jwt');
       const candidateIds = candidates.map(c => c._id);
       
-      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
+      const response = await axios.post(`${API_URL}/api/candidate-job-links/link`, {
         candidateIds,
         jobId: job._id,
         source: 'ai-suggested'
@@ -118,7 +168,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('jwt');
-      const res = await axios.post(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}/suitable-candidates?limit=${limit}`, {
+      const res = await axios.post(`${API_URL}/api/jobs/${job._id}/suitable-candidates?limit=${limit}`, {
         preferences: userPreferences
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -153,7 +203,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}`, {
+      await axios.delete(`${API_URL}/api/jobs/${job._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Job deleted successfully!');
@@ -254,7 +304,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       //console.log('Job ID:', job._id);
 
       const token = localStorage.getItem('jwt');
-      const response = await axios.put(`https://staffanchor-ats-v1.onrender.com/api/jobs/${job._id}`, jobDataToUpdate, {
+      const response = await axios.put(`${API_URL}/api/jobs/${job._id}`, jobDataToUpdate, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -305,7 +355,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
 
   return (
     <Box 
-      onClick={onExpandClick}
+      onClick={editMode ? undefined : onExpandClick}
       sx={{
         p: 3, 
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -314,11 +364,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         color: '#1e293b', 
         border: '1px solid rgba(255, 255, 255, 0.08)',
         transition: 'all 0.3s ease',
-        cursor: 'pointer',
+        cursor: editMode ? 'default' : 'pointer',
         '&:hover': {
-          boxShadow: '0 6px 25px rgba(0, 0, 0, 0.25)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          transform: 'translateY(-2px)'
+          boxShadow: editMode ? '0 4px 20px rgba(0, 0, 0, 0.15)' : '0 6px 25px rgba(0, 0, 0, 0.25)',
+          border: editMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.12)',
+          transform: editMode ? 'none' : 'translateY(-2px)'
         }
       }}
     >
@@ -595,6 +645,53 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       {job.remote ? 'Available' : 'Not Available'}
                     </TableCell>
                   </TableRow>
+
+                  {/* Status */}
+                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                    <TableCell sx={{ 
+                      color: '#90caf9', 
+                      fontWeight: 600, 
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                      py: 2
+                    }}>
+                      Status
+                    </TableCell>
+                    <TableCell sx={{ 
+                      color: '#1e293b', 
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                      py: 2
+                    }}>
+                      <FormControl size="small" sx={{ minWidth: 140 }}>
+                        <Select
+                          value={currentStatus}
+                          onChange={(e) => handleQuickStatusChange(e.target.value)}
+                          sx={{
+                            backgroundColor: `${getStatusColor(currentStatus)}20`,
+                            color: getStatusColor(currentStatus),
+                            fontWeight: 600,
+                            borderRadius: '6px',
+                            border: 'none',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              border: 'none',
+                            },
+                            '&:hover': {
+                              backgroundColor: `${getStatusColor(currentStatus)}30`,
+                            },
+                            '& .MuiSelect-select': {
+                              padding: '4px 8px',
+                              fontSize: '0.875rem',
+                            }
+                          }}
+                        >
+                          <MenuItem value="New">New</MenuItem>
+                          <MenuItem value="In Progress">In Progress</MenuItem>
+                          <MenuItem value="Halted">Halted</MenuItem>
+                          <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                          <MenuItem value="Completed">Completed</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                  </TableRow>
                   
                   {/* Job Description */}
                   {job.description && (
@@ -673,7 +770,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         )}
 
         {editMode && (
-          <>
+          <Box onClick={(e) => e.stopPropagation()}>
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -841,6 +938,30 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 label="Remote Work Available"
                 sx={{ color: '#1e293b', mt: 1 }}
               />
+
+              {/* Status */}
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
+                <Select
+                  name="status"
+                  value={editJob.status || 'New'}
+                  onChange={handleEditChange}
+                  label="Status"
+                  sx={{
+                    color: '#1e293b',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.4)' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                    '& .MuiSvgIcon-root': { color: '#64748b' },
+                  }}
+                >
+                  <MenuItem value="New">New</MenuItem>
+                  <MenuItem value="In Progress">In Progress</MenuItem>
+                  <MenuItem value="Halted">Halted</MenuItem>
+                  <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                  <MenuItem value="Completed">Completed</MenuItem>
+                </Select>
+              </FormControl>
               
               {/* Description */}
               <TextField
@@ -980,7 +1101,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 ))}
               </Box>
             </Box>
-          </>
+          </Box>
         )}
         
         {/* Show matching results summary */}

@@ -20,7 +20,15 @@ exports.addJob = async (req, res) => {
 exports.listJobs = async (req, res) => {
   try {
     const jobs = await Job.find();
-    res.json(jobs);
+    // Ensure all jobs have a status field (with default if missing)
+    const jobsWithStatus = jobs.map(job => {
+      const jobObj = job.toObject();
+      if (!jobObj.status) {
+        jobObj.status = 'New';
+      }
+      return jobObj;
+    });
+    res.json(jobsWithStatus);
   } catch (err) {
     res.status(500).json({ error: 'Fetch jobs failed' });
   }
@@ -29,7 +37,15 @@ exports.listJobs = async (req, res) => {
 exports.jobDetails = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
-    res.json(job);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+    // Ensure job has a status field (with default if missing)
+    const jobObj = job.toObject();
+    if (!jobObj.status) {
+      jobObj.status = 'New';
+    }
+    res.json(jobObj);
   } catch (err) {
     res.status(500).json({ error: 'Fetch job failed' });
   }
@@ -68,6 +84,11 @@ exports.updateJob = async (req, res) => {
       }
     });
 
+    // If status is not in the update but the job doesn't have a status, set default
+    if (!cleanUpdateData.status && !existingJob.status) {
+      cleanUpdateData.status = 'New';
+    }
+
     //console.log('Cleaned update data:', JSON.stringify(cleanUpdateData, null, 2));
 
     // Use findOneAndUpdate instead of findByIdAndUpdate to avoid write concern issues
@@ -85,8 +106,14 @@ exports.updateJob = async (req, res) => {
       return res.status(404).json({ error: 'Job not found after update' });
     }
 
-    //console.log('Job updated successfully:', updatedJob);
-    res.json(updatedJob);
+    // Ensure status is always present in response (with default if missing)
+    const responseJob = updatedJob.toObject();
+    if (!responseJob.status) {
+      responseJob.status = 'New';
+    }
+
+    //console.log('Job updated successfully:', responseJob);
+    res.json(responseJob);
   } catch (err) {
     console.error('=== ERROR UPDATING JOB ===');
     console.error('Error name:', err.name);

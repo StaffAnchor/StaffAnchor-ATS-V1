@@ -38,6 +38,7 @@ const talentPoolRoutes = require('./routes/talentPools');
 const skillRoutes = require('./routes/skills');
 const candidateJobLinkRoutes = require('./routes/candidateJobLinks');
 const commentRoutes = require('./routes/comments');
+const bannerRoutes = require('./routes/banners');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
@@ -48,6 +49,7 @@ app.use('/api/talent-pools', talentPoolRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/candidate-job-links', candidateJobLinkRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/banners', bannerRoutes);
 
 app.get('/', (req, res) => {
   res.send('StaffAnchor ATS Backend Running');

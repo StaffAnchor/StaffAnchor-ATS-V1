@@ -1,7 +1,7 @@
 // Original Code
 import React, { useState, useEffect } from "react";
 import CandidateDetails from "./CandidateDetails.jsx";
-import CandidateFilter from "./CandidateFilter.jsx";
+import CandidateFilterModal from "./CandidateFilterModal.jsx";
 import ResultsLimitPopup from "./ResultsLimitPopup.jsx";
 import DeleteConfirmationPopup from "./DeleteConfirmationPopup.jsx";
 import TalentPoolSelectionModal from "./TalentPoolSelectionModal.jsx";
@@ -43,18 +43,18 @@ import {
   Edit as EditIcon,
   Link as LinkIcon,
   Comment as CommentIcon,
+  Timeline as TimelineIcon,
+  Construction as ConstructionIcon,
 } from "@mui/icons-material";
 import axios from "axios";
+import API_URL from '../config/api';
 
 const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [expandedCandidateId, setExpandedCandidateId] = useState(null);
   const [expandedJobsCandidateId, setExpandedJobsCandidateId] = useState(null);
   const [candidateJobs, setCandidateJobs] = useState({});
   const [loadingJobs, setLoadingJobs] = useState({});
-  const [filter, setFilter] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [editingCandidateId, setEditingCandidateId] = useState(null);
   const [expandedSkills, setExpandedSkills] = useState({});
   const [activeFilters, setActiveFilters] = useState({
@@ -95,6 +95,9 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   const [selectedCandidateForComments, setSelectedCandidateForComments] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
+  // Feature dialog state
+  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+
   // Get current user info
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -105,36 +108,13 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   }, []);
 
   // Debounce search input
-  useEffect(() => {
-    setIsFiltering(true);
-    const timer = setTimeout(() => {
-      setFilter(searchInput);
-      setIsFiltering(false);
-    }, 300); // 300ms debounce
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [searchInput]);
-
-  useEffect(() => {
-    const handleToggleFilters = () => {
-      setShowFilters(prev => !prev);
-    };
-
-    window.addEventListener('toggleCandidateFilters', handleToggleFilters);
-    
-    return () => {
-      window.removeEventListener('toggleCandidateFilters', handleToggleFilters);
-    };
-  }, []);
 
   // Fetch talent pools for filtering
   useEffect(() => {
     const fetchTalentPools = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
+        const response = await axios.get(`${API_URL}/api/talent-pools`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTalentPools(response.data);
@@ -143,7 +123,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
       }
     };
     
-    if (accessLevel === 2) {
+    if (accessLevel === 1 || accessLevel === 2) {
       fetchTalentPools();
     }
   }, [accessLevel]);
@@ -210,7 +190,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
     try {
       setLoadingJobs(prev => ({ ...prev, [selectedCandidate._id]: true }));
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${selectedCandidate._id}/suitable-jobs?limit=${limit}`, {
+      const response = await axios.get(`${API_URL}/api/candidates/${selectedCandidate._id}/suitable-jobs?limit=${limit}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.suitableJobs && response.data.suitableJobs.length > 0) {
@@ -248,7 +228,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
     try {
       setIsDeleting(prev => ({ ...prev, [candidateToDelete._id]: true }));
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateToDelete._id}`, {
+      await axios.delete(`${API_URL}/api/candidates/${candidateToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate deleted successfully!');
@@ -323,7 +303,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
 
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
+      const response = await axios.get(`${API_URL}/api/jobs`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAvailableJobs(response.data);
@@ -343,7 +323,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
     try {
       setLinkingCandidates(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
+      const response = await axios.post(`${API_URL}/api/candidate-job-links/link`, {
         candidateIds: selectedCandidates,
         jobId: selectedJob,
         source: 'added-by-recruiter'
@@ -397,17 +377,6 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   };
 
   const filteredCandidates = candidates.filter((c) => {
-    // Basic search filter
-    const basicSearch = filter.toLowerCase();
-    const matchesBasicSearch =
-      (c.name || "").toLowerCase().includes(basicSearch) ||
-      (Array.isArray(c.skills)
-        ? c.skills.join(",").toLowerCase()
-        : ""
-      ).includes(basicSearch);
-
-    if (!matchesBasicSearch) return false;
-
     // Advanced filters
     if (
       activeFilters.name &&
@@ -559,21 +528,20 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
   ].sort();
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* Header */}
+    <Box sx={{ height: "calc(100vh - 72px)", display: "flex", flexDirection: "column" }}>
+      {/* Fixed Header */}
       <Paper
-        elevation={2}
+        elevation={3}
         sx={{
+          position: "sticky",
+          top: "72px",
+          zIndex: 100,
           background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-          border: "1px solid rgba(255, 255, 255, 0.08)",
-          borderRadius: 1,
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          borderRadius: 0,
           p: 3,
           color: "#1e293b",
-          zIndex: 10,
-          position: "relative",
-          width: showFilters ? "calc(100% - 400px)" : "100%",
-          marginLeft: showFilters ? "400px" : 0,
-          transition: "all 0.3s ease-in-out",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Box
@@ -581,17 +549,14 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            mb: 3,
           }}
         >
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b", mb: 1 }}>
-              Candidate Database
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#64748b", fontSize: "0.9rem" }}>
-              Browse and manage candidate profiles
-            </Typography>
-          </Box>
+          {/* Left side - Title */}
+          <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
+            Candidate Listings
+          </Typography>
+          
+          {/* Right side - Filter icon and other controls */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {hasActiveFilters && (
               <Chip
@@ -600,7 +565,6 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   backgroundColor: "rgba(37, 99, 235, 0.12)",
                   color: "#2563eb",
                   fontWeight: 600,
-                  borderRadius: 1,
                 }}
               />
             )}
@@ -609,10 +573,9 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                 <Chip
                   label={`${selectedCandidates.length} selected`}
                   sx={{
-                    backgroundColor: "rgba(238, 187, 195, 0.2)",
+                    backgroundColor: "rgba(139, 92, 246, 0.12)",
                     color: "#8b5cf6",
                     fontWeight: 600,
-                    borderRadius: 1,
                   }}
                 />
                 <Button
@@ -623,10 +586,9 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     backgroundColor: "#8b5cf6",
                     color: "#f8fafc",
                     fontWeight: 600,
-                    borderRadius: 1,
                     textTransform: "none",
                     "&:hover": {
-                      backgroundColor: "#d4a5ad",
+                      backgroundColor: "#7c3aed",
                     },
                   }}
                 >
@@ -634,131 +596,38 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                 </Button>
               </>
             )}
+            <Tooltip title="Filter Candidates">
+              <IconButton
+                onClick={() => setShowFilterModal(true)}
+                sx={{
+                  backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.15)" : "rgba(139, 92, 246, 0.12)",
+                  color: hasActiveFilters ? "#2563eb" : "#8b5cf6",
+                  border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.3)" : "2px solid rgba(139, 92, 246, 0.3)",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.25)" : "rgba(139, 92, 246, 0.2)",
+                    border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.5)" : "2px solid rgba(139, 92, 246, 0.5)",
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <FilterIcon sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Tooltip>
           </Box>
-        </Box>
-
-        {/* Search bar container with proper width and alignment */}
-        <Box
-          sx={{
-            width: "100%",
-          }}
-        >
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search candidates by name, email, or skills..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ color: "#64748b", mr: 1 }} />,
-              endAdornment: isFiltering && (
-                <CircularProgress
-                  size={20}
-                  sx={{
-                    color: "#8b5cf6",
-                    mr: 1,
-                  }}
-                />
-              ),
-            }}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "rgba(0, 0, 0, 0.08)" },
-                "&:hover fieldset": { borderColor: "rgba(238, 187, 195, 0.4)" },
-                "&.Mui-focused fieldset": { borderColor: "#8b5cf6" },
-                borderRadius: 1,
-              },
-              "& .MuiInputLabel-root": { color: "#64748b" },
-              "& .MuiInputBase-input": { color: "#1e293b" },
-            }}
-          />
         </Box>
       </Paper>
 
-      {/* Main Content */}
+      {/* Candidate List */}
       <Box
         sx={{
           flex: 1,
-          display: "flex",
-          overflow: "hidden",
-          position: "relative",
+          overflowY: "auto",
+          background: "var(--color-bg-dark)",
+          p: 2,
         }}
       >
-        {/* Filter Sidebar - Fixed position with proper top offset */}
-        <Box
-          sx={{
-            position: "fixed",
-            left: showFilters ? 0 : -400,
-            top: "200px", // Increased top offset to avoid overlap with header
-            width: 400,
-            height: "calc(100vh - 200px)", // Adjusted height accordingly
-            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-            borderRight: "1px solid rgba(255, 255, 255, 0.08)",
-            overflowY: "auto",
-            p: 3,
-            zIndex: 5,
-            transition: "left 0.3s ease-in-out",
-            boxShadow: "4px 0 20px rgba(0, 0, 0, 0.15)",
-          }}
-        >
-          <CandidateFilter
-            filters={activeFilters}
-            setFilters={setActiveFilters}
-            onApplyFilters={applyFilters}
-            onClearFilters={clearFilters}
-            allSkills={allSkills}
-            talentPools={talentPools}
-          />
-        </Box>
-
-        {/* Candidate List - Adjusted margin when filters are shown */}
-        <Box
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            p: 2,
-            background: "var(--color-bg-dark)",
-            marginLeft: showFilters ? "400px" : 0,
-            transition: "margin-left 0.3s ease-in-out",
-            width: "100%",
-            maxWidth: "100vw",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Floating Filter Button - Shows when filters are collapsed */}
-          {!showFilters && (
-            <Box
-              sx={{
-                position: "fixed",
-                left: 20,
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 10,
-              }}
-            >
-              <Tooltip title="Show Filters" placement="right">
-                <IconButton
-                  onClick={() => setShowFilters(true)}
-                  sx={{
-                    backgroundColor: "rgba(238, 187, 195, 0.9)",
-                    color: "#f8fafc",
-                    width: 48,
-                    height: 48,
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.25)",
-                    borderRadius: 1,
-                    "&:hover": {
-                      backgroundColor: "rgba(238, 187, 195, 1)",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 6px 25px rgba(0, 0, 0, 0.35)",
-                    },
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <FilterIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
 
           {/* Loading Screen */}
           {loading ? (
@@ -823,14 +692,14 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     sx={{
                       background:
                         "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-                      borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                      borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                     }}
                   >
                     <TableCell
                       sx={{
                         color: "#2563eb",
                         fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
                         width: "60px",
@@ -855,7 +724,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       sx={{
                         color: "#2563eb",
                         fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
                         width: "40px",
@@ -865,7 +734,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       sx={{
                         color: "#2563eb",
                         fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
                         minWidth: "180px",
@@ -877,7 +746,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       sx={{
                         color: "#2563eb",
                         fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
                         minWidth: "160px",
@@ -889,7 +758,33 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       sx={{
                         color: "#2563eb",
                         fontWeight: 700,
-                        borderBottom: "2px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "1rem",
+                        padding: "18px 12px",
+                        minWidth: "120px",
+                        textAlign: "center",
+                      }}
+                    >
+                      Timeline
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "1rem",
+                        padding: "18px 12px",
+                        minWidth: "160px",
+                        textAlign: "center",
+                      }}
+                    >
+                      Recruiter Review
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
                         minWidth: "300px",
@@ -926,7 +821,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                     >
                       <TableCell
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "16px 12px",
                           textAlign: "center",
                         }}
@@ -945,7 +840,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       </TableCell>
                       <TableCell
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "16px 12px",
                           textAlign: "center",
                         }}
@@ -969,7 +864,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       </TableCell>
                       <TableCell
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "16px 12px",
                         }}
                       >
@@ -997,7 +892,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       </TableCell>
                       <TableCell
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "16px 12px",
                         }}
                       >
@@ -1026,7 +921,67 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                       </TableCell>
                       <TableCell
                         sx={{
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "16px 12px",
+                          textAlign: "center",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Tooltip title="View Timeline">
+                          <IconButton
+                            onClick={() => setShowFeatureDialog(true)}
+                            sx={{
+                              color: "#8b5cf6",
+                              backgroundColor: "rgba(139, 92, 246, 0.1)",
+                              "&:hover": {
+                                backgroundColor: "rgba(139, 92, 246, 0.2)",
+                                transform: "scale(1.1)",
+                              },
+                            }}
+                          >
+                            <TimelineIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "16px 12px",
+                          textAlign: "center",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<CommentIcon />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedCandidateForComments(candidate);
+                            setShowCommentsModal(true);
+                          }}
+                          sx={{
+                            background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+                            color: '#fff',
+                            fontWeight: 600,
+                            fontSize: "0.75rem",
+                            padding: "6px 12px",
+                            textTransform: "none",
+                            borderRadius: 1,
+                            "&:hover": {
+                              background: 'linear-gradient(135deg, #3a7bd5 0%, #7c3aed 100%)',
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+                            },
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          Review
+                        </Button>
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "16px 12px",
                           position: "sticky",
                           right: 0,
@@ -1111,28 +1066,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                               {loadingJobs[candidate._id] ? 'Finding...' : 'Jobs'}
                             </Button>
                           </Tooltip>
-                          <Tooltip title="Comments">
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedCandidateForComments(candidate);
-                                setShowCommentsModal(true);
-                              }}
-                              sx={{
-                                color: "#2563eb",
-                                border: "1px solid #2563eb",
-                                padding: "4px",
-                                borderRadius: 1,
-                                "&:hover": {
-                                  backgroundColor: "rgba(79, 140, 255, 0.1)",
-                                },
-                              }}
-                            >
-                              <CommentIcon sx={{ fontSize: "1rem" }} />
-                            </IconButton>
-                          </Tooltip>
-                          {accessLevel === 2 && (
+                          {(accessLevel === 1 || accessLevel === 2) && (
                             <Tooltip title="Add to Talent Pool">
                               <Button
                                 variant="outlined"
@@ -1214,8 +1148,8 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                           <Box sx={{ 
                             p: 2, 
                             background: 'rgba(255, 255, 255, 0.02)', 
-                            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+                            borderTop: '2px solid rgba(139, 92, 246, 0.15)',
+                            borderBottom: '2px solid rgba(139, 92, 246, 0.15)'
                           }}>
                             <Typography variant="subtitle2" sx={{color: '#90caf9', fontWeight: 600, mb: 2}}>Suitable Jobs Found</Typography>
                             
@@ -1299,7 +1233,6 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
             </TableContainer>
           )}
         </Box>
-      </Box>
       
       {/* Results Limit Popup */}
       <AIWarningDialog
@@ -1424,7 +1357,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Comments Modal */}
+      {/* Recruiter Review Modal */}
       {selectedCandidateForComments && currentUser && (
         <CommentsModal
           open={showCommentsModal}
@@ -1438,6 +1371,57 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
           userAccessLevel={accessLevel}
         />
       )}
+
+      {/* Candidate Filter Modal */}
+      <CandidateFilterModal
+        open={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        filters={activeFilters}
+        onApplyFilters={applyFilters}
+        onClearFilters={clearFilters}
+        allSkills={allSkills}
+        talentPools={talentPools}
+      />
+
+      {/* Feature Under Development Dialog */}
+      <Dialog
+        open={showFeatureDialog}
+        onClose={() => setShowFeatureDialog(false)}
+        maxWidth="xs"
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
+          <ConstructionIcon sx={{ fontSize: 64, color: '#f59e0b', mb: 2 }} />
+          <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
+            This feature is currently under development
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setShowFeatureDialog(false)}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+              }
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

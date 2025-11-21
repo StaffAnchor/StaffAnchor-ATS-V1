@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import JobDetails from "./JobDetails.jsx";
-import JobFilter from "./JobFilter.jsx";
+import JobFilterModal from "./JobFilterModal.jsx";
+import { toast } from 'react-toastify';
 import {
   Card,
   CardContent,
@@ -23,6 +24,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Menu,
+  MenuItem,
+  Select,
+  FormControl,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -31,26 +39,33 @@ import {
   Clear as ClearIcon,
   Search as SearchIcon,
   Visibility as VisibilityIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Description as DescriptionIcon,
+  Construction as ConstructionIcon,
 } from "@mui/icons-material";
+import API_URL from '../config/api';
 
 const JobList = ({ accessLevel, userId }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedJobId, setExpandedJobId] = useState(null);
-  const [filter, setFilter] = useState("");
-  const [showFilters, setShowFilters] = useState(true);
-  const [showOnlyAssigned, setShowOnlyAssigned] = useState(false); // New state for toggle
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showOnlyAssigned, setShowOnlyAssigned] = useState(false);
+  const [statusFilterAnchor, setStatusFilterAnchor] = useState(null);
+  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+  const [subordinates, setSubordinates] = useState([]);
   const [activeFilters, setActiveFilters] = useState({
     title: "",
     organization: "",
-    location: "",
+    country: "",
+    state: "",
+    city: "",
     industry: "",
     experience: [0, 20],
     ctcLow: "",
     ctcHigh: "",
     remote: null,
-    recruiterName: "",
-    recruiterEmail: "",
+    status: "",
   });
 
   useEffect(() => {
@@ -58,7 +73,7 @@ const JobList = ({ accessLevel, userId }) => {
       try {
         setLoading(true);
         const token = localStorage.getItem('jwt');
-        const res = await axios.get("https://staffanchor-ats-v1.onrender.com/api/jobs", {
+        const res = await axios.get(`${API_URL}/api/jobs`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         //console.log('=== FETCHED JOBS ===');
@@ -75,32 +90,37 @@ const JobList = ({ accessLevel, userId }) => {
   }, []);
 
   useEffect(() => {
-    const handleToggleFilters = () => {
-      setShowFilters(prev => !prev);
+    const fetchSubordinates = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+        const res = await axios.get(`${API_URL}/api/auth/subordinates`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSubordinates(res.data);
+      } catch (error) {
+        console.error('Failed to fetch subordinates:', error);
+      }
     };
+    fetchSubordinates();
+  }, []);
 
+  useEffect(() => {
     const handleJobDeleted = (event) => {
       const { jobId } = event.detail;
-      //console.log('Job deleted event received:', jobId);
-      // Remove the deleted job from the list
       setJobs(prevJobs => prevJobs.filter(job => job._id !== jobId));
     };
 
     const handleJobUpdated = (event) => {
       const { jobId, updatedJob } = event.detail;
-      //console.log('Job updated event received:', jobId, updatedJob);
-      // Update the job in the list with fresh data from backend
       setJobs(prevJobs => prevJobs.map(job => 
         job._id === jobId ? updatedJob : job
       ));
     };
 
-    window.addEventListener('toggleJobFilters', handleToggleFilters);
     window.addEventListener('jobDeleted', handleJobDeleted);
     window.addEventListener('jobUpdated', handleJobUpdated);
     
     return () => {
-      window.removeEventListener('toggleJobFilters', handleToggleFilters);
       window.removeEventListener('jobDeleted', handleJobDeleted);
       window.removeEventListener('jobUpdated', handleJobUpdated);
     };
@@ -114,57 +134,32 @@ const JobList = ({ accessLevel, userId }) => {
     setActiveFilters({
       title: "",
       organization: "",
-      location: "",
+      country: "",
+      state: "",
+      city: "",
       industry: "",
       experience: [0, 20],
       ctcLow: "",
       ctcHigh: "",
       remote: null,
-      recruiterName: "",
-      recruiterEmail: "",
+      status: "",
     });
   };
 
   const filteredJobs = jobs.filter((job) => {
-    //console.log('=== JOB FILTERING DEBUG ===');
-    //console.log('Job:', job);
-    //console.log('Access Level:', accessLevel);
-    //console.log('User ID:', userId);
-    //console.log('Show Only Assigned:', showOnlyAssigned);
-    //console.log('Job authorizedUsers:', job.authorizedUsers);
-    
-    // Access level filter - Now both admin and subordinate can see all jobs by default
-    // But subordinates can toggle to see only assigned jobs
+    // Access level filter
     if (accessLevel === 1 && showOnlyAssigned) {
-      // Subordinate with "Assigned Jobs Only" toggle enabled
-      //console.log('Subordinate user - filtering for assigned jobs only');
-      
       if (!job.authorizedUsers || job.authorizedUsers.length === 0) {
-        //console.log('Job has no authorized users - filtering out');
         return false;
       }
       
-      // Convert both to strings for comparison
       const authorizedUserIds = job.authorizedUsers.map(id => id.toString());
       const userIdString = userId.toString();
       
-      //console.log('Authorized user IDs (strings):', authorizedUserIds);
-      //console.log('Current user ID (string):', userIdString);
-      //console.log('Is user authorized:', authorizedUserIds.includes(userIdString));
-      
       if (!authorizedUserIds.includes(userIdString)) {
-        //console.log('User not authorized for this job - filtering out');
         return false;
       }
     }
-
-    // Basic search filter
-    const basicSearch = filter.toLowerCase();
-    const matchesBasicSearch =
-      job.title.toLowerCase().includes(basicSearch) ||
-      job.organization.toLowerCase().includes(basicSearch);
-
-    if (!matchesBasicSearch) return false;
 
     // Advanced filters
     if (
@@ -181,15 +176,39 @@ const JobList = ({ accessLevel, userId }) => {
     ) {
       return false;
     }
-    if (
-      activeFilters.location &&
-      !job.location.toLowerCase().includes(activeFilters.location.toLowerCase())
-    ) {
-      return false;
+    
+    // Location filter - check if job has locations array with country/state/city
+    if (activeFilters.country || activeFilters.state || activeFilters.city) {
+      if (!job.locations || job.locations.length === 0) {
+        // If no locations array, check legacy location field
+        if (job.location) {
+          const locationString = job.location.toLowerCase();
+          if (activeFilters.country && !locationString.includes(activeFilters.country.toLowerCase())) return false;
+          if (activeFilters.state && !locationString.includes(activeFilters.state.toLowerCase())) return false;
+          if (activeFilters.city && !locationString.includes(activeFilters.city.toLowerCase())) return false;
+        } else {
+          return false;
+        }
+      } else {
+        // Check if any location matches the filter
+        const hasMatchingLocation = job.locations.some(loc => {
+          if (activeFilters.country && loc.country?.toLowerCase() !== activeFilters.country.toLowerCase()) return false;
+          if (activeFilters.state && loc.state?.toLowerCase() !== activeFilters.state.toLowerCase()) return false;
+          if (activeFilters.city && loc.city?.toLowerCase() !== activeFilters.city.toLowerCase()) return false;
+          return true;
+        });
+        if (!hasMatchingLocation) return false;
+      }
     }
+    
     if (activeFilters.industry && job.industry !== activeFilters.industry) {
       return false;
     }
+    
+    if (activeFilters.status && job.status !== activeFilters.status) {
+      return false;
+    }
+    
     if (
       activeFilters.experience &&
       (job.experience < activeFilters.experience[0] ||
@@ -214,22 +233,6 @@ const JobList = ({ accessLevel, userId }) => {
     if (activeFilters.remote !== null && job.remote !== activeFilters.remote) {
       return false;
     }
-    if (
-      activeFilters.recruiterName &&
-      !job.recruiterName
-        .toLowerCase()
-        .includes(activeFilters.recruiterName.toLowerCase())
-    ) {
-      return false;
-    }
-    if (
-      activeFilters.recruiterEmail &&
-      !job.recruiterEmail
-        .toLowerCase()
-        .includes(activeFilters.recruiterEmail.toLowerCase())
-    ) {
-      return false;
-    }
 
     return true;
   });
@@ -250,23 +253,89 @@ const JobList = ({ accessLevel, userId }) => {
       !(Array.isArray(value) && value[0] === 0 && value[1] === 20)
   );
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'New': return '#3b82f6';
+      case 'In Progress': return '#f59e0b';
+      case 'Halted': return '#ef4444';
+      case 'Withdrawn': return '#6b7280';
+      case 'Completed': return '#10b981';
+      default: return '#64748b';
+    }
+  };
+
+  const getStatusBackgroundColor = (status) => {
+    switch (status) {
+      case 'New': return 'rgba(59, 130, 246, 0.12)';
+      case 'In Progress': return 'rgba(245, 158, 11, 0.12)';
+      case 'Halted': return 'rgba(239, 68, 68, 0.12)';
+      case 'Withdrawn': return 'rgba(107, 116, 128, 0.12)';
+      case 'Completed': return 'rgba(16, 185, 129, 0.12)';
+      default: return 'transparent';
+    }
+  };
+
+  const getAssignees = (authorizedUsers) => {
+    if (!authorizedUsers || authorizedUsers.length === 0) {
+      return [];
+    }
+    return subordinates.filter(sub => authorizedUsers.includes(sub._id));
+  };
+
+  const handleStatusChange = async (jobId, newStatus) => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.put(
+        `${API_URL}/api/jobs/${jobId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Update local state with the response data from backend
+      setJobs(prevJobs => prevJobs.map(job => 
+        job._id === jobId ? { ...job, ...response.data } : job
+      ));
+      
+      // Emit event for job details component
+      window.dispatchEvent(new CustomEvent('jobUpdated', { 
+        detail: { jobId, updatedJob: response.data } 
+      }));
+      
+      toast.success('Status updated successfully!');
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      toast.error('Failed to update status');
+    }
+  };
+
+  const handleStatusFilterClick = (event) => {
+    setStatusFilterAnchor(event.currentTarget);
+  };
+
+  const handleStatusFilterClose = () => {
+    setStatusFilterAnchor(null);
+  };
+
+  const handleStatusFilterSelect = (status) => {
+    setActiveFilters(prev => ({ ...prev, status }));
+    handleStatusFilterClose();
+  };
+
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* Header */}
+    <Box sx={{ height: "calc(100vh - 72px)", display: "flex", flexDirection: "column" }}>
+      {/* Fixed Header */}
       <Paper
-        elevation={2}
+        elevation={3}
         sx={{
+          position: "sticky",
+          top: "72px",
+          zIndex: 100,
           background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
           border: "1px solid rgba(0, 0, 0, 0.05)",
           borderRadius: 0,
-          p: 2,
+          p: 3,
           color: "#1e293b",
-          zIndex: 10,
-          position: "relative",
-          width: showFilters ? "calc(100vw - 400px - 32px)" : "calc(100vw - 32px)",
-          marginLeft: showFilters ? "400px" : 0,
-          transition: "all 0.3s ease-in-out",
-          boxSizing: "border-box",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Box
@@ -274,24 +343,26 @@ const JobList = ({ accessLevel, userId }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            mb: 2,
           }}
         >
+          {/* Left side - Title */}
           <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
             Job Listings
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          
+          {/* Right side - Filter icon and other controls */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {accessLevel === 1 && (
               <Button
                 variant={showOnlyAssigned ? "contained" : "outlined"}
                 onClick={() => setShowOnlyAssigned(!showOnlyAssigned)}
                 sx={{
-                  backgroundColor: showOnlyAssigned ? "rgba(238, 187, 195, 0.9)" : "transparent",
+                  backgroundColor: showOnlyAssigned ? "#8b5cf6" : "transparent",
                   color: showOnlyAssigned ? "#f8fafc" : "#8b5cf6",
                   borderColor: "#8b5cf6",
                   "&:hover": {
-                    backgroundColor: showOnlyAssigned ? "rgba(238, 187, 195, 1)" : "rgba(139, 92, 246, 0.08)",
-                    borderColor: "#8b5cf6",
+                    backgroundColor: showOnlyAssigned ? "#7c3aed" : "rgba(139, 92, 246, 0.08)",
+                    borderColor: "#7c3aed",
                   },
                   fontWeight: 600,
                   textTransform: "none",
@@ -306,114 +377,42 @@ const JobList = ({ accessLevel, userId }) => {
                 sx={{
                   backgroundColor: "rgba(37, 99, 235, 0.12)",
                   color: "#2563eb",
+                  fontWeight: 600,
                 }}
               />
             )}
+            <Tooltip title="Filter Jobs">
+              <IconButton
+                onClick={() => setShowFilterModal(true)}
+                sx={{
+                  backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.15)" : "rgba(139, 92, 246, 0.12)",
+                  color: hasActiveFilters ? "#2563eb" : "#8b5cf6",
+                  border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.3)" : "2px solid rgba(139, 92, 246, 0.3)",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.25)" : "rgba(139, 92, 246, 0.2)",
+                    border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.5)" : "2px solid rgba(139, 92, 246, 0.5)",
+                    transform: "scale(1.05)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <FilterIcon sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
-
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search jobs by title or organization..."
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ color: "#64748b", mr: 1 }} />,
-          }}
-          sx={{
-            width: "100%",
-            maxWidth: "100%",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "rgba(255, 255, 255, 0.3)" },
-              "&:hover fieldset": { borderColor: "rgba(238, 187, 195, 0.5)" },
-              "&.Mui-focused fieldset": { borderColor: "#8b5cf6" },
-            },
-            "& .MuiInputLabel-root": { color: "#64748b" },
-            "& .MuiInputBase-input": { color: "#1e293b" },
-          }}
-        />
       </Paper>
 
-      {/* Main Content */}
+      {/* Job List */}
       <Box
         sx={{
           flex: 1,
-          display: "flex",
-          overflow: "hidden",
-          position: "relative",
-          marginLeft: showFilters ? "400px" : 0,
-          transition: "margin-left 0.3s ease-in-out",
+          overflowY: "auto",
+          background: "var(--color-bg-dark)",
+          p: 2,
         }}
       >
-        {/* Filter Sidebar - Sliding panel from left */}
-        <Box
-          sx={{
-            position: "fixed",
-            left: showFilters ? 0 : -400,
-            top: "72px", // Account for header height
-            width: 400,
-            height: "calc(100vh - 72px)",
-            background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-            borderRight: "1px solid rgba(0, 0, 0, 0.05)",
-            overflowY: "auto",
-            p: 2,
-            zIndex: 5,
-            transition: "left 0.3s ease-in-out",
-          }}
-        >
-          <JobFilter
-            filters={activeFilters}
-            setFilters={setActiveFilters}
-            onApplyFilters={applyFilters}
-            onClearFilters={clearFilters}
-          />
-        </Box>
-
-        {/* Job List - Adjusted margin when filters are shown */}
-        <Box
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            p: 2,
-            background: "var(--color-bg-dark)",
-            width: "100%",
-            maxWidth: "100vw",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Floating Filter Button - Shows when filters are collapsed */}
-          {!showFilters && (
-            <Box
-              sx={{
-                position: "fixed",
-                left: 20,
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 10,
-              }}
-            >
-              <Tooltip title="Show Filters" placement="right">
-                <IconButton
-                  onClick={() => setShowFilters(true)}
-                  sx={{
-                    backgroundColor: "rgba(238, 187, 195, 0.9)",
-                    color: "#f8fafc",
-                    width: 48,
-                    height: 48,
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                    "&:hover": {
-                      backgroundColor: "rgba(238, 187, 195, 1)",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <FilterIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
 
           {/* Loading Screen */}
           {loading ? (
@@ -440,24 +439,6 @@ const JobList = ({ accessLevel, userId }) => {
               </Typography>
               <Typography variant="body2" sx={{ color: "#64748b" }}>
                 Please wait while we fetch the job listings
-              </Typography>
-            </Box>
-          ) : filteredJobs.length === 0 ? (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
-                color: "#64748b",
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                No jobs found
-              </Typography>
-              <Typography variant="body2" sx={{ textAlign: "center" }}>
-                Try adjusting your search criteria or filters
               </Typography>
             </Box>
           ) : (
@@ -504,7 +485,49 @@ const JobList = ({ accessLevel, userId }) => {
                         fontSize: "0.95rem",
                       }}
                     >
-                      Location
+                      Assignee
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color: "#8b5cf6",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        cursor: "pointer",
+                        userSelect: "none",
+                        '&:hover': {
+                          backgroundColor: "rgba(139, 92, 246, 0.08)",
+                        }
+                      }}
+                      onClick={handleStatusFilterClick}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                        Status
+                        <ArrowDropDownIcon sx={{ fontSize: 20 }} />
+                        {activeFilters.status && (
+                          <Chip
+                            label="filtered"
+                            size="small"
+                            sx={{
+                              height: 16,
+                              fontSize: '0.65rem',
+                              backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                              color: '#2563eb',
+                              ml: 0.5
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color: "#8b5cf6",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      Internal Notes
                     </TableCell>
                     <TableCell
                       align="center"
@@ -519,7 +542,26 @@ const JobList = ({ accessLevel, userId }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredJobs.map((job) => (
+                  {filteredJobs.length === 0 ? (
+                    <TableRow>
+                      <TableCell 
+                        colSpan={6} 
+                        sx={{ 
+                          textAlign: 'center', 
+                          py: 6,
+                          color: '#64748b'
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ mb: 1, color: '#1e293b' }}>
+                          No jobs found
+                        </Typography>
+                        <Typography variant="body2">
+                          Try adjusting your filters or search criteria
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredJobs.map((job) => (
                     <React.Fragment key={job._id}>
                       <TableRow
                         onClick={() => handleExpandClick(job._id)}
@@ -527,8 +569,9 @@ const JobList = ({ accessLevel, userId }) => {
                           borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
                           transition: "all 0.3s ease",
                           cursor: "pointer",
+                          backgroundColor: getStatusBackgroundColor(job.status || 'New'),
                           "&:hover": {
-                            background: "rgba(238, 187, 195, 0.05)",
+                            background: "rgba(238, 187, 195, 0.12)",
                           },
                         }}
                       >
@@ -555,14 +598,108 @@ const JobList = ({ accessLevel, userId }) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: "#64748b",
-                            }}
-                          >
-                            {job.location}
-                          </Typography>
+                          {(() => {
+                            const assignees = getAssignees(job.authorizedUsers);
+                            if (assignees.length === 0) {
+                              return (
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: "#94a3b8",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  No assignee
+                                </Typography>
+                              );
+                            }
+                            return (
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {assignees.map((assignee) => (
+                                  <Tooltip
+                                    key={assignee._id}
+                                    title={
+                                      <Box sx={{ p: 0.5 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                          {assignee.fullName}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                                          {assignee.email}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ display: 'block' }}>
+                                          {assignee.phone}
+                                        </Typography>
+                                      </Box>
+                                    }
+                                    arrow
+                                    placement="top"
+                                  >
+                                    <Chip
+                                      label={assignee.fullName}
+                                      size="small"
+                                      sx={{
+                                        backgroundColor: 'rgba(139, 92, 246, 0.12)',
+                                        color: '#8b5cf6',
+                                        fontWeight: 500,
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                                        }
+                                      }}
+                                    />
+                                  </Tooltip>
+                                ))}
+                              </Box>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                          <FormControl size="small" sx={{ minWidth: 140 }}>
+                            <Select
+                              value={job.status || 'New'}
+                              onChange={(e) => handleStatusChange(job._id, e.target.value)}
+                              sx={{
+                                backgroundColor: `${getStatusColor(job.status || 'New')}20`,
+                                color: getStatusColor(job.status || 'New'),
+                                fontWeight: 600,
+                                borderRadius: '6px',
+                                border: 'none',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                  border: 'none',
+                                },
+                                '&:hover': {
+                                  backgroundColor: `${getStatusColor(job.status || 'New')}30`,
+                                },
+                                '& .MuiSelect-select': {
+                                  padding: '4px 8px',
+                                  fontSize: '0.875rem',
+                                }
+                              }}
+                            >
+                              <MenuItem value="New">New</MenuItem>
+                              <MenuItem value="In Progress">In Progress</MenuItem>
+                              <MenuItem value="Halted">Halted</MenuItem>
+                              <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                              <MenuItem value="Completed">Completed</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
+                          <Tooltip title="View Internal Notes">
+                            <IconButton
+                              onClick={() => setShowFeatureDialog(true)}
+                              sx={{
+                                color: "#8b5cf6",
+                                backgroundColor: "rgba(139, 92, 246, 0.1)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(139, 92, 246, 0.2)",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <DescriptionIcon />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                         <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                           <Tooltip title={expandedJobId === job._id ? "Hide Details" : "View Details"}>
@@ -590,7 +727,7 @@ const JobList = ({ accessLevel, userId }) => {
                       {/* Expanded Job Details Row */}
                       <TableRow>
                         <TableCell
-                          colSpan={4}
+                          colSpan={5}
                           sx={{
                             py: 0,
                             borderBottom:
@@ -617,14 +754,158 @@ const JobList = ({ accessLevel, userId }) => {
                         </TableCell>
                       </TableRow>
                     </React.Fragment>
-                  ))}
+                  )))}
                 </TableBody>
               </Table>
             </TableContainer>
           )}
         </Box>
+
+        {/* Filter Modal */}
+        <JobFilterModal
+          open={showFilterModal}
+          onClose={() => setShowFilterModal(false)}
+          filters={activeFilters}
+          onApplyFilters={applyFilters}
+          onClearFilters={clearFilters}
+        />
+
+        {/* Status Filter Menu */}
+        <Menu
+          anchorEl={statusFilterAnchor}
+          open={Boolean(statusFilterAnchor)}
+          onClose={handleStatusFilterClose}
+          PaperProps={{
+            sx: {
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 2,
+              minWidth: '180px',
+              mt: 1,
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+            }
+          }}
+        >
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('')}
+            sx={{
+              color: '#1e293b',
+              fontWeight: activeFilters.status === '' ? 700 : 400,
+              backgroundColor: activeFilters.status === '' ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(139, 92, 246, 0.12)',
+              }
+            }}
+          >
+            All Statuses
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('New')}
+            sx={{
+              color: '#3b82f6',
+              fontWeight: activeFilters.status === 'New' ? 700 : 400,
+              backgroundColor: activeFilters.status === 'New' ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(59, 130, 246, 0.12)',
+              }
+            }}
+          >
+            New
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('In Progress')}
+            sx={{
+              color: '#f59e0b',
+              fontWeight: activeFilters.status === 'In Progress' ? 700 : 400,
+              backgroundColor: activeFilters.status === 'In Progress' ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(245, 158, 11, 0.12)',
+              }
+            }}
+          >
+            In Progress
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('Halted')}
+            sx={{
+              color: '#ef4444',
+              fontWeight: activeFilters.status === 'Halted' ? 700 : 400,
+              backgroundColor: activeFilters.status === 'Halted' ? 'rgba(239, 68, 68, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+              }
+            }}
+          >
+            Halted
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('Withdrawn')}
+            sx={{
+              color: '#6b7280',
+              fontWeight: activeFilters.status === 'Withdrawn' ? 700 : 400,
+              backgroundColor: activeFilters.status === 'Withdrawn' ? 'rgba(107, 116, 128, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(107, 116, 128, 0.12)',
+              }
+            }}
+          >
+            Withdrawn
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusFilterSelect('Completed')}
+            sx={{
+              color: '#10b981',
+              fontWeight: activeFilters.status === 'Completed' ? 700 : 400,
+              backgroundColor: activeFilters.status === 'Completed' ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              }
+            }}
+          >
+            Completed
+          </MenuItem>
+        </Menu>
+
+        {/* Feature Under Development Dialog */}
+        <Dialog
+          open={showFeatureDialog}
+          onClose={() => setShowFeatureDialog(false)}
+          maxWidth="xs"
+          PaperProps={{
+            sx: {
+              background: '#ffffff',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              borderRadius: 2,
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+            }
+          }}
+        >
+          <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
+            <ConstructionIcon sx={{ fontSize: 64, color: '#f59e0b', mb: 2 }} />
+            <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
+              This feature is currently under development
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+            <Button
+              onClick={() => setShowFeatureDialog(false)}
+              variant="contained"
+              sx={{
+                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                textTransform: 'none',
+                px: 3,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+                }
+              }}
+            >
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-    </Box>
   );
 };
 
