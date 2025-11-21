@@ -109,10 +109,10 @@ const AddCandidate = () => {
       try {
         const token = localStorage.getItem('jwt');
         const [poolsResponse, jobsResponse] = await Promise.all([
-          axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
+          axios.get(`${API_URL}/api/talent-pools`, {
             headers: { Authorization: `Bearer ${token}` }
           }),
-          axios.get('https://staffanchor-ats-v1.onrender.com/api/jobs', {
+          axios.get(`${API_URL}/api/jobs`, {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
@@ -136,7 +136,7 @@ const AddCandidate = () => {
 
       try {
         const token = localStorage.getItem('jwt');
-        const skillsResponse = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
+        const skillsResponse = await axios.get(`${API_URL}/api/skills`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { category: selectedCategory }
         });
@@ -353,7 +353,7 @@ const AddCandidate = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidates', {
+      const response = await axios.post(`${API_URL}/api/candidates`, {
         ...form,
         skills: selectedSkills,
         experience,
@@ -371,7 +371,7 @@ const AddCandidate = () => {
       const candidateId = response.data._id;
       for (const poolId of selectedTalentPools) {
         try {
-          await axios.post(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
+          await axios.post(`${API_URL}/api/talent-pools/${poolId}/candidates`, {
             candidateId
           }, {
             headers: { Authorization: `Bearer ${token}` }
@@ -393,7 +393,7 @@ const AddCandidate = () => {
       // Link candidate to selected jobs
       if (selectedJobs.length > 0) {
         try {
-          await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
+          await axios.post(`${API_URL}/api/candidate-job-links/link`, {
             candidateIds: [candidateId],
             jobId: selectedJobs[0], // We'll handle multiple jobs in a loop
             source: 'added-by-recruiter'
@@ -403,7 +403,7 @@ const AddCandidate = () => {
 
           // Link to remaining jobs if multiple selected
           for (let i = 1; i < selectedJobs.length; i++) {
-            await axios.post('https://staffanchor-ats-v1.onrender.com/api/candidate-job-links/link', {
+            await axios.post(`${API_URL}/api/candidate-job-links/link`, {
               candidateIds: [candidateId],
               jobId: selectedJobs[i],
               source: 'added-by-recruiter'
@@ -420,6 +420,12 @@ const AddCandidate = () => {
 
       setMsg('Candidate added successfully!');
       toast.success('Candidate added successfully!');
+      
+      // Dispatch event to notify parent component
+      window.dispatchEvent(new CustomEvent('candidateAdded', { 
+        detail: { candidate: response.data } 
+      }));
+      
       // Reset form
       setForm({ name: '', email: '', phone: '', linkedin: '', totalExperienceYears: '', totalExperienceMonths: '', currentCTC: '', expectedCTC: '' });
       setResumeFile(null);
@@ -438,8 +444,10 @@ const AddCandidate = () => {
       setResumeFileName('');
       setSelectedJobs([]);
     } catch (error) {
-      setMsg('Error adding candidate');
-      toast.error('Error adding candidate');
+      console.error('Error adding candidate:', error);
+      const errorMessage = error.response?.data?.error || 'Error adding candidate';
+      setMsg(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -461,11 +469,7 @@ const AddCandidate = () => {
           <PersonIcon sx={{ fontSize: 40, color: '#8b5cf6', mr: 2 }} />
           <Typography variant="h3" sx={{ 
             fontWeight: 700, 
-            color: '#1e293b',
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            color: '#1e293b'
           }}>
             Add New Candidate
           </Typography>

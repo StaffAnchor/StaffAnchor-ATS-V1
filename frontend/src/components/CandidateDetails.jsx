@@ -4,6 +4,7 @@ import JobList from './JobList.jsx';
 import ResultsLimitPopup from './ResultsLimitPopup.jsx';
 import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
+import ConfirmDialog from './ConfirmDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Autocomplete, IconButton } from '@mui/material';
 import { Star as StarIcon, InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
@@ -24,6 +25,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const [uploadingResume, setUploadingResume] = useState(false);
   const [deletingResume, setDeletingResume] = useState(false);
   const [showAIWarning, setShowAIWarning] = useState(false);
+  const [showDeleteResumeConfirm, setShowDeleteResumeConfirm] = useState(false);
 
   // Sync editMode with initialEditMode prop when it changes
   React.useEffect(() => {
@@ -36,7 +38,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
       const fetchSkills = async () => {
         try {
           const token = localStorage.getItem('jwt');
-          const response = await axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
+          const response = await axios.get(`${API_URL}/api/skills`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setAvailableSkills(response.data.map(skill => skill.name));
@@ -60,7 +62,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
     try {
       setIsLoading(true);
       const token = localStorage.getItem('jwt');
-      const res = await axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}/suitable-jobs?limit=${limit}`, {
+      const res = await axios.get(`${API_URL}/api/candidates/${candidate._id}/suitable-jobs?limit=${limit}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -93,7 +95,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('jwt');
-      await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}`, {
+      await axios.delete(`${API_URL}/api/candidates/${candidate._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate deleted successfully!');
@@ -126,7 +128,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.put(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidate._id}`, editCandidate, {
+      await axios.put(`${API_URL}/api/candidates/${candidate._id}`, editCandidate, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate updated!');
@@ -173,10 +175,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
 
       toast.success('Resume uploaded successfully!');
       
-      // Wait a moment for the success message to show, then refresh
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Dispatch event to update candidate list
+      window.dispatchEvent(new CustomEvent('candidateUpdated', { 
+        detail: { candidateId: candidate._id } 
+      }));
     } catch (error) {
       console.error('Error uploading resume:', error);
       toast.error('Failed to upload resume: ' + (error.response?.data?.error || error.message));
@@ -187,10 +189,6 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
 
   // Handle resume deletion
   const handleResumeDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this resume?')) {
-      return;
-    }
-
     setDeletingResume(true);
     try {
       const token = localStorage.getItem('jwt');
@@ -203,10 +201,10 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
 
       toast.success('Resume deleted successfully!');
       
-      // Wait a moment for the success message to show, then refresh
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Dispatch event to update candidate list
+      window.dispatchEvent(new CustomEvent('candidateUpdated', { 
+        detail: { candidateId: candidate._id } 
+      }));
     } catch (error) {
       console.error('Error deleting resume:', error);
       toast.error('Failed to delete resume: ' + (error.response?.data?.error || error.message));
@@ -432,7 +430,7 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                                 variant="outlined"
                                 color="error"
                                 startIcon={<DeleteIcon />}
-                                onClick={handleResumeDelete}
+                                onClick={() => setShowDeleteResumeConfirm(true)}
                                 disabled={deletingResume}
                                 sx={{ ml: 1 }}
                               >
@@ -795,6 +793,17 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
         message="Are you sure you want to delete this candidate? This action cannot be undone."
         itemName={candidate.name}
         isDeleting={isDeleting}
+      />
+
+      {/* Delete Resume Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteResumeConfirm}
+        onClose={() => setShowDeleteResumeConfirm(false)}
+        onConfirm={handleResumeDelete}
+        title="Delete Resume"
+        message="Are you sure you want to delete this resume? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
       />
     </Box>
   );

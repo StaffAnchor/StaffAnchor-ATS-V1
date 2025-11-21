@@ -71,6 +71,12 @@ const JobSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  status: {
+    type: String,
+    enum: ['New', 'In Progress', 'Halted', 'Withdrawn', 'Completed'],
+    default: 'New',
+    trim: true
+  },
   authorizedUsers: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' 

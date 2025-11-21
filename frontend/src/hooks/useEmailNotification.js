@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config/api';
 
 const useEmailNotification = () => {
   const [emailPreview, setEmailPreview] = useState(null);
@@ -25,7 +26,7 @@ const useEmailNotification = () => {
       
       const token = getAuthToken();
       const response = await axios.post(
-        'https://staffanchor-ats-v1.onrender.com/api/email/preview',
+        `${API_URL}/api/email/preview`,
         { type, data },
         {
           headers: {
@@ -61,7 +62,7 @@ const useEmailNotification = () => {
       
       const token = getAuthToken();
       const response = await axios.post(
-        'https://staffanchor-ats-v1.onrender.com/api/email/send',
+        `${API_URL}/api/email/send`,
         { recipients, subject, html },
         {
           headers: {

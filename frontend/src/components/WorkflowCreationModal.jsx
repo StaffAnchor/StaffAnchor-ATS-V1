@@ -62,7 +62,6 @@ const WorkflowCreationModal = ({
  
 
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('Medium');
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [candidateStatuses, setCandidateStatuses] = useState({});
@@ -109,14 +108,12 @@ const WorkflowCreationModal = ({
             status: 'Active'
           }]);
           setDescription('');
-          setPriority('Medium');
           setSelectedJob({ _id: existingWorkflow.jobId, title: existingWorkflow.jobTitle });
         } else {
           // Normal edit mode
           setIsEditMode(true);
           setPhases(existingWorkflow.phases || []);
           setDescription(existingWorkflow.description || '');
-          setPriority(existingWorkflow.priority || 'Medium');
           setSelectedJob({ _id: existingWorkflow.jobId, title: existingWorkflow.jobTitle, organization: existingWorkflow.organization });
         }
       } else {
@@ -131,30 +128,55 @@ const WorkflowCreationModal = ({
           status: 'Active'
         }]);
         setDescription('');
-        setPriority('Medium');
         setSelectedJob(job || null);
       }
       
-      // Fetch data after state is set
-      setTimeout(() => {
-        fetchAllCandidates();
+      // Fetch data
+      if (allJobs.length === 0) {
         fetchAllJobs();
-      }, 100);
+      }
+      
+      // Fetch candidates linked to the job
+      const jobId = existingWorkflow ? existingWorkflow.jobId : (job ? job._id : null);
+      if (jobId) {
+        fetchCandidatesForJob(jobId);
+      }
     }
-  }, [open, existingWorkflow, suitableCandidates, job, accessLevel, userId]);
+  }, [open]);
 
-  const fetchAllCandidates = async () => {
+  const fetchCandidatesForJob = async (jobId) => {
+    // Validate jobId
+    if (!jobId || typeof jobId !== 'string') {
+      console.error('Invalid job ID:', jobId);
+      setAllCandidates([]);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`${API_URL}/api/workflows/candidates/all`, {
+      const response = await axios.get(`${API_URL}/api/candidate-job-links/job/${jobId}/candidates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setAllCandidates(response.data);
+      // The API returns { count, candidates }
+      const candidatesData = response.data.candidates || [];
+      setAllCandidates(candidatesData);
     } catch (error) {
-      console.error('Error fetching candidates:', error);
-      toast.error('Failed to fetch candidates');
+      console.error('Error fetching candidates for job:', error);
+      toast.error('Failed to fetch candidates for this job');
+      setAllCandidates([]);
     }
   };
+
+  // Fetch candidates when job changes
+  useEffect(() => {
+    if (selectedJob) {
+      // Extract job ID properly
+      const jobId = typeof selectedJob === 'string' ? selectedJob : selectedJob._id;
+      if (jobId) {
+        fetchCandidatesForJob(jobId);
+      }
+    }
+  }, [selectedJob]);
 
   const fetchAllJobs = async () => {
     try {
@@ -494,8 +516,7 @@ const WorkflowCreationModal = ({
           customFields: phase.customFields.filter(f => f.key && f.value),
           status: phase.status
         })),
-        description,
-        priority
+        description
       };
 
       //console.log('Workflow data being sent:', workflowData);
@@ -595,7 +616,7 @@ const WorkflowCreationModal = ({
           {/* Phase Type */}
           <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
-              Phase Type Field (Full Width)
+              Phase Type Field
             </Typography>
             <FormControl fullWidth sx={{ width: '100%', minWidth: '100%' }}>
               <InputLabel sx={{ color: '#64748b' }}>Phase Type</InputLabel>
@@ -624,7 +645,7 @@ const WorkflowCreationModal = ({
           {/* Phase Status */}
           <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
-              Phase Status Field (Full Width)
+              Phase Status Field
             </Typography>
             <FormControl fullWidth sx={{ width: '100%', minWidth: '100%' }}>
               <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
@@ -651,7 +672,7 @@ const WorkflowCreationModal = ({
                       {/* Candidates Selection */}
             <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
               <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
-                Candidates Field (Full Width)
+                Candidates Field
               </Typography>
               
               <Typography variant="subtitle2" sx={{ color: '#90caf9', mb: 2 }}>
@@ -659,7 +680,7 @@ const WorkflowCreationModal = ({
               </Typography>
               
               {/* Candidates Table */}
-              {(phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length > 0 ? (
+              {((phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length > 0 || phase.candidates.length > 0) ? (
                 <TableContainer component={Paper} sx={{ 
                   backgroundColor: 'rgba(255, 255, 255, 0.02)',
                   maxHeight: 400,
@@ -677,16 +698,22 @@ const WorkflowCreationModal = ({
                           width: 60,
                           textAlign: 'center'
                         }}>
-                          <Checkbox
-                            checked={phase.candidates.length === (phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length && (phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length > 0}
-                            indeterminate={phase.candidates.length > 0 && phase.candidates.length < (phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).length}
-                            onChange={(e) => handleSelectAllCandidates(phaseIndex, e.target.checked)}
-                            sx={{
-                              color: '#2563eb',
-                              '&.Mui-checked': { color: '#8b5cf6' },
-                              '&.MuiCheckbox-indeterminate': { color: '#8b5cf6' }
-                            }}
-                          />
+                          {(() => {
+                            const availableCandidates = phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || []);
+                            const totalAvailable = availableCandidates.length;
+                            return (
+                              <Checkbox
+                                checked={phase.candidates.length === totalAvailable && totalAvailable > 0}
+                                indeterminate={phase.candidates.length > 0 && phase.candidates.length < totalAvailable}
+                                onChange={(e) => handleSelectAllCandidates(phaseIndex, e.target.checked)}
+                                sx={{
+                                  color: '#2563eb',
+                                  '&.Mui-checked': { color: '#8b5cf6' },
+                                  '&.MuiCheckbox-indeterminate': { color: '#8b5cf6' }
+                                }}
+                              />
+                            );
+                          })()}
                         </TableCell>
                         <TableCell sx={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', color: '#2563eb', fontWeight: 700 }}>
                           Name
@@ -703,7 +730,17 @@ const WorkflowCreationModal = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {(phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || [])).map((candidate, idx) => {
+                      {(() => {
+                        // Get available candidates based on phase
+                        const availableCandidates = phaseIndex === 0 ? allCandidates : (phases[phaseIndex - 1]?.candidates || []);
+                        
+                        // Merge available candidates with already selected candidates
+                        // This ensures selected candidates are always visible even if they're not in the available list
+                        const allCandidateIds = new Set(availableCandidates.map(c => c._id));
+                        const additionalSelectedCandidates = phase.candidates.filter(c => !allCandidateIds.has(c._id));
+                        const mergedCandidates = [...availableCandidates, ...additionalSelectedCandidates];
+                        
+                        return mergedCandidates.map((candidate, idx) => {
                         const isSelected = phase.candidates.some(c => c._id === candidate._id);
                         return (
                           <TableRow 
@@ -794,7 +831,7 @@ const WorkflowCreationModal = ({
                             </TableCell>
                           </TableRow>
                         );
-                      })}
+                      })})()}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -810,12 +847,17 @@ const WorkflowCreationModal = ({
           {/* Custom Fields */}
           <Grid item xs={12} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)', p: 1, borderRadius: 1, width: '100%', minWidth: '100%' }}>
             <Typography variant="caption" sx={{ color: '#90caf9', mb: 1, display: 'block' }}>
-              Custom Fields Section (Full Width)
+              Custom Fields Section
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: '#90caf9' }}>
-                Custom Fields
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: '#90caf9', mb: 0.5 }}>
+                  Custom Fields
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>
+                  Add anything you would want to convey the recruiters and candidates
+                </Typography>
+              </Box>
               <Button
                 startIcon={<AddIcon />}
                 onClick={() => addCustomField(phaseIndex)}
@@ -998,30 +1040,6 @@ const WorkflowCreationModal = ({
                 )}
               </Box>
             )}
-
-            {/* Priority */}
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel sx={{ color: '#64748b' }}>Priority</InputLabel>
-                <Select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
-                  sx={{
-                    color: '#1e293b',
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                    }
-                  }}
-                >
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
-                  <MenuItem value="Urgent">Urgent</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
           </Box>
 
           <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />

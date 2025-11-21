@@ -14,6 +14,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { Group as GroupIcon } from '@mui/icons-material';
+import API_URL from '../config/api';
 
 const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName }) => {
   const [talentPools, setTalentPools] = useState([]);
@@ -32,10 +33,10 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
     try {
       const token = localStorage.getItem('jwt');
       const [poolsResponse, candidateResponse] = await Promise.all([
-        axios.get('https://staffanchor-ats-v1.onrender.com/api/talent-pools', {
+        axios.get(`${API_URL}/api/talent-pools`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`https://staffanchor-ats-v1.onrender.com/api/candidates/${candidateId}`, {
+        axios.get(`${API_URL}/api/candidates/${candidateId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -77,7 +78,7 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
 
       // Add to new pools
       for (const poolId of poolsToAdd) {
-        await axios.post(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
+        await axios.post(`${API_URL}/api/talent-pools/${poolId}/candidates`, {
           candidateId
         }, {
           headers: { Authorization: `Bearer ${token}` }
@@ -86,7 +87,7 @@ const TalentPoolSelectionModal = ({ open, onClose, candidateId, candidateName })
 
       // Remove from old pools
       for (const poolId of poolsToRemove) {
-        await axios.delete(`https://staffanchor-ats-v1.onrender.com/api/talent-pools/${poolId}/candidates`, {
+        await axios.delete(`${API_URL}/api/talent-pools/${poolId}/candidates`, {
           headers: { Authorization: `Bearer ${token}` },
           data: { candidateId }
         });

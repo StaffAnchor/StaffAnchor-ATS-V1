@@ -24,6 +24,8 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      disableEscapeKeyDown={false}
+      onClick={(e) => e.stopPropagation()}
       PaperProps={{
         sx: {
           background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
@@ -178,5 +180,6 @@ const AIWarningDialog = ({ open, onClose, onProceed, featureName = "AI-Powered M
 };
 
 export default AIWarningDialog;
+
 
 

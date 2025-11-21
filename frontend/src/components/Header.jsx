@@ -1,14 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from '../assets/StaffanchorLogoFinal.png';
-import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, Avatar } from '@mui/material';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon } from '@mui/icons-material';
+import Profile from '../pages/Profile';
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, setUser }) => {
   const navigate = useNavigate ? useNavigate() : () => {};
+  const location = useLocation();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   
   const handleLogoClick = () => {
-    navigate('/');
+    if (user) {
+      navigate('/dashboard');
+      if (setView) setView('jobs');
+    } else {
+      navigate('/login');
+    }
   };
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAddJob = () => {
+    if (setView) setView('addJob');
+    handleCloseMenu();
+    navigate('/dashboard');
+  };
+
+  const handleAddCandidate = () => {
+    if (setView) setView('addCandidate');
+    handleCloseMenu();
+    navigate('/dashboard');
+  };
+
+  const handleAddByResume = () => {
+    handleCloseMenu();
+    setShowFeatureDialog(true);
+  };
+
+  const handleAnalytics = () => {
+    setShowFeatureDialog(true);
+  };
+
+  const handleSubordinatesTab = () => {
+    navigate('/subordinates');
+  };
+
+  const handleBannerTab = () => {
+    navigate('/banners');
+  };
+
+  const getTabStyle = (active) =>
+    active
+      ? { background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)', color: '#ffffff', fontWeight: 700, border: '2px solid transparent', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }
+      : { background: '#ffffff', color: '#475569', border: '2px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' };
 
   return (
     <AppBar position="fixed" sx={{ 
@@ -16,14 +69,15 @@ const Header = ({ user, onLogout }) => {
       backdropFilter: 'blur(10px)',
       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', 
       borderBottom: '1px solid #e2e8f0',
-      zIndex: 1000
+      zIndex: 1200,
+      top: `${bannerHeight}px`
     }} elevation={0}>
-      <Toolbar sx={{ display: 'flex', alignItems: 'center', minHeight: 72, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', minHeight: 72, maxWidth: '100%', width: '100%', px: 3 }}>
+        {/* Logo */}
         <Box 
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            flexGrow: 1,
             cursor: 'pointer',
             '&:hover': {
               opacity: 0.8,
@@ -37,28 +91,232 @@ const Header = ({ user, onLogout }) => {
             src={logo}
             alt="StaffAnchor"
             style={{ 
-              height: 48, 
-              width: 48, 
+              height: 64, 
+              width: 64, 
               objectFit: 'contain', 
               background: 'transparent', 
               borderRadius: 8, 
-              marginRight: 16, 
               boxShadow: 'none' 
             }}
           />
-          <Typography variant="h5" sx={{ 
-            fontWeight: 700, 
-            color: '#1e293b', 
-            letterSpacing: 1,
-            background: 'linear-gradient(135deg, #1e293b 0%, #2563eb 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            StaffAnchor ATS
-          </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+
+        {/* Dashboard Navigation - Only show when user is logged in */}
+        {user && setView && (
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1, 
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            ml: 4,
+            flex: 1
+          }}>
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/dashboard' && view === 'jobs'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => {
+                setView('jobs');
+                navigate('/dashboard');
+              }}
+            >
+              Jobs
+            </Button>
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/dashboard' && view === 'candidates'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => {
+                setView('candidates');
+                navigate('/dashboard');
+              }}
+            >
+              Candidates
+            </Button>
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/dashboard' && view === 'workflows'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => {
+                setView('workflows');
+                navigate('/dashboard');
+              }}
+            >
+              Workflows
+            </Button>
+            {accessLevel === 2 && (
+              <Button 
+                sx={{
+                  ...getTabStyle(location.pathname === '/subordinates'),
+                  textTransform: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: '8px',
+                  minWidth: 'auto'
+                }} 
+                onClick={handleSubordinatesTab}
+              >
+                Subordinates
+              </Button>
+            )}
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/dashboard' && view === 'talentPools'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => {
+                setView('talentPools');
+                navigate('/dashboard');
+              }}
+            >
+              Talent Pools
+            </Button>
+            {accessLevel === 2 && (
+              <Button 
+                sx={{
+                  ...getTabStyle(location.pathname === '/banners'),
+                  textTransform: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: '8px',
+                  minWidth: 'auto'
+                }} 
+                onClick={handleBannerTab}
+              >
+                Banners
+              </Button>
+            )}
+            
+            {/* Analytics button */}
+            <Button
+              onClick={handleAnalytics}
+              sx={{
+                background: '#ffffff',
+                color: '#475569',
+                border: '2px solid #e2e8f0',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto',
+                '&:hover': {
+                  backgroundColor: '#f8fafc',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                }
+              }}
+            >
+              Analytics
+            </Button>
+            
+            {/* Add button with dropdown */}
+            <IconButton
+              onClick={handleOpenMenu}
+              sx={{
+                backgroundColor: location.pathname === '/dashboard' && (view === 'addJob' || view === 'addCandidate') ? '#10b981' : '#ffffff',
+                color: location.pathname === '/dashboard' && (view === 'addJob' || view === 'addCandidate') ? '#ffffff' : '#475569',
+                border: '2px solid',
+                borderColor: location.pathname === '/dashboard' && (view === 'addJob' || view === 'addCandidate') ? '#10b981' : '#e2e8f0',
+                borderRadius: '8px',
+                width: '40px',
+                height: '40px',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                '&:hover': {
+                  backgroundColor: location.pathname === '/dashboard' && (view === 'addJob' || view === 'addCandidate') ? '#059669' : '#f8fafc',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                }
+              }}
+            >
+              <AddIcon />
+            </IconButton>
+            
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+              PaperProps={{
+                sx: {
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: 2,
+                  minWidth: '200px',
+                  mt: 1,
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+                }
+              }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem 
+                onClick={handleAddCandidate}
+                sx={{
+                  color: '#1e293b',
+                  py: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <PersonIcon sx={{ color: '#8b5cf6' }} />
+                </ListItemIcon>
+                <ListItemText>Add Candidate</ListItemText>
+              </MenuItem>
+              <MenuItem 
+                onClick={handleAddJob}
+                sx={{
+                  color: '#1e293b',
+                  py: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <WorkIcon sx={{ color: '#2563eb' }} />
+                </ListItemIcon>
+                <ListItemText>Add Job</ListItemText>
+              </MenuItem>
+              <MenuItem 
+                onClick={handleAddByResume}
+                sx={{
+                  color: '#1e293b',
+                  py: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <DescriptionIcon sx={{ color: '#10b981' }} />
+                </ListItemIcon>
+                <ListItemText>Add Candidate by Resume</ListItemText>
+              </MenuItem>
+            </Menu>
+          </Box>
+        )}
+
+        {/* Right side buttons */}
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', ml: 'auto' }}>
           {!user && (
             <>
               <Button 
@@ -70,6 +328,7 @@ const Header = ({ user, onLogout }) => {
                   borderColor: '#2563eb', 
                   color: '#2563eb', 
                   fontWeight: 600,
+                  textTransform: 'none',
                   '&:hover': {
                     borderColor: '#1d4ed8',
                     color: '#1d4ed8',
@@ -87,6 +346,7 @@ const Header = ({ user, onLogout }) => {
                   background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                   color: '#fff',
                   fontWeight: 600,
+                  textTransform: 'none',
                   boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
                   '&:hover': {
                     background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
@@ -100,46 +360,92 @@ const Header = ({ user, onLogout }) => {
             </>
           )}
           {user && (
-            <Button 
-              component={Link} 
-              to="/dashboard" 
-              variant="outlined" 
-              color="inherit" 
-              sx={{ 
-                borderColor: '#8b5cf6', 
-                color: '#8b5cf6', 
-                fontWeight: 600,
-                '&:hover': {
-                  borderColor: '#7c3aed',
-                  color: '#7c3aed',
-                  background: 'rgba(139, 92, 246, 0.05)'
-                }
-              }}
-            >
-              Dashboard
-            </Button>
-          )}
-          {user && (
-            <Button 
-              onClick={onLogout} 
-              variant="outlined" 
-              color="inherit" 
-              sx={{ 
-                borderColor: '#64748b', 
-                color: '#475569', 
-                fontWeight: 600,
-                '&:hover': {
-                  borderColor: '#475569',
-                  color: '#1e293b',
-                  background: 'rgba(100, 116, 139, 0.05)'
-                }
-              }}
-            >
-              Logout
-            </Button>
+            <>
+              <IconButton
+                onClick={() => setShowProfile(true)}
+                sx={{
+                  color: '#8b5cf6',
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                  },
+                  width: 40,
+                  height: 40,
+                }}
+              >
+                <AccountCircleIcon />
+              </IconButton>
+              <Button 
+                onClick={onLogout} 
+                variant="outlined" 
+                sx={{ 
+                  borderColor: '#ef4444', 
+                  color: '#ef4444', 
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#dc2626',
+                    color: '#dc2626',
+                    background: 'rgba(239, 68, 68, 0.08)'
+                  }
+                }}
+              >
+                Logout
+              </Button>
+            </>
           )}
         </Box>
       </Toolbar>
+
+      {/* Feature Under Development Dialog */}
+      <Dialog
+        open={showFeatureDialog}
+        onClose={() => setShowFeatureDialog(false)}
+        maxWidth="xs"
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
+          <ConstructionIcon sx={{ fontSize: 64, color: '#f59e0b', mb: 2 }} />
+          <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
+            This feature is currently under development
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setShowFeatureDialog(false)}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+              }
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Profile Dialog */}
+      {user && (
+        <Profile
+          open={showProfile}
+          onClose={() => setShowProfile(false)}
+          user={user}
+          setUser={setUser}
+        />
+      )}
     </AppBar>
   );
 };

@@ -41,6 +41,7 @@ import {
   Star as StarIcon
 } from '@mui/icons-material';
 import { useLocationDropdowns } from './useLocationDropdowns';
+import API_URL from '../config/api';
 
 const AddJob = ({ user }) => {
   const [form, setForm] = useState({
@@ -55,7 +56,8 @@ const AddJob = ({ user }) => {
     ctc: '', 
     description: '', 
     industry: '', 
-    authorizedUser: ''
+    authorizedUser: '',
+    status: 'New'
   });
   const [msg, setMsg] = useState('');
   const [users, setUsers] = useState([]);
@@ -87,10 +89,10 @@ const AddJob = ({ user }) => {
       try {
         const token = localStorage.getItem('jwt');
         const [usersResponse, skillsResponse] = await Promise.all([
-          axios.get('https://staffanchor-ats-v1.onrender.com/api/auth/subordinates', {
+          axios.get(`${API_URL}/api/auth/subordinates`, {
             headers: { Authorization: `Bearer ${token}` }
           }),
-          axios.get('https://staffanchor-ats-v1.onrender.com/api/skills', {
+          axios.get(`${API_URL}/api/skills`, {
             headers: { Authorization: `Bearer ${token}` }
           })
         ]);
@@ -233,6 +235,7 @@ const AddJob = ({ user }) => {
         ctc: form.ctc,
         description: form.description,
         industry: form.industry,
+        status: form.status || 'New',
         skills: selectedSkills,
         createdBy: user?._id
       };
@@ -246,7 +249,7 @@ const AddJob = ({ user }) => {
       }
       
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('https://staffanchor-ats-v1.onrender.com/api/jobs', jobData, {
+      const response = await axios.post(`${API_URL}/api/jobs`, jobData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const newJob = response.data;
@@ -332,11 +335,7 @@ const AddJob = ({ user }) => {
           <WorkIcon sx={{ fontSize: 40, color: '#8b5cf6', mr: 2 }} />
           <Typography variant="h3" sx={{ 
             fontWeight: 700, 
-            color: '#1e293b',
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            color: '#1e293b'
           }}>
             Add New Job
           </Typography>
@@ -603,6 +602,32 @@ const AddJob = ({ user }) => {
                 {industries.map((industry) => (
                   <MenuItem key={industry} value={industry}>{industry}</MenuItem>
                 ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Status */}
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
+              <Select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                required
+                sx={{
+                  color: '#1e293b',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
+                }}
+              >
+                <MenuItem value="New">New</MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Halted">Halted</MenuItem>
+                <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
               </Select>
             </FormControl>
           </Box>

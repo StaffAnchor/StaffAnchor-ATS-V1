@@ -24,6 +24,9 @@ router.post('/', workflowController.createWorkflow);
 // Update workflow
 router.put('/:workflowId', workflowController.updateWorkflow);
 
+// Update workflow status (PATCH for partial update)
+router.patch('/:workflowId', workflowController.updateWorkflow);
+
 // Delete workflow
 router.delete('/:workflowId', requireDeletionPermission, workflowController.deleteWorkflow);
 
