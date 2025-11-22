@@ -7,6 +7,11 @@ const SkillSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  talentPool: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'TalentPool'
+  },
+  // Legacy field - kept for backward compatibility
   category: {
     type: String,
     enum: [
@@ -24,17 +29,15 @@ const SkillSchema = new mongoose.Schema({
       'general-management-strategy',
       'miscellaneous'
     ],
-    default: 'sales-and-business-development'
+    default: 'miscellaneous'
   },
   organization: {
     type: String,
-    required: true,
     trim: true
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   isCustom: {
     type: Boolean,
@@ -48,7 +51,7 @@ const SkillSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Compound index for unique skills per organization and faster searches
-SkillSchema.index({ name: 1, organization: 1 }, { unique: true });
+// Compound index for unique skills per talent pool
+SkillSchema.index({ name: 1, talentPool: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Skill', SkillSchema);

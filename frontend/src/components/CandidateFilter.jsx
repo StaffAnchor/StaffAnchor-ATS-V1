@@ -30,6 +30,7 @@ import {
   Phone as PhoneIcon,
   Group as GroupIcon
 } from '@mui/icons-material';
+import ExpertiseSelector from './ExpertiseSelector';
 
 const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, allSkills = [], talentPools = [] }) => {
   const [localFilters, setLocalFilters] = useState(filters);
@@ -60,7 +61,10 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
       x: '',
       company: '',
       position: '',
-      talentPools: []
+      talentPools: [],
+      domain: '',
+      expertiseTalentPools: [],
+      expertiseSkills: []
     });
     onClearFilters();
   };
@@ -465,6 +469,28 @@ const CandidateFilter = ({ filters, setFilters, onApplyFilters, onClearFilters, 
               }}
             />
           </Box>
+        </Box>
+
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
+
+        {/* Expertise Filtration */}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <SchoolIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Expertise Filtration</Typography>
+          </Box>
+          <ExpertiseSelector
+            selectedDomain={localFilters.domain || ''}
+            onDomainChange={(value) => handleFilterChange('domain', value)}
+            selectedTalentPools={localFilters.expertiseTalentPools || []}
+            onTalentPoolsChange={(value) => handleFilterChange('expertiseTalentPools', value)}
+            selectedSkills={localFilters.expertiseSkills || []}
+            onSkillsChange={(value) => handleFilterChange('expertiseSkills', value)}
+            singleDomain={true}
+            multipleTalentPools={true}
+            multipleSkills={true}
+            required={false}
+          />
         </Box>
 
         {/* Active Filters Display */}

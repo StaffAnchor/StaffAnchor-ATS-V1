@@ -1,10 +1,19 @@
 const Job = require('../models/Job');
 const Candidate = require('../models/Candidate');
+const Client = require('../models/Client');
 
 exports.addJob = async (req, res) => {
   try {
     const job = new Job(req.body);
     await job.save();
+    
+    // If clientId is provided, add this job to the client's jobs array
+    if (req.body.clientId) {
+      await Client.findByIdAndUpdate(
+        req.body.clientId,
+        { $addToSet: { jobs: job._id } }
+      );
+    }
     
     // Return job with a flag to trigger email notification in frontend
     res.json({ 
@@ -13,6 +22,7 @@ exports.addJob = async (req, res) => {
       _creatorId: req.user?.id || req.body.createdBy
     });
   } catch (err) {
+    console.error('Add job error:', err);
     res.status(500).json({ error: 'Add job failed' });
   }
 };
@@ -152,13 +162,13 @@ exports.findSuitableCandidates = async (req, res) => {
       location: 50
     };
     
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate('skills', 'name').lean();
     
     if (!job) {
       return res.status(404).json({ error: 'Job not found' });
     }
 
-    const candidates = await Candidate.find().lean();
+    const candidates = await Candidate.find().populate('skills', 'name').lean();
     const scoredCandidates = [];
 
     // Helper function for fuzzy string matching
@@ -235,22 +245,26 @@ exports.findSuitableCandidates = async (req, res) => {
         // If job has skills array, compare directly
         if (job.skills && job.skills.length > 0) {
           candidate.skills.forEach(candidateSkill => {
-            const candidateSkillLower = candidateSkill.toLowerCase().trim();
+            // Extract skill name from populated object or use as string
+            const candidateSkillName = candidateSkill?.name || candidateSkill;
+            const candidateSkillLower = candidateSkillName.toLowerCase().trim();
             
             // Check for exact matches in job skills
-            const exactMatch = job.skills.find(jobSkill => 
-              jobSkill.toLowerCase().trim() === candidateSkillLower
-            );
+            const exactMatch = job.skills.find(jobSkill => {
+              const jobSkillName = jobSkill?.name || jobSkill;
+              return jobSkillName.toLowerCase().trim() === candidateSkillLower;
+            });
             
             if (exactMatch) {
               totalSkillScore += 3;
               skillsMatched++;
-              matchedSkillsList.push(candidateSkill);
+              matchedSkillsList.push(candidateSkillName);
             } else {
               // Use fuzzy matching for partial matches
               let bestFuzzyScore = 0;
               job.skills.forEach(jobSkill => {
-                const fuzzyScore = fuzzyMatch(candidateSkill, jobSkill, 0.7);
+                const jobSkillName = jobSkill?.name || jobSkill;
+                const fuzzyScore = fuzzyMatch(candidateSkillName, jobSkillName, 0.7);
                 if (fuzzyScore > bestFuzzyScore) {
                   bestFuzzyScore = fuzzyScore;
                 }
@@ -259,7 +273,7 @@ exports.findSuitableCandidates = async (req, res) => {
               if (bestFuzzyScore > 0) {
                 totalSkillScore += bestFuzzyScore * 2;
                 skillsMatched++;
-                matchedSkillsList.push(candidateSkill);
+                matchedSkillsList.push(candidateSkillName);
               }
             }
           });
@@ -277,18 +291,20 @@ exports.findSuitableCandidates = async (req, res) => {
           const jobDescriptionLower = job.description.toLowerCase();
           
           candidate.skills.forEach(skill => {
-            const skillLower = skill.toLowerCase();
+            // Extract skill name from populated object or use as string
+            const skillName = skill?.name || skill;
+            const skillLower = skillName.toLowerCase();
             
             if (jobDescriptionLower.includes(skillLower)) {
               totalSkillScore += 3;
               skillsMatched++;
-              matchedSkillsList.push(skill);
+              matchedSkillsList.push(skillName);
             } else {
-              const fuzzyScore = fuzzyMatch(skill, jobDescriptionLower, 0.3);
+              const fuzzyScore = fuzzyMatch(skillName, jobDescriptionLower, 0.3);
               if (fuzzyScore > 0) {
                 totalSkillScore += fuzzyScore * 2;
                 skillsMatched++;
-                matchedSkillsList.push(skill);
+                matchedSkillsList.push(skillName);
               }
             }
           });

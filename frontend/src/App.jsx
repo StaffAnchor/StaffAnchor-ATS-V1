@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Subordinates from './pages/Subordinates.jsx';
 import Banners from './pages/Banners.jsx';
 import PublicJobApplication from './pages/PublicJobApplication.jsx';
+import Clients from './pages/Clients.jsx';
+import AddClient from './components/AddClient.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ActiveBanner from './components/ActiveBanner.jsx';
 import { setupAxiosInterceptors } from './utils/axiosConfig.js';
@@ -153,6 +155,25 @@ function App() {
                           Access Denied: Admin Only
                         </div>
                       )}
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/clients" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      <Clients user={user} />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/add-client" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      <AddClient 
+                        onClose={() => navigate('/clients')}
+                        onClientAdded={() => navigate('/clients')}
+                      />
                     </ProtectedRoute>
                   } 
                 />

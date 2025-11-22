@@ -15,6 +15,9 @@ router.get('/:workflowId', workflowController.getWorkflowById);
 // Check if workflow exists for a job
 router.get('/check/:jobId', workflowController.checkWorkflowExists);
 
+// Get all workflows for a specific job
+router.get('/job/:jobId', workflowController.getWorkflowsByJob);
+
 // Get candidates for workflow creation
 router.get('/candidates/all', workflowController.getCandidatesForWorkflow);
 
@@ -26,6 +29,9 @@ router.put('/:workflowId', workflowController.updateWorkflow);
 
 // Update workflow status (PATCH for partial update)
 router.patch('/:workflowId', workflowController.updateWorkflow);
+
+// Update candidate client-side status in workflow
+router.patch('/:workflowId/candidate-status', workflowController.updateCandidateStatus);
 
 // Delete workflow
 router.delete('/:workflowId', requireDeletionPermission, workflowController.deleteWorkflow);

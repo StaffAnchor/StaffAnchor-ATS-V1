@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Typography,
@@ -24,11 +25,30 @@ import {
   LocationOn as LocationIcon,
   Business as BusinessIcon,
   Work as WorkIcon,
-  AttachMoney as MoneyIcon
+  AttachMoney as MoneyIcon,
+  School as SchoolIcon
 } from '@mui/icons-material';
+import ExpertiseSelector from './ExpertiseSelector';
+import API_URL from '../config/api';
 
 const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
   const [localFilters, setLocalFilters] = useState(filters);
+  const [clients, setClients] = useState([]);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+        const response = await axios.get(`${API_URL}/api/clients`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setClients(response.data);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
+    };
+    fetchClients();
+  }, []);
 
   const handleFilterChange = (field, value) => {
     setLocalFilters(prev => ({
@@ -43,6 +63,7 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
 
   const handleClearFilters = () => {
     setLocalFilters({
+      jobId: '',
       title: '',
       organization: '',
       location: '',
@@ -52,7 +73,10 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
       ctcHigh: '',
       remote: null,
       recruiterName: '',
-      recruiterEmail: ''
+      recruiterEmail: '',
+      domain: '',
+      talentPools: [],
+      skills: []
     });
     onClearFilters();
   };
@@ -137,6 +161,22 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               fullWidth
+              label="Job ID"
+              value={localFilters.jobId}
+              onChange={(e) => handleFilterChange('jobId', e.target.value)}
+              placeholder="e.g., JOB2411221230451AB"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                },
+                '& .MuiInputLabel-root': { color: '#64748b' },
+                '& .MuiInputBase-input': { color: '#1e293b', fontFamily: 'monospace' },
+              }}
+            />
+            <TextField
+              fullWidth
               label="Job Title"
               value={localFilters.title}
               onChange={(e) => handleFilterChange('title', e.target.value)}
@@ -150,21 +190,28 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
                 '& .MuiInputBase-input': { color: '#1e293b' },
               }}
             />
-            <TextField
-              fullWidth
-              label="Organization"
-              value={localFilters.organization}
-              onChange={(e) => handleFilterChange('organization', e.target.value)}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                },
-                '& .MuiInputLabel-root': { color: '#64748b' },
-                '& .MuiInputBase-input': { color: '#1e293b' },
-              }}
-            />
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: '#64748b' }}>Organization (Client)</InputLabel>
+              <Select
+                value={localFilters.organization}
+                onChange={(e) => handleFilterChange('organization', e.target.value)}
+                label="Organization (Client)"
+                sx={{
+                  color: '#1e293b',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
+                }}
+              >
+                <MenuItem value="">All Organizations</MenuItem>
+                {clients.map((client) => (
+                  <MenuItem key={client._id} value={client.organizationName}>
+                    {client.organizationName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Box>
 
@@ -351,6 +398,28 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
           </Box>
         </Box>
 
+        <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
+
+        {/* Expertise Filtration */}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <SchoolIcon sx={{ color: '#8b5cf6' }} />
+            <Typography sx={{ color: '#1e293b', fontWeight: 600 }}>Expertise Filtration</Typography>
+          </Box>
+          <ExpertiseSelector
+            selectedDomain={localFilters.domain || ''}
+            onDomainChange={(value) => handleFilterChange('domain', value)}
+            selectedTalentPools={localFilters.talentPools || []}
+            onTalentPoolsChange={(value) => handleFilterChange('talentPools', value)}
+            selectedSkills={localFilters.skills || []}
+            onSkillsChange={(value) => handleFilterChange('skills', value)}
+            singleDomain={true}
+            multipleTalentPools={true}
+            multipleSkills={true}
+            required={false}
+          />
+        </Box>
+
         {/* Active Filters Display */}
         {Object.values(localFilters).some(value => 
           value !== '' && value !== null && 
@@ -359,6 +428,13 @@ const JobFilter = ({ filters, setFilters, onApplyFilters, onClearFilters }) => {
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1 }}>Active Filters:</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {localFilters.jobId && (
+                <Chip 
+                  label={`Job ID: ${localFilters.jobId}`} 
+                  onDelete={() => handleFilterChange('jobId', '')}
+                  sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6' }}
+                />
+              )}
               {localFilters.title && (
                 <Chip 
                   label={`Title: ${localFilters.title}`} 

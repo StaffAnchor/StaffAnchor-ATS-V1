@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import logo from '../assets/StaffanchorLogoFinal.png';
 import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, Avatar } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon } from '@mui/icons-material';
+import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon } from '@mui/icons-material';
 import Profile from '../pages/Profile';
 
 const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, setUser }) => {
@@ -50,7 +50,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
     setShowFeatureDialog(true);
   };
 
-  const handleSubordinatesTab = () => {
+  const handleInternalRecruitersTab = () => {
     navigate('/subordinates');
   };
 
@@ -111,6 +111,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             ml: 4,
             flex: 1
           }}>
+            {/* 1. Jobs */}
             <Button 
               sx={{
                 ...getTabStyle(location.pathname === '/dashboard' && view === 'jobs'),
@@ -127,6 +128,26 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             >
               Jobs
             </Button>
+
+            {/* 2. Client side status */}
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/dashboard' && view === 'workflows'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => {
+                setView('workflows');
+                navigate('/dashboard');
+              }}
+            >
+              Client side status
+            </Button>
+
+            {/* 3. Candidates */}
             <Button 
               sx={{
                 ...getTabStyle(location.pathname === '/dashboard' && view === 'candidates'),
@@ -143,37 +164,8 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             >
               Candidates
             </Button>
-            <Button 
-              sx={{
-                ...getTabStyle(location.pathname === '/dashboard' && view === 'workflows'),
-                textTransform: 'none',
-                px: 2,
-                py: 1,
-                borderRadius: '8px',
-                minWidth: 'auto'
-              }} 
-              onClick={() => {
-                setView('workflows');
-                navigate('/dashboard');
-              }}
-            >
-              Workflows
-            </Button>
-            {accessLevel === 2 && (
-              <Button 
-                sx={{
-                  ...getTabStyle(location.pathname === '/subordinates'),
-                  textTransform: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: '8px',
-                  minWidth: 'auto'
-                }} 
-                onClick={handleSubordinatesTab}
-              >
-                Subordinates
-              </Button>
-            )}
+
+            {/* 4. Domain, Talent pools and skills */}
             <Button 
               sx={{
                 ...getTabStyle(location.pathname === '/dashboard' && view === 'talentPools'),
@@ -188,25 +180,42 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                 navigate('/dashboard');
               }}
             >
-              Talent Pools
+              Domain, Talent pools and skills
             </Button>
+
+            {/* 5. Clients */}
+            <Button 
+              sx={{
+                ...getTabStyle(location.pathname === '/clients'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto'
+              }} 
+              onClick={() => navigate('/clients')}
+            >
+              Clients
+            </Button>
+
+            {/* 6. Internal Recruiters (only for accessLevel 2) */}
             {accessLevel === 2 && (
               <Button 
                 sx={{
-                  ...getTabStyle(location.pathname === '/banners'),
+                  ...getTabStyle(location.pathname === '/subordinates'),
                   textTransform: 'none',
                   px: 2,
                   py: 1,
                   borderRadius: '8px',
                   minWidth: 'auto'
                 }} 
-                onClick={handleBannerTab}
+                onClick={handleInternalRecruitersTab}
               >
-                Banners
+                Internal Recruiters
               </Button>
             )}
             
-            {/* Analytics button */}
+            {/* 7. Analytics button */}
             <Button
               onClick={handleAnalytics}
               sx={{
@@ -227,6 +236,27 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             >
               Analytics
             </Button>
+
+            {/* 8. Banner (only for accessLevel 2) */}
+            {accessLevel === 2 && (
+              <Button 
+                sx={{
+                  ...getTabStyle(location.pathname === '/banners'),
+                  textTransform: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: '8px',
+                  minWidth: 'auto',
+                  display: 'flex',
+                  gap: 0.5,
+                  alignItems: 'center'
+                }} 
+                onClick={handleBannerTab}
+              >
+                <CampaignIcon sx={{ fontSize: '1.1rem' }} />
+                Banner
+              </Button>
+            )}
             
             {/* Add button with dropdown */}
             <IconButton
@@ -295,6 +325,24 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   <WorkIcon sx={{ color: '#2563eb' }} />
                 </ListItemIcon>
                 <ListItemText>Add Job</ListItemText>
+              </MenuItem>
+              <MenuItem 
+                onClick={() => {
+                  handleCloseMenu();
+                  navigate('/add-client');
+                }}
+                sx={{
+                  color: '#1e293b',
+                  py: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                  }
+                }}
+              >
+                <ListItemIcon>
+                  <BusinessIcon sx={{ color: '#10b981' }} />
+                </ListItemIcon>
+                <ListItemText>Add Client</ListItemText>
               </MenuItem>
               <MenuItem 
                 onClick={handleAddByResume}

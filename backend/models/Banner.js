@@ -35,3 +35,6 @@ bannerSchema.methods.isCurrentlyActive = function() {
 
 module.exports = mongoose.model('Banner', bannerSchema);
 
+
+
+

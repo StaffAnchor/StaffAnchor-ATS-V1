@@ -4,7 +4,7 @@ import JobList from '../components/JobList.jsx';
 import CandidateList from '../components/CandidateList.jsx';
 import AddJob from '../components/AddJob.jsx';
 import AddCandidate from '../components/AddCandidate.jsx';
-import Workflows from './Workflows.jsx';
+import Workflows from './WorkflowsSimple.jsx';
 import TalentPools from './TalentPools.jsx';
 import axios from 'axios';
 import API_URL from '../config/api';
