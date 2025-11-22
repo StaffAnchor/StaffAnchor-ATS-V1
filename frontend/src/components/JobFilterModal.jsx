@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Dialog,
   DialogTitle,
@@ -17,10 +18,27 @@ import {
   Autocomplete
 } from '@mui/material';
 import { useLocationDropdowns } from './useLocationDropdowns';
+import API_URL from '../config/api';
 
 const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters }) => {
   const [localFilters, setLocalFilters] = useState({ ...filters });
+  const [clients, setClients] = useState([]);
   const { countries, states, cities, fetchStates, fetchCities } = useLocationDropdowns();
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+        const response = await axios.get(`${API_URL}/api/clients`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setClients(response.data);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
+    };
+    fetchClients();
+  }, []);
 
   const handleChange = (field, value) => {
     setLocalFilters(prev => ({
@@ -53,6 +71,7 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
 
   const handleClear = () => {
     const clearedFilters = {
+      jobId: '',
       title: '',
       organization: '',
       country: '',
@@ -96,6 +115,24 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
       
       <DialogContent sx={{ pt: 3 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {/* Job ID */}
+          <TextField
+            fullWidth
+            label="Job ID"
+            value={localFilters.jobId}
+            onChange={(e) => handleChange('jobId', e.target.value)}
+            placeholder="e.g., JOB2411221230451AB"
+            sx={{
+              '& .MuiInputBase-input': { color: '#1e293b', fontFamily: 'monospace' },
+              '& .MuiInputLabel-root': { color: '#64748b' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                '&:hover fieldset': { borderColor: 'rgba(37, 99, 235, 0.5)' },
+                '&.Mui-focused fieldset': { borderColor: '#2563eb' },
+              }
+            }}
+          />
+
           {/* Job Title */}
           <TextField
             fullWidth
@@ -114,21 +151,28 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
           />
 
           {/* Organization */}
-          <TextField
-            fullWidth
-            label="Organization"
-            value={localFilters.organization}
-            onChange={(e) => handleChange('organization', e.target.value)}
-            sx={{
-              '& .MuiInputBase-input': { color: '#1e293b' },
-              '& .MuiInputLabel-root': { color: '#64748b' },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                '&:hover fieldset': { borderColor: 'rgba(37, 99, 235, 0.5)' },
-                '&.Mui-focused fieldset': { borderColor: '#2563eb' },
-              }
-            }}
-          />
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: '#64748b' }}>Organization (Client)</InputLabel>
+            <Select
+              value={localFilters.organization}
+              onChange={(e) => handleChange('organization', e.target.value)}
+              label="Organization (Client)"
+              sx={{
+                color: '#1e293b',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(37, 99, 235, 0.5)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563eb' },
+                '& .MuiSvgIcon-root': { color: '#64748b' },
+              }}
+            >
+              <MenuItem value="">All Organizations</MenuItem>
+              {clients.map((client) => (
+                <MenuItem key={client._id} value={client.organizationName}>
+                  {client.organizationName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Location Filters */}
           <Paper sx={{ p: 2, background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
@@ -382,4 +426,7 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
 };
 
 export default JobFilterModal;
+
+
+
 

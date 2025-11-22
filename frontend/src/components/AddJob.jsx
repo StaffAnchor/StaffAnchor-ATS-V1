@@ -41,26 +41,25 @@ import {
   Star as StarIcon
 } from '@mui/icons-material';
 import { useLocationDropdowns } from './useLocationDropdowns';
+import ExpertiseSelector from './ExpertiseSelector';
 import API_URL from '../config/api';
 
 const AddJob = ({ user }) => {
   const [form, setForm] = useState({
     title: '', 
     organization: '', 
-    recruiterName: '', 
-    recruiterEmail: '', 
-    recruiterPhone: '', 
+    clientContact: '',
     location: '', 
     remote: false, 
     experience: '', 
     ctc: '', 
     description: '', 
-    industry: '', 
     authorizedUser: '',
-    status: 'New'
   });
   const [msg, setMsg] = useState('');
   const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [clientContacts, setClientContacts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [jobLocations, setJobLocations] = useState([
     { country: '', state: '', city: '' }
@@ -68,11 +67,13 @@ const AddJob = ({ user }) => {
   const [locationStates, setLocationStates] = useState([[]]);
   const [locationCities, setLocationCities] = useState([[]]);
   const { countries, states, cities, fetchStates, fetchCities, loading: locationLoading } = useLocationDropdowns();
-  const [recruiters, setRecruiters] = useState([
-    { name: '', email: '', phone: '' }
-  ]);
   const [availableSkills, setAvailableSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
+  
+  // Expertise hierarchy state
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedTalentPools, setSelectedTalentPools] = useState([]);
+  const [selectedExpertiseSkills, setSelectedExpertiseSkills] = useState([]);
   
   // Email notification hook
   const {
@@ -84,12 +85,15 @@ const AddJob = ({ user }) => {
   } = useEmailNotification();
 
   useEffect(() => {
-    // Fetch all access level 1 users and skills
+    // Fetch all access level 1 users, clients, and skills
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const [usersResponse, skillsResponse] = await Promise.all([
+        const [usersResponse, clientsResponse, skillsResponse] = await Promise.all([
           axios.get(`${API_URL}/api/auth/subordinates`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get(`${API_URL}/api/clients`, {
             headers: { Authorization: `Bearer ${token}` }
           }),
           axios.get(`${API_URL}/api/skills`, {
@@ -97,6 +101,7 @@ const AddJob = ({ user }) => {
           })
         ]);
         setUsers(usersResponse.data);
+        setClients(clientsResponse.data);
         // Store full skill objects for industry filtering
         setAvailableSkills(skillsResponse.data);
       } catch (error) {
@@ -109,6 +114,13 @@ const AddJob = ({ user }) => {
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    
+    // When organization changes, update client contacts
+    if (name === 'organization') {
+      const selectedClient = clients.find(c => c._id === value);
+      setClientContacts(selectedClient?.contacts || []);
+      setForm(prev => ({ ...prev, clientContact: '' })); // Reset contact selection
+    }
   };
 
   const handleSwitch = e => {
@@ -178,27 +190,13 @@ const AddJob = ({ user }) => {
     }
   };
 
-  // Recruiter handlers
-  const handleRecruiterChange = (idx, field, value) => {
-    const updated = [...recruiters];
-    updated[idx][field] = value;
-    setRecruiters(updated);
-  };
-  const addRecruiter = () => {
-    setRecruiters([...recruiters, { name: '', email: '', phone: '' }]);
-  };
-  const removeRecruiter = (idx) => {
-    if (recruiters.length > 1) {
-      setRecruiters(recruiters.filter((_, i) => i !== idx));
-    }
-  };
 
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
     
     // Validate required fields
-    if (!form.title || !form.organization || !form.experience || !form.ctc || !form.description || !form.industry) {
+    if (!form.title || !form.organization || !form.clientContact || !form.experience || !form.ctc || !form.description) {
       setMsg('Please fill in all required fields');
       toast.error('Please fill in all required fields');
       setLoading(false);
@@ -214,29 +212,35 @@ const AddJob = ({ user }) => {
       return;
     }
     
-    // Validate recruiters
-    const validRecruiters = recruiters.filter(rec => rec.name && rec.email && rec.phone);
-    if (validRecruiters.length === 0) {
-      setMsg('Please add at least one recruiter with complete information');
-      toast.error('Please add at least one recruiter with complete information');
-      setLoading(false);
-      return;
-    }
-    
     try {
+      // Get selected client info
+      const selectedClient = clients.find(c => c._id === form.organization);
+      // clientContact might be _id or index, try both
+      let selectedContact = selectedClient?.contacts?.find(c => c._id === form.clientContact);
+      if (!selectedContact && !isNaN(form.clientContact)) {
+        selectedContact = selectedClient?.contacts?.[parseInt(form.clientContact)];
+      }
+      
       const jobData = {
         title: form.title,
-        organization: form.organization,
-        recruiters: validRecruiters,
+        organization: selectedClient?.organizationName || form.organization,
+        clientId: form.organization,
+        clientContact: selectedContact,
+        recruiters: selectedContact ? [{
+          name: selectedContact.name,
+          email: selectedContact.email,
+          phone: selectedContact.phone
+        }] : [],
         location: validLocations.length > 0 ? `${validLocations[0].city}, ${validLocations[0].state}, ${validLocations[0].country}` : '', // Keep for backward compatibility
         locations: validLocations,
         remote: form.remote,
         experience: parseInt(form.experience),
         ctc: form.ctc,
         description: form.description,
-        industry: form.industry,
-        status: form.status || 'New',
-        skills: selectedSkills,
+        status: 'New',
+        domain: selectedDomain,
+        talentPools: selectedTalentPools,
+        skills: selectedExpertiseSkills,
         createdBy: user?._id
       };
       
@@ -258,8 +262,8 @@ const AddJob = ({ user }) => {
       toast.success('Job added successfully!');
       
       // Check if email notification should be sent
-      if (newJob._emailNotificationPending && validRecruiters.length > 0) {
-        // Show email preview modal for recruiters
+      if (newJob._emailNotificationPending && selectedContact) {
+        // Show email preview modal for client contact
         await handleJobCreatedEmail(newJob, newJob._creatorId || user?._id);
       }
       
@@ -267,22 +271,22 @@ const AddJob = ({ user }) => {
       setForm({
         title: '', 
         organization: '', 
-        recruiterName: '', 
-        recruiterEmail: '', 
-        recruiterPhone: '', 
+        clientContact: '',
         location: '', 
         remote: false, 
         experience: '', 
         ctc: '', 
         description: '', 
-        industry: '', 
         authorizedUser: ''
       });
       setJobLocations([{ country: '', state: '', city: '' }]);
       setLocationStates([[]]);
       setLocationCities([[]]);
-      setRecruiters([{ name: '', email: '', phone: '' }]);
+      setClientContacts([]);
       setSelectedSkills([]);
+      setSelectedDomain('');
+      setSelectedTalentPools([]);
+      setSelectedExpertiseSkills([]);
     } catch (error) {
       console.error('Error adding job:', error);
       setMsg('Error adding job: ' + (error.response?.data?.error || error.message));
@@ -366,9 +370,9 @@ const AddJob = ({ user }) => {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
                 },
                 '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiInputBase-input': { color: '#1e293b' },
@@ -378,26 +382,56 @@ const AddJob = ({ user }) => {
 
           {/* Organization */}
           <Box sx={{ mb: 3 }}>
-            <TextField
-              name="organization"
-              label="Organization"
-              value={form.organization}
-              onChange={handleChange}
-              required
-              fullWidth
-              InputProps={{
-                startAdornment: <BusinessIcon sx={{ color: '#64748b', mr: 1 }} />,
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                },
-                '& .MuiInputLabel-root': { color: '#64748b' },
-                '& .MuiInputBase-input': { color: '#1e293b' },
-              }}
-            />
+            <FormControl fullWidth required>
+              <InputLabel sx={{ color: '#64748b' }}>Organization (Client)</InputLabel>
+              <Select
+                name="organization"
+                value={form.organization}
+                onChange={handleChange}
+                startAdornment={<BusinessIcon sx={{ color: '#64748b', mr: 1 }} />}
+                sx={{
+                  color: '#1e293b',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
+                }}
+              >
+                <MenuItem value="">Select Client Organization</MenuItem>
+                {clients.map((client) => (
+                  <MenuItem key={client._id} value={client._id}>
+                    {client.organizationName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Client Contact for this Job */}
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth required disabled={!form.organization}>
+              <InputLabel sx={{ color: '#64748b' }}>Client Contact for this Job</InputLabel>
+              <Select
+                name="clientContact"
+                value={form.clientContact}
+                onChange={handleChange}
+                startAdornment={<PersonIcon sx={{ color: '#64748b', mr: 1 }} />}
+                sx={{
+                  color: '#1e293b',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                  '& .MuiSvgIcon-root': { color: '#64748b' },
+                }}
+              >
+                <MenuItem value="">Select Client Contact</MenuItem>
+                {clientContacts.map((contact, idx) => (
+                  <MenuItem key={contact._id || idx} value={contact._id || idx}>
+                    {contact.name} - {contact.designation} ({contact.email})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
 
           {/* Job Locations */}
@@ -471,9 +505,9 @@ const AddJob = ({ user }) => {
                         label="Country"
                         sx={{
                           color: '#1e293b',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
                           '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
@@ -494,9 +528,9 @@ const AddJob = ({ user }) => {
                         disabled={!loc.country}
                         sx={{
                           color: '#1e293b',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
                           '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
@@ -517,9 +551,9 @@ const AddJob = ({ user }) => {
                         disabled={!loc.state}
                         sx={{
                           color: '#1e293b',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
                           '& .MuiSvgIcon-root': { color: '#64748b' },
                         }}
                       >
@@ -548,9 +582,9 @@ const AddJob = ({ user }) => {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
                 },
                 '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiInputBase-input': { color: '#1e293b' },
@@ -572,9 +606,9 @@ const AddJob = ({ user }) => {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
                 },
                 '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiInputBase-input': { color: '#1e293b' },
@@ -582,114 +616,20 @@ const AddJob = ({ user }) => {
             />
           </Box>
 
-          {/* Industry */}
+          {/* Expertise Selection (Domain → Talent Pools → Skills) */}
           <Box sx={{ mb: 3 }}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: '#64748b' }}>Industry</InputLabel>
-              <Select
-                name="industry"
-                value={form.industry}
-                onChange={handleChange}
-                required
-                sx={{
-                  color: '#1e293b',
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
-                  '& .MuiSvgIcon-root': { color: '#64748b' },
-                }}
-              >
-                {industries.map((industry) => (
-                  <MenuItem key={industry} value={industry}>{industry}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-
-          {/* Status */}
-          <Box sx={{ mb: 3 }}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: '#64748b' }}>Status</InputLabel>
-              <Select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                required
-                sx={{
-                  color: '#1e293b',
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
-                  '& .MuiSvgIcon-root': { color: '#64748b' },
-                }}
-              >
-                <MenuItem value="New">New</MenuItem>
-                <MenuItem value="In Progress">In Progress</MenuItem>
-                <MenuItem value="Halted">Halted</MenuItem>
-                <MenuItem value="Withdrawn">Withdrawn</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          {/* Required Skills */}
-          <Box sx={{ mb: 3 }}>
-            <Autocomplete
-              multiple
-              freeSolo
-              options={availableSkills.map(skill => skill.name)}
-              value={selectedSkills}
-              onChange={(e, newValue) => setSelectedSkills(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Required Skills"
-                  placeholder="Select or type skills..."
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <>
-                        <StarIcon sx={{ color: '#64748b', mr: 1 }} />
-                        {params.InputProps.startAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                    },
-                    '& .MuiInputLabel-root': { color: '#64748b' },
-                    '& .MuiInputBase-input': { color: '#1e293b' },
-                  }}
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    sx={{ 
-                      backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                      color: '#2563eb',
-                      textTransform: 'capitalize',
-                      '& .MuiChip-deleteIcon': { color: '#2563eb' }
-                    }}
-                  />
-                ))
-              }
-              sx={{
-                '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
-                '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
-              }}
+            <ExpertiseSelector
+              selectedDomain={selectedDomain}
+              onDomainChange={setSelectedDomain}
+              selectedTalentPools={selectedTalentPools}
+              onTalentPoolsChange={setSelectedTalentPools}
+              selectedSkills={selectedExpertiseSkills}
+              onSkillsChange={setSelectedExpertiseSkills}
+              singleDomain={true}
+              multipleTalentPools={true}
+              multipleSkills={true}
+              required={true}
             />
-            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
-              {form.industry 
-                ? "Select from industry-relevant skills or type to add custom skills" 
-                : "Skills will be filtered based on selected industry"}
-            </Typography>
           </Box>
 
           {/* Job Description */}
@@ -708,9 +648,9 @@ const AddJob = ({ user }) => {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
                 },
                 '& .MuiInputLabel-root': { color: '#64748b' },
                 '& .MuiInputBase-input': { color: '#1e293b' },
@@ -758,132 +698,33 @@ const AddJob = ({ user }) => {
 
           <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
-          {/* Recruiter Details Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
-                Recruiter Details
-              </Typography>
-            </Box>
-            
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2 }}>Recruiters</Typography>
-              {recruiters.map((rec, idx) => (
-                <Grid container spacing={2} key={idx} alignItems="center" sx={{ mb: 2 }}>
-                  <Grid item xs={12}>
-                    <TextField 
-                      label="Name" 
-                      value={rec.name} 
-                      onChange={e => handleRecruiterChange(idx, 'name', e.target.value)} 
-                      fullWidth 
-                      required
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                        },
-                        '& .MuiInputLabel-root': { color: '#64748b' },
-                        '& .MuiInputBase-input': { color: '#1e293b' },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField 
-                      label="Email" 
-                      value={rec.email} 
-                      onChange={e => handleRecruiterChange(idx, 'email', e.target.value)} 
-                      fullWidth 
-                      required
-                      type="email"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                        },
-                        '& .MuiInputLabel-root': { color: '#64748b' },
-                        '& .MuiInputBase-input': { color: '#1e293b' },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField 
-                      label="Phone" 
-                      value={rec.phone} 
-                      onChange={e => handleRecruiterChange(idx, 'phone', e.target.value)} 
-                      fullWidth 
-                      required
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                        },
-                        '& .MuiInputLabel-root': { color: '#64748b' },
-                        '& .MuiInputBase-input': { color: '#1e293b' },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                    <IconButton 
-                      onClick={() => removeRecruiter(idx)} 
-                      disabled={recruiters.length === 1}
-                      sx={{ 
-                        color: '#ff6b6b', 
-                        '&:hover': { backgroundColor: 'rgba(255, 107, 107, 0.1)' },
-                        '&.Mui-disabled': { color: '#475569' }
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                    {idx === recruiters.length - 1 && (
-                      <IconButton 
-                        onClick={addRecruiter}
-                        sx={{ 
-                          color: '#51cf66', 
-                          '&:hover': { backgroundColor: 'rgba(81, 207, 102, 0.1)' } 
-                        }}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    )}
-                  </Grid>
-                </Grid>
-              ))}
-            </Box>
-          </Box>
-
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
-
-          {/* Authorization Section - Only show for admins */}
+          {/* StaffAnchor Recruiter - Only show for admins */}
           {user.accessLevel === 2 && (
             <>
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <SecurityIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                  <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
                   <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
-                    Authorization
+                    StaffAnchor Recruiter
                   </Typography>
                 </Box>
                 
                 <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#64748b' }}>Authorized User (Level 1) - Optional</InputLabel>
+                  <InputLabel sx={{ color: '#64748b' }}>StaffAnchor Recruiter - Optional</InputLabel>
                   <Select
                     name="authorizedUser"
                     value={form.authorizedUser}
                     onChange={handleChange}
-                    startAdornment={<SecurityIcon sx={{ color: '#64748b', mr: 1 }} />}
+                    startAdornment={<PersonIcon sx={{ color: '#64748b', mr: 1 }} />}
                     sx={{
                       color: '#1e293b',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6', borderWidth: '2px' },
                       '& .MuiSvgIcon-root': { color: '#64748b' },
                     }}
                   >
-                    <MenuItem value="">Select Authorized User (Level 1)</MenuItem>
+                    <MenuItem value="">Select StaffAnchor Recruiter</MenuItem>
                     {users.map(u => (
                       <MenuItem key={u._id} value={u._id}>
                         {u.fullName} ({u.email})
@@ -892,7 +733,7 @@ const AddJob = ({ user }) => {
                   </Select>
                 </FormControl>
                 <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
-                  Select a Level 1 user to grant them access to this job, or leave empty for no specific authorization
+                  Assign a recruiter from your team to manage this job
                 </Typography>
               </Box>
               <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />

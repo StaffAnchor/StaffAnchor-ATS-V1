@@ -155,7 +155,7 @@ const Workflows = ({ user }) => {
         headers: { Authorization: `Bearer ${token}` },
         data: { userId: user._id }
       });
-      toast.success('Workflow deleted successfully!');
+      toast.success('Client side status deleted successfully!');
       fetchWorkflows();
       setShowDeletePopup(false);
       setWorkflowToDelete(null);
@@ -372,7 +372,7 @@ const Workflows = ({ user }) => {
         >
           {/* Left side - Title */}
           <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
-            Workflow Listings
+            Client side status
           </Typography>
           
           {/* Right side - Controls */}
@@ -406,7 +406,7 @@ const Workflows = ({ user }) => {
                 <FilterIcon sx={{ fontSize: 28 }} />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Create New Workflow">
+            <Tooltip title="Start new client side tracking">
               <IconButton
                 onClick={() => setShowWorkflowModal(true)}
                 sx={{
@@ -466,7 +466,7 @@ const Workflows = ({ user }) => {
                 '&:hover': { backgroundColor: '#3d7be8' }
               }}
             >
-              Create Workflow
+              Start client side tracking
             </Button>
           )}
         </Box>

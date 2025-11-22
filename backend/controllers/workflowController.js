@@ -8,7 +8,7 @@ const getWorkflows = async (req, res) => {
     // Everyone can see all workflows
     const workflows = await Workflow.find({})
       .populate('jobId', 'title organization')
-      .populate('phases.candidates', 'name email phone skills')
+      .populate('candidateStatuses.candidateId', 'name email phone')
       .populate('createdBy', 'name email')
       .populate('assignedTo', 'name email')
       .sort({ createdAt: -1 });
@@ -71,6 +71,24 @@ const checkWorkflowExists = async (req, res) => {
   }
 };
 
+// Get all workflows for a specific job
+const getWorkflowsByJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    
+    const workflows = await Workflow.find({ jobId })
+      .populate('candidateStatuses.candidateId', 'name email phone')
+      .populate('createdBy', 'name email')
+      .populate('assignedTo', 'name email')
+      .sort({ createdAt: -1 });
+    
+    res.json(workflows);
+  } catch (error) {
+    console.error('Error fetching workflows by job:', error);
+    res.status(500).json({ error: 'Failed to fetch workflows' });
+  }
+};
+
 // Create new workflow
 const createWorkflow = async (req, res) => {
   try {
@@ -93,6 +111,14 @@ const createWorkflow = async (req, res) => {
     // Calculate total candidates from first phase
     const totalCandidates = phases[0]?.candidates?.length || 0;
     
+    // Initialize candidate statuses from first phase candidates
+    const candidateStatuses = phases[0]?.candidates?.map(candidateId => ({
+      candidateId,
+      clientSideStatus: 'Interview Scheduled',
+      notes: '',
+      updatedAt: new Date()
+    })) || [];
+    
     const workflow = new Workflow({
       jobId,
       jobTitle: job.title,
@@ -102,6 +128,7 @@ const createWorkflow = async (req, res) => {
         phaseNumber: index,
         createdBy: userId
       })),
+      candidateStatuses,
       description,
       priority,
       totalCandidates,
@@ -110,6 +137,9 @@ const createWorkflow = async (req, res) => {
     });
     
     await workflow.save();
+    
+    // Update job status to "Ongoing client process"
+    await Job.findByIdAndUpdate(jobId, { status: 'Ongoing client process' });
     
     const populatedWorkflow = await Workflow.findById(workflow._id)
       .populate('jobId', 'title organization description location remote experience ctc industry recruiters')
@@ -194,6 +224,9 @@ const deleteWorkflow = async (req, res) => {
     
     await Workflow.findByIdAndDelete(workflowId);
     
+    // Reset job status to "In Progress" when workflow is deleted
+    await Job.findByIdAndUpdate(workflow.jobId, { status: 'In Progress' });
+    
     res.json({ message: 'Workflow deleted successfully' });
   } catch (error) {
     console.error('Error deleting workflow:', error);
@@ -215,12 +248,57 @@ const getCandidatesForWorkflow = async (req, res) => {
   }
 };
 
+// Update candidate client-side status in workflow
+const updateCandidateStatus = async (req, res) => {
+  try {
+    const { workflowId } = req.params;
+    const { candidateId, clientSideStatus, notes } = req.body;
+    
+    const workflow = await Workflow.findById(workflowId);
+    if (!workflow) {
+      return res.status(404).json({ error: 'Workflow not found' });
+    }
+    
+    // Find the candidate status entry
+    const candidateStatus = workflow.candidateStatuses.find(
+      cs => cs.candidateId.toString() === candidateId
+    );
+    
+    if (candidateStatus) {
+      // Update existing status
+      candidateStatus.clientSideStatus = clientSideStatus;
+      if (notes !== undefined) candidateStatus.notes = notes;
+      candidateStatus.updatedAt = new Date();
+    } else {
+      // Add new status entry
+      workflow.candidateStatuses.push({
+        candidateId,
+        clientSideStatus,
+        notes: notes || '',
+        updatedAt: new Date()
+      });
+    }
+    
+    await workflow.save();
+    
+    const updatedWorkflow = await Workflow.findById(workflowId)
+      .populate('candidateStatuses.candidateId', 'name email phone');
+    
+    res.json(updatedWorkflow);
+  } catch (error) {
+    console.error('Error updating candidate status:', error);
+    res.status(500).json({ error: 'Failed to update candidate status' });
+  }
+};
+
 module.exports = {
   getWorkflows,
   getWorkflowById,
   checkWorkflowExists,
+  getWorkflowsByJob,
   createWorkflow,
   updateWorkflow,
   deleteWorkflow,
-  getCandidatesForWorkflow
+  getCandidatesForWorkflow,
+  updateCandidateStatus
 };

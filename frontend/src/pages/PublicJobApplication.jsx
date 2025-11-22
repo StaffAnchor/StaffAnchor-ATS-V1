@@ -43,6 +43,7 @@ const PublicJobApplication = () => {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [displayCompanyName, setDisplayCompanyName] = useState('');
   
   // Location state
   const [selectedPreferredLocations, setSelectedPreferredLocations] = useState([]);
@@ -88,6 +89,21 @@ const PublicJobApplication = () => {
   useEffect(() => {
     fetchJobDetails();
   }, [jobId]);
+
+  // Check URL parameters for company name visibility when job is loaded
+  useEffect(() => {
+    if (job) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hideCompany = urlParams.get('hideCompany');
+      const altName = urlParams.get('altName');
+      
+      if (hideCompany === 'true' && altName) {
+        setDisplayCompanyName(altName);
+      } else {
+        setDisplayCompanyName(job.organization);
+      }
+    }
+  }, [job]);
 
   // Fetch skills when category changes
   useEffect(() => {
@@ -430,7 +446,7 @@ const PublicJobApplication = () => {
                   mt: { xs: 0.5, sm: 0 },
                   wordBreak: 'break-word'
                 }}>
-                  {job.organization}
+                  {displayCompanyName || job.organization}
                 </Typography>
               </Box>
             </Box>

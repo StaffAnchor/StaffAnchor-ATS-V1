@@ -4,20 +4,26 @@ const Candidate = require('../models/Candidate');
 // Create a new talent pool
 exports.createTalentPool = async (req, res) => {
   try {
-    const { name, description, candidateIds } = req.body;
+    const { name, description, candidateIds, domainId } = req.body;
     
-    // Check if talent pool with same name already exists
+    if (!domainId) {
+      return res.status(400).json({ error: 'Domain is required' });
+    }
+    
+    // Check if talent pool with same name already exists in this domain
     const existingPool = await TalentPool.findOne({ 
-      name: { $regex: new RegExp(`^${name}$`, 'i') }
+      name: { $regex: new RegExp(`^${name}$`, 'i') },
+      domain: domainId
     });
     
     if (existingPool) {
-      return res.status(400).json({ error: 'Talent pool with this name already exists' });
+      return res.status(400).json({ error: 'Talent pool with this name already exists in this domain' });
     }
 
     const talentPool = new TalentPool({
       name,
       description,
+      domain: domainId,
       organization: req.user.organization || 'Default',
       createdBy: req.user._id,
       candidates: candidateIds || []
@@ -43,30 +49,25 @@ exports.createTalentPool = async (req, res) => {
 // Get all talent pools for the organization
 exports.getTalentPools = async (req, res) => {
   try {
-    //console.log('=== GET TALENT POOLS ===');
-    //console.log('User:', req.user);
-    //console.log('Organization:', req.user?.organization);
+    const { domainId } = req.query;
+    
+    // Build query - filter by domain if provided
+    const query = {};
+    
+    if (domainId) {
+      query.domain = domainId;
+    }
     
     // If user has organization, filter by organization (case-insensitive); otherwise show all
-    const query = req.user.organization 
-      ? { organization: { $regex: new RegExp(`^${req.user.organization}$`, 'i') } }
-      : {};
-    
-    //console.log('Query:', JSON.stringify(query));
+    if (req.user.organization) {
+      query.organization = { $regex: new RegExp(`^${req.user.organization}$`, 'i') };
+    }
     
     const talentPools = await TalentPool.find(query)
+      .populate('domain', 'name description')
       .populate('createdBy', 'fullName email')
       .populate('candidates', 'name email phone')
       .sort({ createdAt: -1 });
-
-    //console.log('Found talent pools:', talentPools.length);
-    
-    // If no pools found with organization filter, let's check all pools for debugging
-    if (talentPools.length === 0 && req.user.organization) {
-      const allPools = await TalentPool.find({});
-      //console.log('Total pools in database:', allPools.length);
-      //console.log('All pool organizations:', allPools.map(p => ({ id: p._id, org: p.organization })));
-    }
 
     res.json(talentPools);
   } catch (err) {
@@ -86,6 +87,7 @@ exports.getTalentPool = async (req, res) => {
     }
     
     const talentPool = await TalentPool.findOne(query)
+      .populate('domain', 'name description')
       .populate('createdBy', 'fullName email')
       .populate('candidates', 'name email phone skills experience');
 
@@ -103,7 +105,7 @@ exports.getTalentPool = async (req, res) => {
 // Update a talent pool
 exports.updateTalentPool = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, domainId } = req.body;
     
     const query = { 
       _id: req.params.id,
@@ -115,11 +117,16 @@ exports.updateTalentPool = async (req, res) => {
       query.organization = req.user.organization;
     }
     
+    const updateData = { name, description };
+    if (domainId) {
+      updateData.domain = domainId;
+    }
+    
     const talentPool = await TalentPool.findOneAndUpdate(
       query,
-      { name, description },
+      updateData,
       { new: true, runValidators: true }
-    );
+    ).populate('domain', 'name description');
 
     if (!talentPool) {
       return res.status(404).json({ error: 'Talent pool not found or access denied' });

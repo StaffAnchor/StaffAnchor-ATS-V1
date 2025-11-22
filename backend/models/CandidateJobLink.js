@@ -25,6 +25,14 @@ const CandidateJobLinkSchema = new mongoose.Schema({
     enum: [
       'New',
       'Applied',
+      'Pre-screening',
+      'Stage 2 Screening',
+      'Shortlisted (Internal)',
+      'Not Reachable',
+      'Candidate Not Interested',
+      'Rejected (Internal)',
+      'Submitted to Client',
+      // Legacy statuses for backward compatibility
       'Pre screening',
       'Stage 2 screening',
       'Submitted',
@@ -36,7 +44,6 @@ const CandidateJobLinkSchema = new mongoose.Schema({
       'Rejected',
       'Not able to contact',
       'Candidate Not interested',
-      // Legacy statuses for backward compatibility
       'active',
       'rejected',
       'shortlisted',

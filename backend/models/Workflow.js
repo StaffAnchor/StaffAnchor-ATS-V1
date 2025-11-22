@@ -1,5 +1,36 @@
 const mongoose = require('mongoose');
 
+const candidateStatusSchema = new mongoose.Schema({
+  candidateId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Candidate',
+    required: true
+  },
+  clientSideStatus: {
+    type: String,
+    enum: [
+      'Interview Scheduled',
+      'Interview Completed',
+      'Awaiting Feedback',
+      'Feedback Received',
+      'Shortlisted',
+      'Rejected',
+      'On Hold',
+      'Offered',
+      'Offer Accepted',
+      'Offer Declined',
+      'Joined',
+      'No Show'
+    ],
+    default: 'Interview Scheduled'
+  },
+  notes: String,
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: false });
+
 const phaseSchema = new mongoose.Schema({
   phaseNumber: {
     type: Number,
@@ -63,6 +94,7 @@ const workflowSchema = new mongoose.Schema({
     required: true
   },
   phases: [phaseSchema],
+  candidateStatuses: [candidateStatusSchema],
   status: {
     type: String,
     default: 'Active',

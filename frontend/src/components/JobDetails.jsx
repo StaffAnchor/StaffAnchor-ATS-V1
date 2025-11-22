@@ -7,6 +7,7 @@ import PreferenceSelectionModal from './PreferenceSelectionModal.jsx';
 import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import LinkedCandidates from './LinkedCandidates.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
+import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon } from '@mui/icons-material';
@@ -32,13 +33,49 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showLinkedCandidatesModal, setShowLinkedCandidatesModal] = useState(false);
   const [showAIWarning, setShowAIWarning] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(job.status || 'New');
+  const [showCompanyNameModal, setShowCompanyNameModal] = useState(false);
+  const [existingWorkflow, setExistingWorkflow] = useState(null);
+  const [checkingWorkflow, setCheckingWorkflow] = useState(false);
 
   // Update currentStatus when job prop changes
   useEffect(() => {
     setCurrentStatus(job.status || 'New');
   }, [job.status]);
 
+  // Check for existing workflow
+  useEffect(() => {
+    const checkWorkflow = async () => {
+      try {
+        setCheckingWorkflow(true);
+        const token = localStorage.getItem('jwt');
+        const response = await axios.get(`${API_URL}/api/workflows/job/${job._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const activeWorkflow = response.data.find(w => w.status === 'Active');
+        setExistingWorkflow(activeWorkflow || null);
+      } catch (error) {
+        console.error('Error checking workflow:', error);
+        setExistingWorkflow(null);
+      } finally {
+        setCheckingWorkflow(false);
+      }
+    };
+    
+    if (job._id) {
+      checkWorkflow();
+    }
+  }, [job._id]);
+
   const handleQuickStatusChange = async (newStatus) => {
+    // Check if workflow exists - only allow "Ongoing client process" or "Completed"
+    if (existingWorkflow && existingWorkflow.status === 'Active') {
+      const allowedStatuses = ['Ongoing client process', 'Completed'];
+      if (!allowedStatuses.includes(newStatus)) {
+        toast.error('Client side process already started');
+        return;
+      }
+    }
+    
     try {
       const token = localStorage.getItem('jwt');
       const response = await axios.put(
@@ -71,6 +108,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       case 'In Progress': return '#f59e0b';
       case 'Halted': return '#ef4444';
       case 'Withdrawn': return '#6b7280';
+      case 'Ongoing client process': return '#8b5cf6';
       case 'Completed': return '#10b981';
       default: return '#64748b';
     }
@@ -105,6 +143,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
 
   // When entering edit mode, ensure recruiters array exists
   const handleEditClick = () => {
+    // Check if workflow exists - prevent editing
+    if (existingWorkflow && existingWorkflow.status === 'Active') {
+      toast.error('Client side process is already started for this job');
+      return;
+    }
+    
     const recruitersList = job.recruiters && job.recruiters.length > 0 
       ? job.recruiters 
       : [{ name: '', email: '', phone: '' }];
@@ -229,13 +273,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   };
 
   const handleShareableLink = () => {
-    const shareableUrl = `${window.location.origin}/apply/${job._id}`;
-    navigator.clipboard.writeText(shareableUrl).then(() => {
-      toast.success('Shareable link copied to clipboard!');
-    }).catch((err) => {
-      console.error('Failed to copy link:', err);
-      toast.error('Failed to copy link');
-    });
+    setShowCompanyNameModal(true);
+  };
+
+  const handleCompanyNameModalConfirm = (shareableUrl) => {
+    toast.success('Shareable link copied to clipboard!');
   };
 
   const handleEditChange = e => {
@@ -683,10 +725,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                             }
                           }}
                         >
-                          <MenuItem value="New">New</MenuItem>
-                          <MenuItem value="In Progress">In Progress</MenuItem>
-                          <MenuItem value="Halted">Halted</MenuItem>
-                          <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                          <MenuItem value="New" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>New</MenuItem>
+                          <MenuItem value="In Progress" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>In Progress</MenuItem>
+                          <MenuItem value="Halted" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>Halted</MenuItem>
+                          <MenuItem value="Withdrawn" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>Withdrawn</MenuItem>
+                          <MenuItem value="Ongoing client process">Ongoing client process</MenuItem>
                           <MenuItem value="Completed">Completed</MenuItem>
                         </Select>
                       </FormControl>
@@ -1279,6 +1322,15 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         jobId={job._id}
         jobTitle={job.title}
         accessLevel={accessLevel}
+      />
+
+      {/* Company Name Visibility Modal */}
+      <CompanyNameVisibilityModal
+        open={showCompanyNameModal}
+        onClose={() => setShowCompanyNameModal(false)}
+        onConfirm={handleCompanyNameModalConfirm}
+        jobId={job._id}
+        organizationName={job.organization}
       />
     </Box>
   );

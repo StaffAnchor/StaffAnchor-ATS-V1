@@ -47,8 +47,9 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const [loading, setLoading] = useState(false);
   const [unlinking, setUnlinking] = useState({});
   const [updatingStatus, setUpdatingStatus] = useState({});
-  const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [existingWorkflow, setExistingWorkflow] = useState(null);
+  const [checkingWorkflow, setCheckingWorkflow] = useState(false);
 
   // Comments state
   const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -67,23 +68,19 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const statusOptions = [
     'New',
     'Applied',
-    'Pre screening',
-    'Stage 2 screening',
-    'Submitted',
-    'Interview',
-    'Offered',
-    'Offer Rejected',
-    'Offer Accepted',
-    'Hired',
-    'Rejected',
-    'Not able to contact',
-    'Candidate Not interested'
+    'Pre-screening',
+    'Stage 2 Screening',
+    'Shortlisted (Internal)',
+    'Not Reachable',
+    'Candidate Not Interested',
+    'Rejected (Internal)',
+    'Submitted to Client'
   ];
 
   useEffect(() => {
     if (open && jobId) {
       fetchLinkedCandidates();
-      setSelectedCandidates([]);
+      checkExistingWorkflow();
       setStatusFilter('All');
     }
   }, [open, jobId]);
@@ -105,7 +102,32 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     }
   };
 
+  const checkExistingWorkflow = async () => {
+    try {
+      setCheckingWorkflow(true);
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/workflows/job/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Check if there's an active workflow
+      const activeWorkflow = response.data.find(w => w.status === 'Active');
+      setExistingWorkflow(activeWorkflow || null);
+    } catch (error) {
+      console.error('Error checking workflow:', error);
+      setExistingWorkflow(null);
+    } finally {
+      setCheckingWorkflow(false);
+    }
+  };
+
   const handleUnlinkCandidate = async (linkId, candidateName) => {
+    // Check if workflow exists - prevent unlinking
+    if (existingWorkflow && existingWorkflow.status === 'Active') {
+      toast.error('Client side process is already started for this job');
+      return;
+    }
+
     try {
       setUnlinking(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
@@ -125,6 +147,12 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   };
 
   const handleStatusChange = async (linkId, newStatus) => {
+    // Check if workflow exists - prevent editing
+    if (existingWorkflow && existingWorkflow.status === 'Active') {
+      toast.error('Client side process is already started for this job');
+      return;
+    }
+
     try {
       setUpdatingStatus(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
@@ -157,47 +185,49 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     }
   };
 
-  const handleSelectCandidate = (candidateId) => {
-    setSelectedCandidates(prev => {
-      if (prev.includes(candidateId)) {
-        return prev.filter(id => id !== candidateId);
-      } else {
-        return [...prev, candidateId];
-      }
-    });
-  };
-
-  const handleSelectAllCandidates = (event) => {
-    if (event.target.checked) {
-      setSelectedCandidates(filteredCandidates.map(c => c._id));
-    } else {
-      setSelectedCandidates([]);
-    }
-  };
 
   const handleCreateWorkflow = () => {
-    // Close this modal and navigate to workflows with selected candidates
-    const candidatesToPass = selectedCandidates.length > 0 
-      ? linkedCandidates.filter(c => selectedCandidates.includes(c._id))
-      : linkedCandidates;
+    // Only include candidates with status "Submitted to Client"
+    const submittedCandidates = linkedCandidates.filter(
+      c => c.linkInfo?.status === 'Submitted to Client'
+    );
 
-    // Store workflow data in sessionStorage to pass to Workflows page
+    if (submittedCandidates.length === 0) {
+      toast.info('No candidates submitted to client');
+      return;
+    }
+
+    // If workflow exists, check for new candidates
+    if (existingWorkflow) {
+      // Get all candidate IDs already in the workflow using candidateStatuses
+      const existingCandidateIds = new Set();
+      existingWorkflow.candidateStatuses?.forEach(cs => {
+        existingCandidateIds.add(cs.candidateId?.toString() || cs.candidateId);
+      });
+
+      // Filter for new candidates not in workflow
+      const newCandidates = submittedCandidates.filter(
+        c => !existingCandidateIds.has(c._id.toString())
+      );
+
+      if (newCandidates.length === 0) {
+        toast.info('No new candidates submitted to client');
+        return;
+      }
+    }
+
+    // Store job ID to open creation modal with pre-selected job
     sessionStorage.setItem('workflowData', JSON.stringify({
       jobId,
-      jobTitle,
-      candidates: candidatesToPass
+      jobTitle
     }));
 
-    // Close modal and trigger navigation
+    // Close modal and navigate to workflows page
     onClose();
     
-    // Trigger custom event to navigate to workflows
+    // Trigger navigation to workflows page
     window.dispatchEvent(new CustomEvent('createWorkflowFromLinked', {
-      detail: {
-        jobId,
-        jobTitle,
-        candidates: candidatesToPass
-      }
+      detail: { jobId, jobTitle }
     }));
   };
 
@@ -256,14 +286,15 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
 
   const getStatusColor = (status) => {
     const statusLower = status?.toLowerCase() || '';
-    if (statusLower.includes('hired') || statusLower.includes('offer accepted')) return '#4caf50';
-    if (statusLower.includes('offered')) return '#8bc34a';
-    if (statusLower.includes('interview')) return '#2196f3';
-    if (statusLower.includes('submitted') || statusLower.includes('screening')) return '#00bcd4';
-    if (statusLower.includes('applied') || statusLower.includes('new')) return '#9c27b0';
-    if (statusLower.includes('rejected') || statusLower.includes('not interested')) return '#f44336';
-    if (statusLower.includes('not able to contact')) return '#ff9800';
-    return '#757575';
+    if (statusLower.includes('submitted to client')) return '#4caf50'; // Green - Submitted to client
+    if (statusLower.includes('shortlisted')) return '#8bc34a'; // Light green - Shortlisted
+    if (statusLower.includes('stage 2')) return '#2196f3'; // Blue - Stage 2
+    if (statusLower.includes('pre-screening') || statusLower.includes('screening')) return '#00bcd4'; // Cyan - Pre-screening
+    if (statusLower.includes('applied')) return '#9c27b0'; // Purple - Applied
+    if (statusLower.includes('new')) return '#607d8b'; // Blue-grey - New
+    if (statusLower.includes('rejected') || statusLower.includes('not interested')) return '#f44336'; // Red - Rejected/Not interested
+    if (statusLower.includes('not reachable')) return '#ff9800'; // Orange - Not reachable
+    return '#757575'; // Grey - Default
   };
 
   // Filter candidates by status
@@ -307,18 +338,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {selectedCandidates.length > 0 && (
-            <Chip
-              label={`${selectedCandidates.length} Selected`}
-              sx={{
-                backgroundColor: 'rgba(238, 187, 195, 0.3)',
-                color: '#8b5cf6',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                border: '2px solid #8b5cf6',
-              }}
-            />
-          )}
           {linkedCandidates.length > 0 && (
             <Chip
               label={`${filteredCandidates.length} of ${linkedCandidates.length}`}
@@ -380,7 +399,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                   onChange={(e) => {
                     e.stopPropagation();
                     setStatusFilter(e.target.value);
-                    setSelectedCandidates([]); // Clear selection when filter changes
                   }}
                   onClick={(e) => e.stopPropagation()}
                   sx={{
@@ -466,35 +484,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ 
-                      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                      color: '#2563eb',
-                      fontWeight: 700,
-                      fontSize: '0.95rem',
-                      borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
-                      width: 60,
-                      textAlign: 'center'
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    >
-                      <Checkbox
-                        checked={selectedCandidates.length === filteredCandidates.length && filteredCandidates.length > 0}
-                        indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < filteredCandidates.length}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleSelectAllCandidates(e);
-                        }}
-                        sx={{
-                          color: '#2563eb',
-                          '&.Mui-checked': {
-                            color: '#8b5cf6',
-                          },
-                          '&.MuiCheckbox-indeterminate': {
-                            color: '#8b5cf6',
-                          },
-                        }}
-                      />
-                    </TableCell>
                   <TableCell sx={{ 
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
                     color: '#2563eb',
@@ -594,28 +583,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     }}
                   >
                     {/* Checkbox */}
-                    <TableCell sx={{ 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                      py: 2,
-                      textAlign: 'center'
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    >
-                      <Checkbox
-                        checked={selectedCandidates.includes(candidate._id)}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleSelectCandidate(candidate._id);
-                        }}
-                        sx={{
-                          color: '#2563eb',
-                          '&.Mui-checked': {
-                            color: '#8b5cf6',
-                          },
-                        }}
-                      />
-                    </TableCell>
-
                     {/* Name */}
                     <TableCell sx={{ 
                       color: '#1e293b',
@@ -749,7 +716,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                             handleStatusChange(candidate.linkInfo.linkId, e.target.value);
                           }}
                           onClick={(e) => e.stopPropagation()}
-                          disabled={updatingStatus[candidate.linkInfo.linkId]}
+                          disabled={updatingStatus[candidate.linkInfo.linkId] || (existingWorkflow && existingWorkflow.status === 'Active')}
                           sx={{
                             color: getStatusColor(candidate.linkInfo.status || 'New'),
                             fontWeight: 600,
@@ -893,43 +860,58 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         justifyContent: 'space-between',
       }}>
         <Box>
-          {selectedCandidates.length > 0 && (
-            <Button
-              onClick={handleCreateWorkflow}
-              variant="contained"
-              startIcon={<WorkflowIcon />}
-              sx={{
-                backgroundColor: '#2563eb',
-                color: '#ffffff',
-                fontWeight: 600,
-                textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: '#3d7be8',
-                }
-              }}
-            >
-              Create Workflow ({selectedCandidates.length} selected)
-            </Button>
-          )}
-          {selectedCandidates.length === 0 && linkedCandidates.length > 0 && (
-            <Button
-              onClick={handleCreateWorkflow}
-              variant="outlined"
-              startIcon={<WorkflowIcon />}
-              sx={{
-                borderColor: 'rgba(79, 140, 255, 0.5)',
-                color: '#2563eb',
-                fontWeight: 600,
-                textTransform: 'none',
-                '&:hover': {
-                  borderColor: '#2563eb',
-                  backgroundColor: 'rgba(79, 140, 255, 0.1)',
-                }
-              }}
-            >
-              Start Workflow for this Job
-            </Button>
-          )}
+          {linkedCandidates.length > 0 && (() => {
+            const submittedCandidates = linkedCandidates.filter(
+              c => c.linkInfo?.status === 'Submitted to Client'
+            );
+            
+            let buttonText = 'Start tracking submitted candidates to client';
+            let isDisabled = submittedCandidates.length === 0;
+            
+            if (existingWorkflow) {
+              // Check for new candidates not in workflow
+              const existingCandidateIds = new Set();
+              existingWorkflow.phases?.forEach(phase => {
+                phase.candidates?.forEach(candidateId => {
+                  existingCandidateIds.add(candidateId.toString());
+                });
+              });
+              
+              const newSubmittedCandidates = submittedCandidates.filter(
+                c => !existingCandidateIds.has(c._id.toString())
+              );
+              
+              buttonText = 'Start tracking newly submitted candidates to client';
+              isDisabled = newSubmittedCandidates.length === 0;
+            }
+            
+            return (
+              <Button
+                onClick={handleCreateWorkflow}
+                variant={existingWorkflow ? "outlined" : "contained"}
+                startIcon={<WorkflowIcon />}
+                disabled={isDisabled || checkingWorkflow}
+                sx={{
+                  backgroundColor: existingWorkflow ? 'transparent' : '#2563eb',
+                  borderColor: existingWorkflow ? 'rgba(79, 140, 255, 0.5)' : 'transparent',
+                  color: existingWorkflow ? '#2563eb' : '#ffffff',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: existingWorkflow ? 'rgba(79, 140, 255, 0.1)' : '#3d7be8',
+                    borderColor: existingWorkflow ? '#2563eb' : 'transparent',
+                  },
+                  '&:disabled': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    color: 'rgba(0, 0, 0, 0.26)',
+                    borderColor: 'rgba(0, 0, 0, 0.12)',
+                  }
+                }}
+              >
+                {buttonText}
+              </Button>
+            );
+          })()}
         </Box>
         <Button
           onClick={onClose}

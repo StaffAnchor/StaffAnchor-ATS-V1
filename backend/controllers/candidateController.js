@@ -82,9 +82,26 @@ exports.addCandidate = async (req, res) => {
 
 exports.listCandidates = async (req, res) => {
   try {
-    const candidates = await Candidate.find();
+    const { domain, talentPools } = req.query;
+    
+    // Build query based on filters
+    const query = {};
+    if (domain) {
+      query.domain = domain;
+    }
+    if (talentPools) {
+      // Support both single and multiple talent pools
+      const talentPoolArray = Array.isArray(talentPools) ? talentPools : [talentPools];
+      query.talentPools = { $in: talentPoolArray };
+    }
+    
+    const candidates = await Candidate.find(query)
+      .populate('domain', 'name')
+      .populate('talentPools', 'name')
+      .populate('skills', 'name');
     res.json(candidates);
   } catch (err) {
+    console.error('Error fetching candidates:', err);
     res.status(500).json({ error: 'Fetch candidates failed' });
   }
 };

@@ -3,48 +3,30 @@ const Skill = require('../models/Skill');
 // Create a new skill
 exports.createSkill = async (req, res) => {
   try {
-    const { name, category = 'sales-and-business-development' } = req.body;
+    const { name, category = 'miscellaneous', talentPoolId } = req.body;
     
-    //console.log('Creating skill:', { name, category, organization: req.user.organization, createdBy: req.user._id });
-    
-    // Validate category
-    const validCategories = [
-      'sales-and-business-development',
-      'marketing-communications',
-      'technology-engineering',
-      'finance-accounting-audit',
-      'human-resources',
-      'operations-supply-chain-procurement',
-      'product-management-design',
-      'data-analytics-insights',
-      'customer-success-support',
-      'legal-risk-compliance',
-      'manufacturing-projects-quality',
-      'general-management-strategy',
-      'miscellaneous'
-    ];
-    
-    if (category && !validCategories.includes(category)) {
-      return res.status(400).json({ error: `Invalid category. Must be one of: ${validCategories.join(', ')}` });
+    if (!talentPoolId) {
+      return res.status(400).json({ error: 'Talent pool is required' });
     }
     
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Skill name is required' });
     }
     
-    // Check if skill already exists (case insensitive)
+    // Check if skill already exists in this talent pool (case insensitive)
     const existingSkill = await Skill.findOne({ 
       name: { $regex: new RegExp(`^${name.trim()}$`, 'i') },
-      organization: req.user.organization 
+      talentPool: talentPoolId 
     });
     
     if (existingSkill) {
-      return res.status(400).json({ error: 'Skill already exists' });
+      return res.status(400).json({ error: 'Skill already exists in this talent pool' });
     }
 
     const skill = new Skill({
       name: name.trim().toLowerCase(),
-      category: category || 'sales-and-business-development',
+      category: category || 'miscellaneous',
+      talentPool: talentPoolId,
       organization: req.user.organization,
       createdBy: req.user._id,
       isCustom: true
@@ -76,17 +58,24 @@ exports.createSkill = async (req, res) => {
 // Get all skills for the organization
 exports.getSkills = async (req, res) => {
   try {
-    const { category, search } = req.query;
-    
-    //console.log('=== GET SKILLS ===');
-    //console.log('User:', req.user);
-    //console.log('Category:', category);
-    //console.log('Organization:', req.user?.organization);
+    const { category, search, talentPoolId, talentPoolIds } = req.query;
     
     // Build query - if user has organization, filter by it (case-insensitive); otherwise show all
     let query = {};
     if (req.user.organization) {
       query.organization = { $regex: new RegExp(`^${req.user.organization}$`, 'i') };
+    }
+    
+    // Filter by talent pool(s) if provided, otherwise ensure talentPool exists
+    if (talentPoolId) {
+      query.talentPool = talentPoolId;
+    } else if (talentPoolIds) {
+      // Handle comma-separated list of talent pool IDs
+      const poolIds = talentPoolIds.split(',').map(id => id.trim());
+      query.talentPool = { $in: poolIds };
+    } else {
+      // Only return skills that have a talentPool assigned (no orphaned skills)
+      query.talentPool = { $exists: true, $ne: null };
     }
     
     if (category) {
@@ -98,31 +87,8 @@ exports.getSkills = async (req, res) => {
     }
 
     let skills = await Skill.find(query)
-      .sort({ usageCount: -1, name: 1 })
-      .limit(100); // Limit to prevent large responses
-
-    //console.log('Skills found:', skills.length);
-
-    // If no skills found for organization but category specified,
-    // try to find skills from other organizations with same category
-    if (skills.length === 0 && category && req.user.organization) {
-      //console.log('No skills found for organization, fetching from all organizations');
-      const fallbackQuery = { category };
-      if (search) {
-        fallbackQuery.name = { $regex: search, $options: 'i' };
-      }
-      skills = await Skill.find(fallbackQuery)
-        .sort({ usageCount: -1, name: 1 })
-        .limit(100);
-      //console.log('Fallback skills found:', skills.length);
-    }
-    
-    // Additional debugging if no skills found
-    if (skills.length === 0 && req.user.organization) {
-      const allSkills = await Skill.find({});
-      //console.log('Total skills in database:', allSkills.length);
-      //console.log('Sample skill organizations:', allSkills.slice(0, 5).map(s => ({ name: s.name, org: s.organization })));
-    }
+      .populate('talentPool', 'name domain')
+      .sort({ usageCount: -1, name: 1 });
 
     res.json(skills);
   } catch (err) {
@@ -134,9 +100,16 @@ exports.getSkills = async (req, res) => {
 // Get all skills for public access (no authentication required)
 exports.getPublicSkills = async (req, res) => {
   try {
-    const { category, search } = req.query;
+    const { category, search, talentPoolId } = req.query;
     
     let query = {};
+    
+    if (talentPoolId) {
+      query.talentPool = talentPoolId;
+    } else {
+      // Only return skills that have a talentPool assigned
+      query.talentPool = { $exists: true, $ne: null };
+    }
     
     if (category) {
       query.category = category;
@@ -147,8 +120,8 @@ exports.getPublicSkills = async (req, res) => {
     }
 
     const skills = await Skill.find(query)
-      .sort({ usageCount: -1, name: 1 })
-      .limit(100); // Limit to prevent large responses
+      .populate('talentPool', 'name')
+      .sort({ usageCount: -1, name: 1 });
 
     res.json(skills);
   } catch (err) {
@@ -174,7 +147,12 @@ exports.getSkillCategories = async (req, res) => {
 // Update a skill
 exports.updateSkill = async (req, res) => {
   try {
-    const { name, category } = req.body;
+    const { name, category, talentPoolId } = req.body;
+    
+    const updateData = {};
+    if (name) updateData.name = name.toLowerCase();
+    if (category) updateData.category = category;
+    if (talentPoolId) updateData.talentPool = talentPoolId;
     
     const skill = await Skill.findOneAndUpdate(
       { 
@@ -182,9 +160,9 @@ exports.updateSkill = async (req, res) => {
         organization: req.user.organization,
         createdBy: req.user._id
       },
-      { name: name?.toLowerCase(), category },
+      updateData,
       { new: true, runValidators: true }
-    );
+    ).populate('talentPool', 'name domain');
 
     if (!skill) {
       return res.status(404).json({ error: 'Skill not found or access denied' });

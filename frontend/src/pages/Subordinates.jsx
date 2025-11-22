@@ -97,11 +97,11 @@ const Subordinates = ({ user }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSubordinates(subordinates.filter(sub => sub._id !== subordinateToDelete));
-      toast.success('Subordinate account deleted successfully');
+      toast.success('Internal recruiter account deleted successfully');
       setSubordinateToDelete(null);
     } catch (error) {
       console.error('Error deleting subordinate:', error);
-      toast.error('Failed to delete subordinate account');
+      toast.error('Failed to delete internal recruiter account');
     } finally {
       setDeletingSubordinate(null);
     }
@@ -215,12 +215,12 @@ const Subordinates = ({ user }) => {
         >
           {/* Left side - Title */}
           <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
-            Subordinate Listings
+            Internal Recruiters
           </Typography>
         </Box>
       </Paper>
 
-      {/* Subordinates Content */}
+      {/* Internal Recruiters Content */}
       <Box
         sx={{
           flex: 1,
@@ -249,7 +249,7 @@ const Subordinates = ({ user }) => {
               }}
             />
             <Typography variant="h6" sx={{ mb: 1, color: "#1e293b" }}>
-              Loading Subordinates...
+              Loading Internal Recruiters...
             </Typography>
             <Typography variant="body2" sx={{ color: "#64748b" }}>
               Please wait while we fetch your team members
@@ -263,10 +263,10 @@ const Subordinates = ({ user }) => {
             }}>
               <GroupIcon sx={{ fontSize: 60, color: '#64748b', mb: 2 }} />
               <Typography variant="h5" sx={{ mb: 1 }}>
-                No Subordinates Found
+                No Internal Recruiters Found
               </Typography>
               <Typography variant="body1">
-                You don't have any subordinates assigned yet.
+                You don't have any internal recruiters assigned yet.
               </Typography>
             </Box>
           ) : (
@@ -730,8 +730,8 @@ const Subordinates = ({ user }) => {
             setSubordinateToDelete(null);
           }}
           onConfirm={handleDeleteSubordinate}
-          title="Delete Subordinate"
-          message="Are you sure you want to delete this subordinate? This will permanently delete their account and cannot be undone."
+          title="Delete Internal Recruiter"
+          message="Are you sure you want to delete this internal recruiter? This will permanently delete their account and cannot be undone."
           confirmText="Delete"
           cancelText="Cancel"
         />

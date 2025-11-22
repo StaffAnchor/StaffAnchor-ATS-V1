@@ -42,6 +42,7 @@ import {
   CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { useLocationDropdowns } from './useLocationDropdowns';
+import ExpertiseSelector from './ExpertiseSelector';
 import API_URL from '../config/api';
 
 const AddCandidate = () => {
@@ -81,6 +82,11 @@ const AddCandidate = () => {
   const [availableSkills, setAvailableSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  
+  // Expertise hierarchy state
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedExpertiseTalentPools, setSelectedExpertiseTalentPools] = useState([]);
+  const [selectedExpertiseSkills, setSelectedExpertiseSkills] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeFileName, setResumeFileName] = useState('');
   const [uploadingResume, setUploadingResume] = useState(false);
@@ -338,13 +344,19 @@ const AddCandidate = () => {
     e.preventDefault();
     
     // Validation
-    if (!selectedCategory) {
-      toast.error('Please select a skill category');
+    if (!selectedDomain) {
+      toast.error('Please select a domain');
       setLoading(false);
       return;
     }
     
-    if (selectedSkills.length === 0) {
+    if (selectedExpertiseTalentPools.length === 0) {
+      toast.error('Please select at least one talent pool');
+      setLoading(false);
+      return;
+    }
+    
+    if (selectedExpertiseSkills.length === 0) {
       toast.error('Please select at least one skill');
       setLoading(false);
       return;
@@ -355,21 +367,23 @@ const AddCandidate = () => {
       const token = localStorage.getItem('jwt');
       const response = await axios.post(`${API_URL}/api/candidates`, {
         ...form,
-        skills: selectedSkills,
+        skills: selectedSkills, // Legacy field
+        domain: selectedDomain,
+        talentPools: selectedExpertiseTalentPools,
+        expertiseSkills: selectedExpertiseSkills,
         experience,
         education,
         certifications,
         additionalLinks,
         currentLocation,
-        preferredLocations,
-        talentPools: selectedTalentPools
+        preferredLocations
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       // Add candidate to selected talent pools
       const candidateId = response.data._id;
-      for (const poolId of selectedTalentPools) {
+      for (const poolId of selectedExpertiseTalentPools) {
         try {
           await axios.post(`${API_URL}/api/talent-pools/${poolId}/candidates`, {
             candidateId
@@ -661,93 +675,20 @@ const AddCandidate = () => {
               />
             </Box>
 
-            {/* Skills */}
+            {/* Expertise Selection (Domain → Talent Pools → Skills) */}
             <Box sx={{ mb: 3 }}>
-              {/* Category Selection */}
-              <Box sx={{ mb: 2 }}>
-                <FormControl fullWidth required>
-                  <InputLabel sx={{ color: '#64748b' }}>Category</InputLabel>
-                  <Select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    label="Category"
-                    sx={{
-                      color: '#1e293b',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
-                      '& .MuiSvgIcon-root': { color: '#64748b' }
-                    }}
-                  >
-                    {skillCategories.map((category) => (
-                      <MenuItem key={category.value} value={category.value}>
-                        {category.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-
-              {/* Skills Selection */}
-              {selectedCategory && (
-                <Autocomplete
-                  multiple
-                  options={availableSkills}
-                  value={selectedSkills}
-                  onChange={(e, newValue) => setSelectedSkills(newValue)}
-                  disabled={!selectedCategory || availableSkills.length === 0}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Skills"
-                      required={selectedSkills.length === 0}
-                      placeholder={availableSkills.length === 0 ? "No skills available for this category" : "Select skills..."}
-                      InputProps={{
-                        ...params.InputProps,
-                        startAdornment: (
-                          <>
-                            <StarIcon sx={{ color: '#64748b', mr: 1 }} />
-                            {params.InputProps.startAdornment}
-                          </>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                        },
-                        '& .MuiInputLabel-root': { color: '#64748b' },
-                        '& .MuiInputBase-input': { color: '#1e293b' },
-                      }}
-                    />
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        {...getTagProps({ index })}
-                        key={option}
-                        label={option}
-                        sx={{ 
-                          backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                          color: '#2563eb',
-                          textTransform: 'capitalize',
-                          '& .MuiChip-deleteIcon': { color: '#2563eb' }
-                        }}
-                      />
-                    ))
-                  }
-                  sx={{
-                    '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
-                    '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
-                  }}
-                />
-              )}
-              {!selectedCategory && (
-                <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
-                  Please select a category first
-                </Typography>
-              )}
+              <ExpertiseSelector
+                selectedDomain={selectedDomain}
+                onDomainChange={setSelectedDomain}
+                selectedTalentPools={selectedExpertiseTalentPools}
+                onTalentPoolsChange={setSelectedExpertiseTalentPools}
+                selectedSkills={selectedExpertiseSkills}
+                onSkillsChange={setSelectedExpertiseSkills}
+                singleDomain={true}
+                multipleTalentPools={true}
+                multipleSkills={true}
+                required={true}
+              />
             </Box>
 
             {/* LinkedIn Username */}

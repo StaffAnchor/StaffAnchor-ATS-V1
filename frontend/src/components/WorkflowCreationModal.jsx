@@ -537,7 +537,7 @@ const WorkflowCreationModal = ({
         result = await axios.put(`${API_URL}/api/workflows/${existingWorkflow._id}`, updateData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Workflow updated successfully!');
+        toast.success('Client side status updated successfully!');
       } else {
         const createData = {
           ...workflowData,
@@ -548,7 +548,7 @@ const WorkflowCreationModal = ({
         result = await axios.post(`${API_URL}/api/workflows`, createData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Workflow created successfully!');
+        toast.success('Client side status tracking started successfully!');
       }
 
       // Pass the result data to the parent
@@ -946,7 +946,7 @@ const WorkflowCreationModal = ({
       }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
-            {isEditMode ? 'Edit Workflow' : 'Create Workflow'}
+            {isEditMode ? 'Edit client side status' : 'Start client side tracking'}
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
             {job?.title ? `${job.title} - ${job.organization}` : 
@@ -1113,7 +1113,7 @@ const WorkflowCreationModal = ({
             '&:disabled': { backgroundColor: '#475569' }
           }}
         >
-          {isLoading ? 'Saving...' : (isEditMode ? 'Update Workflow' : 'Create Workflow')}
+          {isLoading ? 'Saving...' : (isEditMode ? 'Update status' : 'Start tracking')}
         </Button>
       </DialogActions>
     </Dialog>

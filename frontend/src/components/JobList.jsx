@@ -55,6 +55,7 @@ const JobList = ({ accessLevel, userId }) => {
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [subordinates, setSubordinates] = useState([]);
   const [activeFilters, setActiveFilters] = useState({
+    jobId: "",
     title: "",
     organization: "",
     country: "",
@@ -163,6 +164,12 @@ const JobList = ({ accessLevel, userId }) => {
 
     // Advanced filters
     if (
+      activeFilters.jobId &&
+      !job.jobId?.toLowerCase().includes(activeFilters.jobId.toLowerCase())
+    ) {
+      return false;
+    }
+    if (
       activeFilters.title &&
       !job.title.toLowerCase().includes(activeFilters.title.toLowerCase())
     ) {
@@ -259,6 +266,7 @@ const JobList = ({ accessLevel, userId }) => {
       case 'In Progress': return '#f59e0b';
       case 'Halted': return '#ef4444';
       case 'Withdrawn': return '#6b7280';
+      case 'Ongoing client process': return '#8b5cf6';
       case 'Completed': return '#10b981';
       default: return '#64748b';
     }
@@ -270,6 +278,7 @@ const JobList = ({ accessLevel, userId }) => {
       case 'In Progress': return 'rgba(245, 158, 11, 0.12)';
       case 'Halted': return 'rgba(239, 68, 68, 0.12)';
       case 'Withdrawn': return 'rgba(107, 116, 128, 0.12)';
+      case 'Ongoing client process': return 'rgba(139, 92, 246, 0.12)';
       case 'Completed': return 'rgba(16, 185, 129, 0.12)';
       default: return 'transparent';
     }
@@ -285,6 +294,22 @@ const JobList = ({ accessLevel, userId }) => {
   const handleStatusChange = async (jobId, newStatus) => {
     try {
       const token = localStorage.getItem('jwt');
+      
+      // Check if job has an active workflow
+      const workflowResponse = await axios.get(`${API_URL}/api/workflows/job/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const activeWorkflow = workflowResponse.data.find(w => w.status === 'Active');
+      
+      // If workflow exists, only allow "Ongoing client process" or "Completed"
+      if (activeWorkflow) {
+        const allowedStatuses = ['Ongoing client process', 'Completed'];
+        if (!allowedStatuses.includes(newStatus)) {
+          toast.error('Client side process already started');
+          return;
+        }
+      }
+      
       const response = await axios.put(
         `${API_URL}/api/jobs/${jobId}`,
         { status: newStatus },
@@ -467,6 +492,16 @@ const JobList = ({ accessLevel, userId }) => {
                         py: 2,
                       }}
                     >
+                      Job ID
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#8b5cf6",
+                        fontWeight: 700,
+                        fontSize: "0.95rem",
+                        py: 2,
+                      }}
+                    >
                       Job Title
                     </TableCell>
                     <TableCell
@@ -545,7 +580,7 @@ const JobList = ({ accessLevel, userId }) => {
                   {filteredJobs.length === 0 ? (
                     <TableRow>
                       <TableCell 
-                        colSpan={6} 
+                        colSpan={7} 
                         sx={{ 
                           textAlign: 'center', 
                           py: 6,
@@ -575,6 +610,19 @@ const JobList = ({ accessLevel, userId }) => {
                           },
                         }}
                       >
+                        <TableCell sx={{ py: 2 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#8b5cf6",
+                              fontWeight: 600,
+                              fontSize: "0.85rem",
+                              fontFamily: "monospace",
+                            }}
+                          >
+                            {job.jobId || 'N/A'}
+                          </Typography>
+                        </TableCell>
                         <TableCell sx={{ py: 2 }}>
                           <Typography
                             variant="h6"
@@ -676,10 +724,11 @@ const JobList = ({ accessLevel, userId }) => {
                                 }
                               }}
                             >
-                              <MenuItem value="New">New</MenuItem>
-                              <MenuItem value="In Progress">In Progress</MenuItem>
-                              <MenuItem value="Halted">Halted</MenuItem>
-                              <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                              <MenuItem value="New" disabled={job.status === 'Ongoing client process'}>New</MenuItem>
+                              <MenuItem value="In Progress" disabled={job.status === 'Ongoing client process'}>In Progress</MenuItem>
+                              <MenuItem value="Halted" disabled={job.status === 'Ongoing client process'}>Halted</MenuItem>
+                              <MenuItem value="Withdrawn" disabled={job.status === 'Ongoing client process'}>Withdrawn</MenuItem>
+                              <MenuItem value="Ongoing client process">Ongoing client process</MenuItem>
                               <MenuItem value="Completed">Completed</MenuItem>
                             </Select>
                           </FormControl>
