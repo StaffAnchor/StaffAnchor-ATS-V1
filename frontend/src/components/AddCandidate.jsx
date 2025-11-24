@@ -244,8 +244,8 @@ const AddCandidate = () => {
       updated[idx].city = '';
       // Fetch states for this preferred location
       try {
-        const res = await axios.post('https://countriesnow.space/api/v0.1/countries/states', { country: value });
-        const newStates = res.data.data.states.map(s => s.name);
+        const res = await axios.post(`${API_URL}/api/locations/states`, { country: value });
+        const newStates = res.data.data;
         const updatedStates = [...preferredLocationStates];
         updatedStates[idx] = newStates;
         setPreferredLocationStates(updatedStates);
@@ -256,7 +256,7 @@ const AddCandidate = () => {
       updated[idx].city = '';
       // Fetch cities for this preferred location
       try {
-        const res = await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { 
+        const res = await axios.post(`${API_URL}/api/locations/cities`, { 
           country: updated[idx].country, 
           state: value 
         });

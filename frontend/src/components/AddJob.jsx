@@ -38,7 +38,8 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  Group as GroupIcon
 } from '@mui/icons-material';
 import { useLocationDropdowns } from './useLocationDropdowns';
 import ExpertiseSelector from './ExpertiseSelector';
@@ -53,8 +54,7 @@ const AddJob = ({ user }) => {
     remote: false, 
     experience: '', 
     ctc: '', 
-    description: '', 
-    authorizedUser: '',
+    description: '',
   });
   const [msg, setMsg] = useState('');
   const [users, setUsers] = useState([]);
@@ -69,6 +69,7 @@ const AddJob = ({ user }) => {
   const { countries, states, cities, fetchStates, fetchCities, loading: locationLoading } = useLocationDropdowns();
   const [availableSkills, setAvailableSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
+  const [selectedRecruiters, setSelectedRecruiters] = useState([]);
   
   // Expertise hierarchy state
   const [selectedDomain, setSelectedDomain] = useState('');
@@ -140,8 +141,8 @@ const AddJob = ({ user }) => {
       
       if (value) {
         try {
-          const res = await axios.post('https://countriesnow.space/api/v0.1/countries/states', { country: value });
-          updatedStates[idx] = res.data.data.states.map(s => s.name);
+          const res = await axios.post(`${API_URL}/api/locations/states`, { country: value });
+          updatedStates[idx] = res.data.data;
         } catch (error) {
           console.error('Error fetching states:', error);
           updatedStates[idx] = [];
@@ -158,7 +159,7 @@ const AddJob = ({ user }) => {
       
       if (value && updated[idx].country) {
         try {
-          const res = await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { 
+          const res = await axios.post(`${API_URL}/api/locations/cities`, { 
             country: updated[idx].country, 
             state: value 
           });
@@ -245,8 +246,8 @@ const AddJob = ({ user }) => {
       };
       
       // Admin can add authorized users, subordinate is auto-added
-      if (user.accessLevel === 2 && form.authorizedUser) {
-        jobData.authorizedUsers = [form.authorizedUser];
+      if (user.accessLevel === 2 && selectedRecruiters.length > 0) {
+        jobData.authorizedUsers = selectedRecruiters;
       } else if (user.accessLevel === 1) {
         // Subordinate creating job - auto-add themselves as authorized user
         jobData.authorizedUsers = [user._id];
@@ -276,14 +277,14 @@ const AddJob = ({ user }) => {
         remote: false, 
         experience: '', 
         ctc: '', 
-        description: '', 
-        authorizedUser: ''
+        description: ''
       });
       setJobLocations([{ country: '', state: '', city: '' }]);
       setLocationStates([[]]);
       setLocationCities([[]]);
       setClientContacts([]);
       setSelectedSkills([]);
+      setSelectedRecruiters([]);
       setSelectedDomain('');
       setSelectedTalentPools([]);
       setSelectedExpertiseSkills([]);
@@ -698,24 +699,47 @@ const AddJob = ({ user }) => {
 
           <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
-          {/* StaffAnchor Recruiter - Only show for admins */}
+          {/* StaffAnchor Recruiters - Only show for admins */}
           {user.accessLevel === 2 && (
             <>
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+                  <GroupIcon sx={{ color: '#8b5cf6', mr: 1 }} />
                   <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
-                    StaffAnchor Recruiter
+                    StaffAnchor Recruiters
                   </Typography>
                 </Box>
                 
                 <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#64748b' }}>StaffAnchor Recruiter - Optional</InputLabel>
+                  <InputLabel sx={{ color: '#64748b' }}>Select Recruiters - Optional</InputLabel>
                   <Select
-                    name="authorizedUser"
-                    value={form.authorizedUser}
-                    onChange={handleChange}
-                    startAdornment={<PersonIcon sx={{ color: '#64748b', mr: 1 }} />}
+                    multiple
+                    value={selectedRecruiters}
+                    onChange={(e) => setSelectedRecruiters(e.target.value)}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => {
+                          const user = users.find(u => u._id === value);
+                          return (
+                            <Chip
+                              key={value}
+                              label={user?.fullName || value}
+                              size="small"
+                              sx={{
+                                backgroundColor: '#8b5cf6',
+                                color: '#ffffff',
+                                '& .MuiChip-deleteIcon': {
+                                  color: '#ffffff',
+                                  '&:hover': {
+                                    color: '#f3e8ff'
+                                  }
+                                }
+                              }}
+                            />
+                          );
+                        })}
+                      </Box>
+                    )}
                     sx={{
                       color: '#1e293b',
                       '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.23)' },
@@ -724,16 +748,21 @@ const AddJob = ({ user }) => {
                       '& .MuiSvgIcon-root': { color: '#64748b' },
                     }}
                   >
-                    <MenuItem value="">Select StaffAnchor Recruiter</MenuItem>
                     {users.map(u => (
                       <MenuItem key={u._id} value={u._id}>
-                        {u.fullName} ({u.email})
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                          <PersonIcon sx={{ mr: 1, fontSize: '1.2rem', color: '#8b5cf6' }} />
+                          <Box>
+                            <Typography sx={{ fontWeight: 500 }}>{u.fullName}</Typography>
+                            <Typography variant="caption" sx={{ color: '#64748b' }}>{u.email}</Typography>
+                          </Box>
+                        </Box>
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
                 <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
-                  Assign a recruiter from your team to manage this job
+                  Assign one or more recruiters from your team to manage this job
                 </Typography>
               </Box>
               <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
