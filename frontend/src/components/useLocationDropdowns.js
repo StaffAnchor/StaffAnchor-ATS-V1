@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../config/api';
 
 export function useLocationDropdowns() {
   const [countries, setCountries] = useState([]);
@@ -9,9 +10,13 @@ export function useLocationDropdowns() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('https://countriesnow.space/api/v0.1/countries/iso')
+    axios.get(`${API_URL}/api/locations/countries`)
       .then(res => {
-        setCountries(res.data.data.map(c => c.name));
+        setCountries(res.data.data);
+      })
+      .catch(err => {
+        console.error('Error fetching countries:', err);
+        setCountries([]);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -21,8 +26,11 @@ export function useLocationDropdowns() {
     setStates([]);
     setCities([]);
     try {
-      const res = await axios.post('https://countriesnow.space/api/v0.1/countries/states', { country });
-      setStates(res.data.data.states.map(s => s.name));
+      const res = await axios.post(`${API_URL}/api/locations/states`, { country });
+      setStates(res.data.data);
+    } catch (err) {
+      console.error('Error fetching states:', err);
+      setStates([]);
     } finally {
       setLoading(false);
     }
@@ -32,8 +40,11 @@ export function useLocationDropdowns() {
     setLoading(true);
     setCities([]);
     try {
-      const res = await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { country, state });
+      const res = await axios.post(`${API_URL}/api/locations/cities`, { country, state });
       setCities(res.data.data);
+    } catch (err) {
+      console.error('Error fetching cities:', err);
+      setCities([]);
     } finally {
       setLoading(false);
     }
