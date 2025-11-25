@@ -3,7 +3,12 @@ const router = express.Router();
 const domainController = require('../controllers/domainController');
 const { authenticateToken } = require('../middleware/auth');
 
-// All routes require authentication
+// Public routes (no authentication required)
+router.get('/public', domainController.getPublicDomains);
+router.get('/public/:domainId/talent-pools', domainController.getPublicTalentPoolsByDomain);
+router.get('/public/skills/by-talent-pools', domainController.getPublicSkillsByTalentPools);
+
+// All other routes require authentication
 router.use(authenticateToken);
 
 // Get all domains

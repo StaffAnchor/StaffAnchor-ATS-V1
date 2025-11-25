@@ -610,6 +610,22 @@ exports.submitPublicJobApplication = async (req, res) => {
         appliedJobs: [jobId]
       });
       await candidate.save();
+
+      // Add candidate to talent pools if provided
+      if (req.body.talentPools && req.body.talentPools.length > 0) {
+        const TalentPool = require('../models/TalentPool');
+        for (const poolId of req.body.talentPools) {
+          try {
+            await TalentPool.findByIdAndUpdate(
+              poolId,
+              { $addToSet: { candidates: candidate._id } }
+            );
+          } catch (poolError) {
+            console.error('Error adding candidate to talent pool:', poolError);
+            // Don't fail the application if pool linking fails
+          }
+        }
+      }
     }
 
     // Create candidate-job link with source "applied-through-link"
