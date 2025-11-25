@@ -4,7 +4,7 @@ const Candidate = require('../models/Candidate');
 const Workflow = require('../models/Workflow');
 const User = require('../models/User');
 
-// Preview email before sending
+  // Preview email before sending
 exports.previewEmail = async (req, res) => {
   try {
     const { type, data } = req.body;
@@ -14,7 +14,7 @@ exports.previewEmail = async (req, res) => {
 
     // Enrich job data
     if (data.jobId) {
-      const job = await Job.findById(data.jobId);
+      const job = await Job.findById(data.jobId).populate('authorizedUsers');
       if (!job) {
         return res.status(404).json({ message: 'Job not found' });
       }
@@ -67,10 +67,18 @@ exports.previewEmail = async (req, res) => {
       if (enrichedData.candidates && enrichedData.candidates.length > 0) {
         enrichedData.candidate = enrichedData.candidates[0];
       }
-    } else if (type === 'recruiterPhase' || type === 'recruiterJobCreation') {
+    } else if (type === 'recruiterPhase') {
+      // For recruiter phase emails, use client contact recruiters
       if (enrichedData.job && enrichedData.job.recruiters) {
         recipients = enrichedData.job.recruiters
           .map(r => r.email)
+          .filter(Boolean);
+      }
+    } else if (type === 'recruiterJobCreation') {
+      // For job creation emails, send to internal StaffAnchor recruiters (authorizedUsers)
+      if (enrichedData.job && enrichedData.job.authorizedUsers) {
+        recipients = enrichedData.job.authorizedUsers
+          .map(user => user.email)
           .filter(Boolean);
       }
     }

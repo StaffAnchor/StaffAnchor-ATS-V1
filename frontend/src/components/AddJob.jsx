@@ -262,9 +262,9 @@ const AddJob = ({ user }) => {
       setMsg('Job added successfully!');
       toast.success('Job added successfully!');
       
-      // Check if email notification should be sent
-      if (newJob._emailNotificationPending && selectedContact) {
-        // Show email preview modal for client contact
+      // Check if email notification should be sent to internal recruiters
+      if (newJob._emailNotificationPending && newJob.authorizedUsers && newJob.authorizedUsers.length > 0) {
+        // Show email preview modal for internal StaffAnchor recruiters
         await handleJobCreatedEmail(newJob, newJob._creatorId || user?._id);
       }
       

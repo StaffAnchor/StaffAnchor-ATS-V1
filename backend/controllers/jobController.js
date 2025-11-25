@@ -29,7 +29,7 @@ exports.addJob = async (req, res) => {
 
 exports.listJobs = async (req, res) => {
   try {
-    const jobs = await Job.find();
+    const jobs = await Job.find().populate('authorizedUsers', 'fullName email phone');
     // Ensure all jobs have a status field (with default if missing)
     const jobsWithStatus = jobs.map(job => {
       const jobObj = job.toObject();
@@ -46,7 +46,7 @@ exports.listJobs = async (req, res) => {
 
 exports.jobDetails = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(req.params.id).populate('authorizedUsers', 'fullName email phone');
     if (!job) {
       return res.status(404).json({ error: 'Job not found' });
     }

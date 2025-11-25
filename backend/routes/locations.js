@@ -10,3 +10,4 @@ router.post('/cities', locationController.getCities);
 module.exports = router;
 
 
+

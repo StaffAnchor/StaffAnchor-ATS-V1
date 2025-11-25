@@ -31,11 +31,8 @@ exports.createClient = async (req, res) => {
 // Get all clients
 exports.getClients = async (req, res) => {
   try {
-    const query = req.user.organization
-      ? { organization: req.user.organization }
-      : {};
-
-    const clients = await Client.find(query)
+    // All authenticated users can see all clients
+    const clients = await Client.find()
       .populate('createdBy', 'fullName email')
       .populate('jobs', 'title status')
       .sort({ createdAt: -1 });
@@ -50,12 +47,7 @@ exports.getClients = async (req, res) => {
 // Get a specific client
 exports.getClient = async (req, res) => {
   try {
-    const query = {
-      _id: req.params.id,
-      organization: req.user.organization
-    };
-
-    const client = await Client.findOne(query)
+    const client = await Client.findById(req.params.id)
       .populate('createdBy', 'fullName email')
       .populate('jobs', 'title status organization location');
 
@@ -75,19 +67,14 @@ exports.updateClient = async (req, res) => {
   try {
     const { organizationName, contacts } = req.body;
 
-    const query = {
-      _id: req.params.id,
-      organization: req.user.organization
-    };
-
-    const client = await Client.findOneAndUpdate(
-      query,
+    const client = await Client.findByIdAndUpdate(
+      req.params.id,
       { organizationName, contacts },
       { new: true, runValidators: true }
     );
 
     if (!client) {
-      return res.status(404).json({ error: 'Client not found or access denied' });
+      return res.status(404).json({ error: 'Client not found' });
     }
 
     res.json(client);
@@ -100,15 +87,10 @@ exports.updateClient = async (req, res) => {
 // Delete a client
 exports.deleteClient = async (req, res) => {
   try {
-    const query = {
-      _id: req.params.id,
-      organization: req.user.organization
-    };
-
-    const client = await Client.findOneAndDelete(query);
+    const client = await Client.findByIdAndDelete(req.params.id);
 
     if (!client) {
-      return res.status(404).json({ error: 'Client not found or access denied' });
+      return res.status(404).json({ error: 'Client not found' });
     }
 
     res.json({ message: 'Client deleted successfully' });

@@ -122,7 +122,7 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
         {view === 'jobs' && <JobList accessLevel={user.accessLevel} userId={user._id} />}
         {view === 'candidates' && <CandidateList candidates={candidates} accessLevel={user.accessLevel} loading={loadingCandidates} />}
         {view === 'addJob' && <AddJob user={user} />}
-        {view === 'addCandidate' && <AddCandidate />}
+        {view === 'addCandidate' && <AddCandidate key={location.state?.preSelectedJob?._id || 'default'} />}
         {view === 'workflows' && <Workflows user={user} />}
         {view === 'talentPools' && <TalentPools user={user} />}
         {user.accessLevel === 2 && view === 'subordinates' && <div>Subordinates View</div>}
