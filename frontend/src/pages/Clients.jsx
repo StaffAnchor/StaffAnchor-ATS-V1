@@ -31,16 +31,19 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon,
   Work as WorkIcon,
-  Construction as ConstructionIcon
+  Construction as ConstructionIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import API_URL from '../config/api';
 import ConfirmDialog from '../components/ConfirmDialog';
+import EditClient from '../components/EditClient';
 
 const Clients = () => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState(null);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, clientId: null, clientName: '' });
 
@@ -72,6 +75,21 @@ const Clients = () => {
   const handleBilling = (e) => {
     e.stopPropagation(); // Prevent row click
     setShowFeatureDialog(true);
+  };
+
+  const handleEdit = () => {
+    setOpenDetailsDialog(false);
+    setOpenEditDialog(true);
+  };
+
+  const handleClientUpdated = (updatedClient) => {
+    // Update the client in the list
+    setClients(clients.map(client => 
+      client._id === updatedClient._id ? updatedClient : client
+    ));
+    // Update selected client if it's the same one
+    setSelectedClient(updatedClient);
+    setOpenEditDialog(false);
   };
 
   const handleDelete = async () => {
@@ -327,12 +345,35 @@ const Clients = () => {
             </>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}>
+          <Button
+            startIcon={<EditIcon />}
+            onClick={handleEdit}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              color: 'white',
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+              }
+            }}
+          >
+            Edit Client
+          </Button>
           <Button onClick={() => setOpenDetailsDialog(false)} sx={{ color: '#64748b' }}>
             Close
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Edit Client Dialog */}
+      <EditClient
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        client={selectedClient}
+        onClientUpdated={handleClientUpdated}
+      />
 
       {/* Feature Under Development Dialog */}
       <Dialog
