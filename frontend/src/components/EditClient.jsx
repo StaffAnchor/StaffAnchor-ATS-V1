@@ -66,9 +66,9 @@ const EditClient = ({ open, onClose, client, onClientUpdated }) => {
       return;
     }
 
-    const validContacts = contacts.filter(c => c.name.trim() && c.email.trim());
+    const validContacts = contacts.filter(c => c.name.trim());
     if (validContacts.length === 0) {
-      toast.error('At least one contact with name and email is required');
+      toast.error('At least one contact with a name is required');
       return;
     }
 
@@ -215,7 +215,6 @@ const EditClient = ({ open, onClose, client, onClientUpdated }) => {
                     type="email"
                     value={contact.email}
                     onChange={(e) => handleContactChange(index, 'email', e.target.value)}
-                    required
                     sx={inputStyles}
                   />
                   <TextField
