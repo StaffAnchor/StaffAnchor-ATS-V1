@@ -35,6 +35,7 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
   const [submittedCandidates, setSubmittedCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [existingWorkflow, setExistingWorkflow] = useState(null);
 
   useEffect(() => {
     if (open) {
@@ -70,14 +71,33 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
     try {
       setLoading(true);
       const token = localStorage.getItem('jwt');
-      const response = await axios.get(`${API_URL}/api/candidate-job-links/job/${jobId}/candidates`, {
+      
+      // Fetch candidates
+      const candidatesResponse = await axios.get(`${API_URL}/api/candidate-job-links/job/${jobId}/candidates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      // Check if workflow exists for this job
+      const workflowResponse = await axios.get(`${API_URL}/api/workflows/job/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const activeWorkflow = workflowResponse.data.find(w => w.status === 'Active');
+      setExistingWorkflow(activeWorkflow || null);
+
       // Filter only "Submitted to Client" candidates
-      const submitted = response.data.candidates.filter(
+      let submitted = candidatesResponse.data.candidates.filter(
         c => c.linkInfo?.status === 'Submitted to Client'
       );
+
+      // If workflow exists, filter out candidates already in it
+      if (activeWorkflow) {
+        const existingCandidateIds = new Set();
+        activeWorkflow.candidateStatuses?.forEach(cs => {
+          existingCandidateIds.add(cs.candidateId?._id?.toString() || cs.candidateId?.toString());
+        });
+        submitted = submitted.filter(c => !existingCandidateIds.has(c._id.toString()));
+      }
+
       setSubmittedCandidates(submitted);
     } catch (error) {
       console.error('Error fetching candidates:', error);
@@ -120,12 +140,17 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
         userId: user._id
       };
 
-      await axios.post(`${API_URL}/api/workflows`, workflowData, {
+      const response = await axios.post(`${API_URL}/api/workflows`, workflowData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      toast.success('Client side status tracking started successfully!');
-      onClose(true); // Pass true to indicate workflow was created
+      // Show appropriate success message based on whether workflow was created or updated
+      if (response.data.message) {
+        toast.success(response.data.message);
+      } else {
+        toast.success('Client side status tracking started successfully!');
+      }
+      onClose(true); // Pass true to indicate workflow was created/updated
     } catch (error) {
       console.error('Error creating workflow:', error);
       if (error.response?.data?.error) {
@@ -224,7 +249,7 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ color: '#1e293b', fontWeight: 600 }}>
-                  Candidates Submitted to Client
+                  {existingWorkflow ? 'New Candidates to Track' : 'Candidates Submitted to Client'}
                 </Typography>
                 <Chip
                   label={`${submittedCandidates.length} Candidate${submittedCandidates.length !== 1 ? 's' : ''}`}
@@ -235,6 +260,13 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
                   }}
                 />
               </Box>
+              {existingWorkflow && (
+                <Paper sx={{ p: 2, mb: 2, background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.2)' }}>
+                  <Typography variant="body2" sx={{ color: '#2563eb', fontWeight: 600 }}>
+                    ℹ️ A client side process already exists for this job. Only newly submitted candidates are shown below.
+                  </Typography>
+                </Paper>
+              )}
               <TableContainer component={Paper} sx={{ border: '1px solid rgba(0, 0, 0, 0.05)' }}>
                 <Table size="small">
                   <TableHead>
@@ -289,25 +321,25 @@ const ClientSideStatusCreation = ({ open, onClose, preSelectedJobId, user }) => 
         >
           Cancel
         </Button>
-        <Button
-          onClick={handleCreate}
-          variant="contained"
-          disabled={!selectedJobId || submittedCandidates.length === 0 || creating}
-          sx={{
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-            color: '#fff',
-            fontWeight: 600,
-            '&:hover': {
-              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-            },
-            '&:disabled': {
-              background: 'rgba(0, 0, 0, 0.12)',
-              color: 'rgba(0, 0, 0, 0.26)'
-            }
-          }}
-        >
-          {creating ? 'Creating...' : 'Start Tracking'}
-        </Button>
+          <Button
+            onClick={handleCreate}
+            variant="contained"
+            disabled={!selectedJobId || submittedCandidates.length === 0 || creating}
+            sx={{
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+              },
+              '&:disabled': {
+                background: 'rgba(0, 0, 0, 0.12)',
+                color: 'rgba(0, 0, 0, 0.26)'
+              }
+            }}
+          >
+            {creating ? (existingWorkflow ? 'Adding...' : 'Creating...') : (existingWorkflow ? 'Add to Existing Tracking' : 'Start Tracking')}
+          </Button>
       </DialogActions>
     </Dialog>
   );

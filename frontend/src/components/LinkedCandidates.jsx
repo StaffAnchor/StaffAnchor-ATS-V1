@@ -122,12 +122,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   };
 
   const handleUnlinkCandidate = async (linkId, candidateName) => {
-    // Check if workflow exists - prevent unlinking
-    if (existingWorkflow && existingWorkflow.status === 'Active') {
-      toast.error('Client side process is already started for this job');
-      return;
-    }
-
     try {
       setUnlinking(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
@@ -147,12 +141,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   };
 
   const handleStatusChange = async (linkId, newStatus) => {
-    // Check if workflow exists - prevent editing
-    if (existingWorkflow && existingWorkflow.status === 'Active') {
-      toast.error('Client side process is already started for this job');
-      return;
-    }
-
     try {
       setUpdatingStatus(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
@@ -716,7 +704,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                             handleStatusChange(candidate.linkInfo.linkId, e.target.value);
                           }}
                           onClick={(e) => e.stopPropagation()}
-                          disabled={updatingStatus[candidate.linkInfo.linkId] || (existingWorkflow && existingWorkflow.status === 'Active')}
+                          disabled={updatingStatus[candidate.linkInfo.linkId]}
                           sx={{
                             color: getStatusColor(candidate.linkInfo.status || 'New'),
                             fontWeight: 600,

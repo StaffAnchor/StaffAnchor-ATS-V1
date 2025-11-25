@@ -89,7 +89,7 @@ const getWorkflowsByJob = async (req, res) => {
   }
 };
 
-// Create new workflow
+// Create new workflow or add candidates to existing workflow
 const createWorkflow = async (req, res) => {
   try {
     const { jobId, phases, description, priority, userId } = req.body;
@@ -100,15 +100,64 @@ const createWorkflow = async (req, res) => {
       return res.status(404).json({ error: 'Job not found' });
     }
     
-
-    
     // Check if workflow already exists
     const existingWorkflow = await Workflow.findOne({ jobId });
+    
     if (existingWorkflow) {
-      return res.status(400).json({ error: 'Workflow already exists for this job' });
+      // Workflow exists - add new candidates to it
+      const newCandidateIds = phases[0]?.candidates || [];
+      
+      if (newCandidateIds.length === 0) {
+        return res.status(400).json({ error: 'No new candidates to add' });
+      }
+      
+      // Get existing candidate IDs from workflow
+      const existingCandidateIds = new Set(
+        existingWorkflow.candidateStatuses.map(cs => cs.candidateId.toString())
+      );
+      
+      // Filter out candidates that are already in the workflow
+      const candidatesToAdd = newCandidateIds.filter(
+        id => !existingCandidateIds.has(id.toString())
+      );
+      
+      if (candidatesToAdd.length === 0) {
+        return res.status(400).json({ error: 'All candidates are already in the workflow' });
+      }
+      
+      // Add new candidates to candidateStatuses
+      const newCandidateStatuses = candidatesToAdd.map(candidateId => ({
+        candidateId,
+        clientSideStatus: 'Interview Scheduled',
+        notes: '',
+        updatedAt: new Date()
+      }));
+      
+      existingWorkflow.candidateStatuses.push(...newCandidateStatuses);
+      
+      // Also add to first phase candidates array
+      if (existingWorkflow.phases && existingWorkflow.phases.length > 0) {
+        existingWorkflow.phases[0].candidates.push(...candidatesToAdd);
+      }
+      
+      // Update total candidates count
+      existingWorkflow.totalCandidates = existingWorkflow.candidateStatuses.length;
+      
+      await existingWorkflow.save();
+      
+      const populatedWorkflow = await Workflow.findById(existingWorkflow._id)
+        .populate('jobId', 'title organization description location remote experience ctc industry recruiters')
+        .populate('candidateStatuses.candidateId', 'name email phone skills organization')
+        .populate('createdBy', 'name email');
+      
+      return res.status(200).json({
+        message: `Added ${candidatesToAdd.length} new candidate(s) to existing workflow`,
+        workflow: populatedWorkflow,
+        _emailNotificationPending: false
+      });
     }
     
-    // Calculate total candidates from first phase
+    // No existing workflow - create new one
     const totalCandidates = phases[0]?.candidates?.length || 0;
     
     // Initialize candidate statuses from first phase candidates
@@ -143,7 +192,7 @@ const createWorkflow = async (req, res) => {
     
     const populatedWorkflow = await Workflow.findById(workflow._id)
       .populate('jobId', 'title organization description location remote experience ctc industry recruiters')
-      .populate('phases.candidates', 'name email phone skills organization')
+      .populate('candidateStatuses.candidateId', 'name email phone skills organization')
       .populate('createdBy', 'name email');
     
     res.status(201).json({
