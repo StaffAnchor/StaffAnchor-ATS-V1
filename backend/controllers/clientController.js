@@ -13,6 +13,12 @@ exports.createClient = async (req, res) => {
       return res.status(400).json({ error: 'At least one contact is required' });
     }
 
+    // Validate that contacts have at least a name
+    const validContacts = contacts.filter(c => c.name && c.name.trim());
+    if (validContacts.length === 0) {
+      return res.status(400).json({ error: 'At least one contact with a name is required' });
+    }
+
     const client = new Client({
       organizationName: organizationName.trim(),
       contacts,
@@ -66,6 +72,14 @@ exports.getClient = async (req, res) => {
 exports.updateClient = async (req, res) => {
   try {
     const { organizationName, contacts } = req.body;
+
+    // Validate that contacts have at least a name
+    if (contacts && contacts.length > 0) {
+      const validContacts = contacts.filter(c => c.name && c.name.trim());
+      if (validContacts.length === 0) {
+        return res.status(400).json({ error: 'At least one contact with a name is required' });
+      }
+    }
 
     const client = await Client.findByIdAndUpdate(
       req.params.id,
