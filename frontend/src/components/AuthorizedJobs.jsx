@@ -16,9 +16,14 @@ const AuthorizedJobs = ({ userId }) => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setJobs(
-          res.data.filter(
-            j => Array.isArray(j.authorizedUsers) && j.authorizedUsers.map(String).includes(String(userId))
-          )
+          res.data.filter(j => {
+            if (!Array.isArray(j.authorizedUsers)) return false;
+            // Handle both populated objects and plain IDs
+            return j.authorizedUsers.some(user => {
+              const id = typeof user === 'object' ? user._id : user;
+              return id.toString() === userId.toString();
+            });
+          })
         );
       } catch (error) {
         console.error('Failed to fetch authorized jobs:', error);

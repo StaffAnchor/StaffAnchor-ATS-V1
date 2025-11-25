@@ -154,7 +154,11 @@ const JobList = ({ accessLevel, userId }) => {
         return false;
       }
       
-      const authorizedUserIds = job.authorizedUsers.map(id => id.toString());
+      // Handle both populated objects and plain IDs
+      const authorizedUserIds = job.authorizedUsers.map(user => {
+        const id = typeof user === 'object' ? user._id : user;
+        return id.toString();
+      });
       const userIdString = userId.toString();
       
       if (!authorizedUserIds.includes(userIdString)) {
@@ -288,7 +292,12 @@ const JobList = ({ accessLevel, userId }) => {
     if (!authorizedUsers || authorizedUsers.length === 0) {
       return [];
     }
-    return subordinates.filter(sub => authorizedUsers.includes(sub._id));
+    // Handle both populated objects and plain IDs
+    const authorizedUserIds = authorizedUsers.map(user => {
+      const id = typeof user === 'object' ? user._id : user;
+      return id.toString();
+    });
+    return subordinates.filter(sub => authorizedUserIds.includes(sub._id.toString()));
   };
 
   const handleStatusChange = async (jobId, newStatus) => {

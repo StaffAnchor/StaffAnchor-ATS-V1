@@ -78,7 +78,14 @@ const Subordinates = ({ user }) => {
       axios.get(`${API_URL}/api/jobs`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
-        const authorizedJobs = res.data.filter(j => Array.isArray(j.authorizedUsers) && j.authorizedUsers.includes(id));
+        const authorizedJobs = res.data.filter(j => {
+          if (!Array.isArray(j.authorizedUsers)) return false;
+          // Handle both populated objects and plain IDs
+          return j.authorizedUsers.some(user => {
+            const userId = typeof user === 'object' ? user._id : user;
+            return userId.toString() === id.toString();
+          });
+        });
         setJobs(prev => ({ ...prev, [id]: authorizedJobs }));
       });
     }
@@ -118,9 +125,10 @@ const Subordinates = ({ user }) => {
       const job = jobs[subordinateId].find(j => j._id === jobId);
       
       // Remove subordinate from authorized users
-      const updatedAuthorizedUsers = (job.authorizedUsers || []).filter(
-        userId => userId !== subordinateId
-      );
+      // Handle both populated objects and plain IDs
+      const updatedAuthorizedUsers = (job.authorizedUsers || [])
+        .map(user => typeof user === 'object' ? user._id : user)
+        .filter(userId => userId.toString() !== subordinateId.toString());
       
       await axios.put(`${API_URL}/api/jobs/${jobId}`, {
         authorizedUsers: updatedAuthorizedUsers
@@ -161,24 +169,43 @@ const Subordinates = ({ user }) => {
       const token = localStorage.getItem('jwt');
       const job = allJobs.find(j => j._id === jobId);
       
-      // Check if already authorized
-      if (job.authorizedUsers && job.authorizedUsers.includes(selectedSubordinateId)) {
+      // Check if already authorized - handle both populated objects and plain IDs
+      const isAlreadyAuthorized = (job.authorizedUsers || []).some(user => {
+        const userId = typeof user === 'object' ? user._id : user;
+        return userId.toString() === selectedSubordinateId.toString();
+      });
+
+      if (isAlreadyAuthorized) {
         toast.info('This subordinate is already authorized for this job');
         return;
       }
 
-      // Update job with new authorized user
-      const updatedAuthorizedUsers = [...(job.authorizedUsers || []), selectedSubordinateId];
+      // Update job with new authorized user - extract IDs from populated objects
+      const existingUserIds = (job.authorizedUsers || []).map(user => 
+        typeof user === 'object' ? user._id : user
+      );
+      const updatedAuthorizedUsers = [...existingUserIds, selectedSubordinateId];
+
       await axios.put(`${API_URL}/api/jobs/${jobId}`, {
         authorizedUsers: updatedAuthorizedUsers
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Update local state
+      // Refetch jobs for this subordinate to get updated data
+      const jobsRes = await axios.get(`${API_URL}/api/jobs`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const authorizedJobs = jobsRes.data.filter(j => {
+        if (!Array.isArray(j.authorizedUsers)) return false;
+        return j.authorizedUsers.some(user => {
+          const userId = typeof user === 'object' ? user._id : user;
+          return userId.toString() === selectedSubordinateId.toString();
+        });
+      });
       setJobs(prev => ({
         ...prev,
-        [selectedSubordinateId]: [...(prev[selectedSubordinateId] || []), job]
+        [selectedSubordinateId]: authorizedJobs
       }));
 
       toast.success('Job authorized successfully');
@@ -610,7 +637,11 @@ const Subordinates = ({ user }) => {
                   </TableHead>
                   <TableBody>
                     {allJobs.map(job => {
-                      const isAuthorized = job.authorizedUsers && job.authorizedUsers.includes(selectedSubordinateId);
+                      // Handle both populated objects and plain IDs
+                      const isAuthorized = (job.authorizedUsers || []).some(user => {
+                        const userId = typeof user === 'object' ? user._id : user;
+                        return userId.toString() === selectedSubordinateId.toString();
+                      });
                       return (
                         <TableRow key={job._id} sx={{
                           "&:hover": {
