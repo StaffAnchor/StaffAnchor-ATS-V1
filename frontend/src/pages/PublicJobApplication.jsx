@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import API_URL from '../config/api';
 import staffAnchorLogo from '../assets/StaffanchorLogoFinalSVG.svg';
+import PublicExpertiseSelector from '../components/PublicExpertiseSelector';
 
 const PublicJobApplication = () => {
   const { jobId } = useParams();
@@ -48,26 +49,10 @@ const PublicJobApplication = () => {
   // Location state
   const [selectedPreferredLocations, setSelectedPreferredLocations] = useState([]);
 
-  // Skills state
-  const [allSkills, setAllSkills] = useState([]);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-
-  const skillCategories = [
-    { value: 'sales-and-business-development', label: 'Sales and Business Development' },
-    { value: 'marketing-communications', label: 'Marketing & Communications' },
-    { value: 'technology-engineering', label: 'Technology and Engineering' },
-    { value: 'finance-accounting-audit', label: 'Finance, Accounting & Audit' },
-    { value: 'human-resources', label: 'Human Resources' },
-    { value: 'operations-supply-chain-procurement', label: 'Operations, Supply Chain & Procurement' },
-    { value: 'product-management-design', label: 'Product Management & Design' },
-    { value: 'data-analytics-insights', label: 'Data, Analytics and Insights' },
-    { value: 'customer-success-support', label: 'Customer Success & Support' },
-    { value: 'legal-risk-compliance', label: 'Legal Risk & Compliance' },
-    { value: 'manufacturing-projects-quality', label: 'Manufacturing, Projects & Quality' },
-    { value: 'general-management-strategy', label: 'General Management & Strategy' },
-    { value: 'miscellaneous', label: 'Miscellaneous' }
-  ];
+  // Expertise hierarchy state (Domain → Talent Pools → Skills)
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedExpertiseTalentPools, setSelectedExpertiseTalentPools] = useState([]);
+  const [selectedExpertiseSkills, setSelectedExpertiseSkills] = useState([]);
 
   // Resume upload state
   const [resumeFile, setResumeFile] = useState(null);
@@ -104,29 +89,6 @@ const PublicJobApplication = () => {
       }
     }
   }, [job]);
-
-  // Fetch skills when category changes
-  useEffect(() => {
-    const fetchSkillsByCategory = async () => {
-      if (!selectedCategory) {
-        setAllSkills([]);
-        setSelectedSkills([]);
-        return;
-      }
-
-      try {
-        const res = await axios.get(`${API_URL}/api/skills/public`, {
-          params: { category: selectedCategory }
-        });
-        setAllSkills(res.data.map(skill => skill.name));
-        setSelectedSkills([]); // Clear selected skills when category changes
-      } catch (error) {
-        console.error('Error fetching skills:', error);
-        setAllSkills([]);
-      }
-    };
-    fetchSkillsByCategory();
-  }, [selectedCategory]);
 
 
   const fetchJobDetails = async () => {
@@ -234,12 +196,17 @@ const PublicJobApplication = () => {
       return;
     }
 
-    if (!selectedCategory) {
-      toast.error('Please select a skill category');
+    if (!selectedDomain) {
+      toast.error('Please select a domain');
       return;
     }
 
-    if (selectedSkills.length === 0) {
+    if (selectedExpertiseTalentPools.length === 0) {
+      toast.error('Please select at least one talent pool');
+      return;
+    }
+
+    if (selectedExpertiseSkills.length === 0) {
       toast.error('Please select at least one skill');
       return;
     }
@@ -271,7 +238,9 @@ const PublicJobApplication = () => {
       const candidateData = {
         ...form,
         preferredLocations,
-        skills: selectedSkills,
+        domain: selectedDomain,
+        talentPools: selectedExpertiseTalentPools,
+        expertiseSkills: selectedExpertiseSkills,
         experience: form.experience.filter(exp => exp.company || exp.position),
         education: form.education.filter(edu => edu.clg || edu.course)
       };
@@ -752,128 +721,20 @@ const PublicJobApplication = () => {
 
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
-                {/* Skills */}
-                <Box>
-                  <Typography variant="h6" sx={{ 
-                    color: '#475569', 
-                    mb: { xs: 1.5, sm: 2 },
-                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-                  }}>
-                    Skills *
-                  </Typography>
-                  
-                  {/* Category Selection */}
-                  <Box sx={{ mb: 2 }}>
-                    <FormControl fullWidth required>
-                      <InputLabel sx={{ color: '#64748b' }}>Category</InputLabel>
-                      <Select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        label="Category"
-                        sx={{
-                          color: '#1e293b',
-                          backgroundColor: '#fff',
-                          borderRadius: '6px',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#ddd' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#bbb' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
-                          '& .MuiSvgIcon-root': { color: '#475569' }
-                        }}
-                      >
-                        {skillCategories.map((category) => (
-                          <MenuItem key={category.value} value={category.value}>
-                            {category.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  {/* Skills Selection */}
-                  {selectedCategory && (
-                    <Autocomplete
-                      multiple
-                      options={allSkills}
-                      value={selectedSkills}
-                      onChange={(e, newValue) => setSelectedSkills(newValue)}
-                      disabled={!selectedCategory || allSkills.length === 0}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={allSkills.length === 0 ? "No skills available for this category" : "Select skills..."}
-                          required={selectedSkills.length === 0}
-                          sx={{
-                            backgroundColor: '#ffffff !important',
-                            borderRadius: '6px',
-                            '& .MuiOutlinedInput-root': {
-                              backgroundColor: '#ffffff !important',
-                              '& fieldset': { borderColor: '#ddd !important' },
-                              '&:hover fieldset': { borderColor: '#bbb !important' },
-                              '&.Mui-focused fieldset': { borderColor: '#1976d2 !important' },
-                            },
-                            '& .MuiInputLabel-root': { color: '#777 !important' },
-                            '& .MuiInputBase-input': { 
-                              color: '#333 !important',
-                              backgroundColor: 'transparent !important'
-                            },
-                            '& .MuiAutocomplete-input': {
-                              color: '#333 !important',
-                              backgroundColor: 'transparent !important'
-                            }
-                          }}
-                        />
-                      )}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            label={option}
-                            sx={{ 
-                              backgroundColor: '#ffffff !important', 
-                              border: '1px solid #ddd !important',
-                              color: '#333 !important',
-                              textTransform: 'capitalize'
-                            }}
-                          />
-                        ))
-                      }
-                      sx={{
-                        backgroundColor: '#ffffff !important',
-                        '& .MuiAutocomplete-popupIndicator': { color: '#666 !important' },
-                        '& .MuiAutocomplete-clearIndicator': { color: '#666 !important' },
-                        '& .MuiAutocomplete-inputRoot': {
-                          backgroundColor: '#ffffff !important',
-                          color: '#333 !important'
-                        },
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: '#ffffff !important'
-                        },
-                        '& .MuiAutocomplete-listbox': {
-                          backgroundColor: '#ffffff !important',
-                          '& .MuiAutocomplete-option': {
-                            color: '#333 !important',
-                            backgroundColor: '#ffffff !important',
-                            '&[aria-selected="true"]': {
-                              backgroundColor: '#f5f5f5 !important',
-                            },
-                            '&:hover': {
-                              backgroundColor: '#f5f5f5 !important',
-                            },
-                          },
-                        },
-                        '& .MuiAutocomplete-paper': {
-                          backgroundColor: '#ffffff !important',
-                          border: '1px solid #e5e5e5 !important',
-                        },
-                      }}
-                    />
-                  )}
-                  {!selectedCategory && (
-                    <Typography variant="caption" sx={{ color: '#475569', mt: 0.5, display: 'block' }}>
-                      Please select a category first
-                    </Typography>
-                  )}
+                {/* Expertise Selection (Domain → Talent Pools → Skills) */}
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                  <PublicExpertiseSelector
+                    selectedDomain={selectedDomain}
+                    onDomainChange={setSelectedDomain}
+                    selectedTalentPools={selectedExpertiseTalentPools}
+                    onTalentPoolsChange={setSelectedExpertiseTalentPools}
+                    selectedSkills={selectedExpertiseSkills}
+                    onSkillsChange={setSelectedExpertiseSkills}
+                    singleDomain={true}
+                    multipleTalentPools={true}
+                    multipleSkills={true}
+                    required={true}
+                  />
                 </Box>
 
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />

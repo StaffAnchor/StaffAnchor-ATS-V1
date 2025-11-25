@@ -161,3 +161,53 @@ exports.deleteDomain = async (req, res) => {
   }
 };
 
+// Public endpoints (no authentication required)
+
+// Get all domains - public
+exports.getPublicDomains = async (req, res) => {
+  try {
+    const domains = await Domain.find().sort({ name: 1 });
+    res.json(domains);
+  } catch (error) {
+    console.error('Error fetching public domains:', error);
+    res.status(500).json({ error: 'Failed to fetch domains' });
+  }
+};
+
+// Get talent pools by domain ID - public
+exports.getPublicTalentPoolsByDomain = async (req, res) => {
+  try {
+    const { domainId } = req.params;
+    const talentPools = await TalentPool.find({ domain: domainId }).sort({ name: 1 });
+    res.json(talentPools);
+  } catch (error) {
+    console.error('Error fetching public talent pools:', error);
+    res.status(500).json({ error: 'Failed to fetch talent pools' });
+  }
+};
+
+// Get skills by talent pool IDs - public
+exports.getPublicSkillsByTalentPools = async (req, res) => {
+  try {
+    const { talentPoolIds } = req.query;
+    
+    if (!talentPoolIds) {
+      return res.status(400).json({ error: 'talentPoolIds query parameter is required' });
+    }
+    
+    // Parse talent pool IDs (can be comma-separated string or array)
+    const poolIds = Array.isArray(talentPoolIds) 
+      ? talentPoolIds 
+      : talentPoolIds.split(',');
+    
+    const skills = await Skill.find({ 
+      talentPool: { $in: poolIds } 
+    }).sort({ name: 1 });
+    
+    res.json(skills);
+  } catch (error) {
+    console.error('Error fetching public skills:', error);
+    res.status(500).json({ error: 'Failed to fetch skills' });
+  }
+};
+
