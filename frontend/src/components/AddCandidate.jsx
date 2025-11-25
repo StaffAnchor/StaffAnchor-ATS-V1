@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { 
   Paper, 
@@ -46,6 +47,7 @@ import ExpertiseSelector from './ExpertiseSelector';
 import API_URL from '../config/api';
 
 const AddCandidate = () => {
+  const location = useLocation();
   const [form, setForm] = useState({
     name: '', 
     email: '', 
@@ -130,6 +132,21 @@ const AddCandidate = () => {
     };
     fetchData();
   }, []);
+
+  // Check for pre-selected job from navigation state
+  React.useEffect(() => {
+    if (location.state?.preSelectedJob && jobs.length > 0) {
+      const preSelectedJobId = location.state.preSelectedJob._id;
+      // Check if job exists in jobs list
+      const jobExists = jobs.find(job => job._id === preSelectedJobId);
+      if (jobExists) {
+        setSelectedJobs([preSelectedJobId]);
+        toast.info(`Auto-selected job: ${location.state.preSelectedJob.title}`, {
+          autoClose: 3000
+        });
+      }
+    }
+  }, [location.state, jobs]);
 
   // Fetch skills when category changes
   React.useEffect(() => {
@@ -1597,6 +1614,20 @@ const AddCandidate = () => {
                 Link to Jobs (Optional)
               </Typography>
             </Box>
+            
+            {location.state?.preSelectedJob && (
+              <Box sx={{ 
+                mb: 2, 
+                p: 2, 
+                background: 'rgba(37, 99, 235, 0.1)', 
+                borderRadius: 2,
+                border: '1px solid rgba(37, 99, 235, 0.2)'
+              }}>
+                <Typography variant="body2" sx={{ color: '#2563eb', fontWeight: 600 }}>
+                  ℹ️ Job Pre-selected: {location.state.preSelectedJob.title} - {location.state.preSelectedJob.organization}
+                </Typography>
+              </Box>
+            )}
             
             <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
               Select one or more jobs to link this candidate to

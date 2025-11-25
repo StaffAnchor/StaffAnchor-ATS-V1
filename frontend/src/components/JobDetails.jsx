@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import CandidateList from './CandidateList.jsx';
 import ResultsLimitPopup from './ResultsLimitPopup.jsx';
 import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
@@ -9,11 +10,12 @@ import LinkedCandidates from './LinkedCandidates.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
 import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
 import { toast } from 'react-toastify';
-import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon } from '@mui/icons-material';
+import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
+import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
 const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
+  const navigate = useNavigate();
   const [showCandidates, setShowCandidates] = useState(false);
   const [candidates, setCandidates] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -280,6 +282,21 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     toast.success('Shareable link copied to clipboard!');
   };
 
+  const handleAddCandidateForJob = (e) => {
+    e.stopPropagation();
+    // Navigate to dashboard with addCandidate view and pass job data
+    navigate('/dashboard', { 
+      state: { 
+        view: 'addCandidate',
+        preSelectedJob: {
+          _id: job._id,
+          title: job.title,
+          organization: job.organization
+        }
+      } 
+    });
+  };
+
   const handleEditChange = e => {
     const { name, value, type, checked } = e.target;
     setEditJob({ ...editJob, [name]: type === 'checkbox' ? checked : value });
@@ -300,7 +317,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     if (recruiters.length > 1) {
       setRecruiters(recruiters.filter((_, i) => i !== index));
     } else {
-      toast.warning('At least one recruiter is required');
+      toast.warning('At least one contact is required');
     }
   };
 
@@ -537,6 +554,21 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               </Button>
               <Button 
                 variant="outlined" 
+                onClick={handleAddCandidateForJob}
+                startIcon={<PersonAddIcon />}
+                sx={{ 
+                  borderColor: 'rgba(37, 99, 235, 0.5)', 
+                  color: '#2563eb',
+                  '&:hover': { 
+                    borderColor: '#2563eb', 
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)' 
+                  }
+                }}
+              >
+                Add Candidate for this Job
+              </Button>
+              <Button 
+                variant="outlined" 
                 onClick={(e) => {
                   e.stopPropagation();
                   handleShareableLink();
@@ -759,21 +791,21 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                     </TableRow>
                   )}
                   
-                  {/* Recruiters */}
+                  {/* Client Contact */}
                   {job.recruiters && job.recruiters.length > 0 && (
                     <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                       <TableCell sx={{ 
                         color: '#90caf9', 
                         fontWeight: 600, 
-                        borderBottom: 'none',
+                        borderBottom: job.authorizedUsers && job.authorizedUsers.length > 0 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
                         verticalAlign: 'top',
                         py: 2
                       }}>
-                        Recruiters ({job.recruiters.length})
+                        Client Contact
                       </TableCell>
                       <TableCell sx={{ 
                         color: '#1e293b', 
-                        borderBottom: 'none',
+                        borderBottom: job.authorizedUsers && job.authorizedUsers.length > 0 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
                         py: 2
                       }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -803,6 +835,63 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                             </Paper>
                           ))}
                         </Box>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Internal Recruiter Contact Details */}
+                  {job.authorizedUsers && job.authorizedUsers.length > 0 && (
+                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                      <TableCell sx={{ 
+                        color: '#90caf9', 
+                        fontWeight: 600, 
+                        borderBottom: 'none',
+                        verticalAlign: 'top',
+                        py: 2
+                      }}>
+                        Internal Recruiter Contact Details
+                      </TableCell>
+                      <TableCell sx={{ 
+                        color: '#1e293b', 
+                        borderBottom: 'none',
+                        py: 2
+                      }}>
+                        <TableContainer component={Paper} sx={{ 
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(0, 0, 0, 0.05)',
+                          boxShadow: 'none'
+                        }}>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow sx={{ background: 'rgba(139, 92, 246, 0.08)' }}>
+                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Name</TableCell>
+                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Email</TableCell>
+                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Phone</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {job.authorizedUsers.map((user, index) => (
+                                <TableRow 
+                                  key={user._id || index}
+                                  sx={{ 
+                                    '&:hover': { background: 'rgba(255, 255, 255, 0.08)' },
+                                    '&:last-child td': { borderBottom: 0 }
+                                  }}
+                                >
+                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
+                                    {user.fullName || 'N/A'}
+                                  </TableCell>
+                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
+                                    {user.email || 'N/A'}
+                                  </TableCell>
+                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
+                                    {user.phone || 'N/A'}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
                       </TableCell>
                     </TableRow>
                   )}
@@ -1026,11 +1115,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 }}
               />
 
-              {/* Recruiters Section */}
+              {/* Client Contact Section */}
               <Box sx={{ mt: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
-                    Recruiters ({recruiters.length})
+                    Client Contact ({recruiters.length})
                   </Typography>
                   <Button
                     variant="outlined"
@@ -1049,7 +1138,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       }
                     }}
                   >
-                    Add Recruiter
+                    Add Contact
                   </Button>
                 </Box>
 
@@ -1066,7 +1155,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ color: '#90caf9', fontWeight: 600 }}>
-                        Recruiter {index + 1}
+                        Contact {index + 1}
                       </Typography>
                       <IconButton
                         onClick={(e) => {

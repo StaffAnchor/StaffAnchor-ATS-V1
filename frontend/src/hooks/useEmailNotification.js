@@ -170,10 +170,10 @@ const useEmailNotification = () => {
     });
   };
 
-  // Handle job creation email notification
+  // Handle job creation email notification for internal recruiters
   const handleJobCreatedEmail = async (job, creatorId) => {
-    if (!job || !job.recruiters || job.recruiters.length === 0) {
-      //console.log('No recruiters in job, skipping email');
+    if (!job || !job.authorizedUsers || job.authorizedUsers.length === 0) {
+      //console.log('No authorized users (internal recruiters) in job, skipping email');
       return;
     }
 

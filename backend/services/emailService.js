@@ -151,7 +151,7 @@ const emailTemplates = {
   // Template for recruiters when new job is created
   recruiterJobCreation: (job, creator) => {
     return {
-      subject: `New Job Posted: ${job.title} at ${job.organization}`,
+      subject: `New Job Assignment: ${job.title} at ${job.organization}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -171,12 +171,12 @@ const emailTemplates = {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎯 New Job Opening</h1>
-              <p>A new position has been added to the system</p>
+              <h1>🎯 New Job Assignment</h1>
+              <p>You've been assigned to a new recruitment position</p>
             </div>
             <div class="content">
               <p>Dear Recruiter,</p>
-              <p>A new job opening has been created in the recruitment system. Please review the details below:</p>
+              <p>You have been assigned as a recruiter for a new job opening. Please review the details below and start sourcing candidates:</p>
               
               <div class="job-details">
                 <h2 style="color: #51cf66; margin-top: 0;">Job Details</h2>
@@ -196,28 +196,25 @@ const emailTemplates = {
                 ` : ''}
               </div>
 
-              ${job.recruiters && job.recruiters.length > 0 ? `
+              ${job.clientContact ? `
                 <div class="job-details">
-                  <h3 style="color: #51cf66; margin-top: 0;">Assigned Recruiters</h3>
-                  ${job.recruiters.map(recruiter => `
-                    <div style="margin: 10px 0;">
-                      <div class="detail-row"><span class="label">Name:</span> ${recruiter.name}</div>
-                      ${recruiter.email ? `<div class="detail-row"><span class="label">Email:</span> ${recruiter.email}</div>` : ''}
-                      ${recruiter.phone ? `<div class="detail-row"><span class="label">Phone:</span> ${recruiter.phone}</div>` : ''}
-                    </div>
-                  `).join('<hr style="border: 1px solid #eee; margin: 15px 0;">')}
+                  <h3 style="color: #51cf66; margin-top: 0;">Client Contact Information</h3>
+                  <div class="detail-row"><span class="label">Name:</span> ${job.clientContact.name}</div>
+                  ${job.clientContact.designation ? `<div class="detail-row"><span class="label">Designation:</span> ${job.clientContact.designation}</div>` : ''}
+                  ${job.clientContact.email ? `<div class="detail-row"><span class="label">Email:</span> ${job.clientContact.email}</div>` : ''}
+                  ${job.clientContact.phone ? `<div class="detail-row"><span class="label">Phone:</span> ${job.clientContact.phone}</div>` : ''}
                 </div>
               ` : ''}
 
               ${creator ? `
                 <div class="highlight">
-                  <strong>Created by:</strong> ${creator.name || creator.email || 'System Admin'}
+                  <strong>Created by:</strong> ${creator.fullName || creator.email || 'System Admin'}
                 </div>
               ` : ''}
 
               <p style="margin-top: 20px;">Please start sourcing candidates for this position.</p>
               
-              <p>Best regards,<br/>Recruitment Management System</p>
+              <p>Best regards,<br/>StaffAnchor Recruitment Team</p>
             </div>
             <div class="footer">
               <p>This is an automated notification from your recruitment system.</p>
