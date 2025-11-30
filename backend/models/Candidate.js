@@ -64,6 +64,8 @@ const CandidateSchema = new mongoose.Schema({
       default: Date.now
     }
   }
+}, {
+  timestamps: true // Adds createdAt and updatedAt fields
 });
 
 module.exports = mongoose.model('Candidate', CandidateSchema);

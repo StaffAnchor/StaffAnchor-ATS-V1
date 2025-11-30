@@ -13,8 +13,24 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
   // View is now managed by App.jsx and passed through Header
   const [candidates, setCandidates] = useState([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCandidates: 0,
+    limit: 20,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Handler to change sort order and reset to first page
+  const handleSortChange = (newSortOrder) => {
+    setSortOrder(newSortOrder);
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
 
   useEffect(() => {
     // Check if there's a view state from navigation
@@ -30,9 +46,16 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
           setLoadingCandidates(true);
           const token = localStorage.getItem('jwt');
           const res = await axios.get(`${API_URL}/api/candidates`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
+            params: {
+              page: currentPage,
+              limit: 20,
+              sortBy: '_id', // Use _id for sorting (contains timestamp)
+              sortOrder: sortOrder
+            }
           });
-          setCandidates(res.data);
+          setCandidates(res.data.candidates || []);
+          setPagination(res.data.pagination || {});
         } catch (error) {
           console.error('Error fetching candidates:', error);
         } finally {
@@ -41,7 +64,7 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
       };
       fetchCandidates();
     }
-  }, [view]);
+  }, [view, currentPage, sortOrder]);
 
   // Listen for workflow creation event from LinkedCandidates
   useEffect(() => {
@@ -120,7 +143,18 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
       {/* Navigation is now in the Header component */}
       <div>
         {view === 'jobs' && <JobList accessLevel={user.accessLevel} userId={user._id} />}
-        {view === 'candidates' && <CandidateList candidates={candidates} accessLevel={user.accessLevel} loading={loadingCandidates} />}
+        {view === 'candidates' && (
+          <CandidateList 
+            candidates={candidates} 
+            accessLevel={user.accessLevel} 
+            loading={loadingCandidates}
+            pagination={pagination}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            sortOrder={sortOrder}
+            onSortChange={handleSortChange}
+          />
+        )}
         {view === 'addJob' && <AddJob user={user} />}
         {view === 'addCandidate' && <AddCandidate key={location.state?.preSelectedJob?._id || 'default'} />}
         {view === 'workflows' && <Workflows user={user} />}
