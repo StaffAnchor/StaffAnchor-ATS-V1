@@ -245,7 +245,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just r
 
 exports.listCandidates = async (req, res) => {
   try {
-    const { domain, talentPools } = req.query;
+    const { domain, talentPools, page = 1, limit = 20, sortBy = '_id', sortOrder = 'desc' } = req.query;
     
     // Build query based on filters
     const query = {};
@@ -258,11 +258,40 @@ exports.listCandidates = async (req, res) => {
       query.talentPools = { $in: talentPoolArray };
     }
     
+    // Calculate pagination
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Build sort object - use _id which contains timestamp information
+    // This works for all candidates regardless of when they were created
+    const sort = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    
+    // Get total count for pagination
+    const totalCandidates = await Candidate.countDocuments(query);
+    
+    // Fetch candidates with pagination and sorting
+    // Only return basic fields, not full nested arrays
     const candidates = await Candidate.find(query)
+      .select('name email phone currentLocation domain talentPools skills resume createdAt updatedAt')
       .populate('domain', 'name')
       .populate('talentPools', 'name')
-      .populate('skills', 'name');
-    res.json(candidates);
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNum);
+    
+    res.json({
+      candidates,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCandidates / limitNum),
+        totalCandidates,
+        limit: limitNum,
+        hasNextPage: pageNum < Math.ceil(totalCandidates / limitNum),
+        hasPrevPage: pageNum > 1
+      }
+    });
   } catch (err) {
     console.error('Error fetching candidates:', err);
     res.status(500).json({ error: 'Fetch candidates failed' });
@@ -271,7 +300,11 @@ exports.listCandidates = async (req, res) => {
 
 exports.candidateDetails = async (req, res) => {
   try {
-    const candidate = await Candidate.findById(req.params.id).populate('talentPools', 'name description');
+    const candidate = await Candidate.findById(req.params.id)
+      .populate('domain', 'name description')
+      .populate('talentPools', 'name description')
+      .populate('expertiseSkills', 'name category')
+      .populate('appliedJobs', 'title organization');
     res.json(candidate);
   } catch (err) {
     res.status(500).json({ error: 'Fetch candidate failed' });

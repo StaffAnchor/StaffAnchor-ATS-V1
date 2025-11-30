@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import CommentsModal from './CommentsModal.jsx';
+import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import {
   Dialog,
   DialogTitle,
@@ -55,6 +56,10 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedCandidateForComments, setSelectedCandidateForComments] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Candidate details modal state
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedCandidateForDetails, setSelectedCandidateForDetails] = useState(null);
 
   // Get current user info
   useEffect(() => {
@@ -295,7 +300,14 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     <>
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={(event, reason) => {
+        // Prevent closing if details modal is open
+        if (showDetailsModal) {
+          event?.stopPropagation();
+          return;
+        }
+        onClose();
+      }}
       maxWidth="xl"
       fullWidth
       PaperProps={{
@@ -351,7 +363,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent sx={{ p: 0 }} onClick={(e) => e.stopPropagation()}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300, p: 4 }}>
             <CircularProgress sx={{ color: '#8b5cf6' }} />
@@ -562,10 +574,16 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                 {filteredCandidates.map((candidate, index) => (
                   <TableRow
                     key={candidate._id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCandidateForDetails(candidate);
+                      setShowDetailsModal(true);
+                    }}
                     sx={{
                       background: index % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.04)',
                       '&:hover': {
                         background: 'rgba(79, 140, 255, 0.08)',
+                        cursor: 'pointer',
                       },
                       transition: 'background 0.2s ease',
                     }}
@@ -590,6 +608,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     }}>
                       <Link
                         href={`mailto:${candidate.email}`}
+                        onClick={(e) => e.stopPropagation()}
                         sx={{
                           color: '#2563eb',
                           textDecoration: 'none',
@@ -611,6 +630,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       {candidate.phone ? (
                         <Link
                           href={`tel:${candidate.phone}`}
+                          onClick={(e) => e.stopPropagation()}
                           sx={{
                             color: '#64748b',
                             textDecoration: 'none',
@@ -664,6 +684,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                             href={candidate.resume.url}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
                             sx={{
                               color: '#2563eb',
                               border: '1px solid rgba(37, 99, 235, 0.18)',
@@ -931,6 +952,20 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         candidateName={selectedCandidateForComments.name}
         currentUserId={currentUser._id}
         userAccessLevel={accessLevel}
+      />
+    )}
+
+    {/* Candidate Details Modal */}
+    {selectedCandidateForDetails && (
+      <CandidateDetailsModal
+        open={showDetailsModal}
+        onClose={(e) => {
+          if (e) e.stopPropagation();
+          setShowDetailsModal(false);
+          setSelectedCandidateForDetails(null);
+        }}
+        candidate={selectedCandidateForDetails}
+        preferences={null}
       />
     )}
     </>

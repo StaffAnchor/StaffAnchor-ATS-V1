@@ -1,6 +1,7 @@
 // Original Code
 import React, { useState, useEffect } from "react";
 import CandidateDetails from "./CandidateDetails.jsx";
+import CandidateDetailsModal from "./CandidateDetailsModal.jsx";
 import CandidateFilterModal from "./CandidateFilterModal.jsx";
 import ResultsLimitPopup from "./ResultsLimitPopup.jsx";
 import DeleteConfirmationPopup from "./DeleteConfirmationPopup.jsx";
@@ -34,6 +35,9 @@ import {
   ListItem,
   ListItemText,
   CircularProgress,
+  Pagination,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -45,11 +49,21 @@ import {
   Comment as CommentIcon,
   Timeline as TimelineIcon,
   Construction as ConstructionIcon,
+  Sort as SortIcon,
 } from "@mui/icons-material";
 import axios from "axios";
 import API_URL from '../config/api';
 
-const CandidateList = ({ candidates, accessLevel, loading = false }) => {
+const CandidateList = ({ 
+  candidates, 
+  accessLevel, 
+  loading = false,
+  pagination = {},
+  currentPage = 1,
+  onPageChange = () => {},
+  sortOrder = 'desc',
+  onSortChange = () => {}
+}) => {
   const [expandedCandidateId, setExpandedCandidateId] = useState(null);
   const [expandedJobsCandidateId, setExpandedJobsCandidateId] = useState(null);
   const [candidateJobs, setCandidateJobs] = useState({});
@@ -97,6 +111,15 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
 
   // Feature dialog state
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+
+  // Details modal state
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedCandidateForDetails, setSelectedCandidateForDetails] = useState(null);
+  const [loadingFullDetails, setLoadingFullDetails] = useState(false);
+
+  // Sort menu state
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const sortMenuOpen = Boolean(sortAnchorEl);
 
   // Get current user info
   useEffect(() => {
@@ -490,6 +513,24 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
     return true;
   });
 
+  // Load full candidate details and open modal
+  const handleViewCandidateDetails = async (candidateId) => {
+    try {
+      setLoadingFullDetails(true);
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/candidates/${candidateId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSelectedCandidateForDetails(response.data);
+      setShowDetailsModal(true);
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      toast.error('Failed to load candidate details');
+    } finally {
+      setLoadingFullDetails(false);
+    }
+  };
+
   const handleExpandCandidate = (candidateId) => {
     if (expandedCandidateId === candidateId) {
       // Collapsing - reset edit mode
@@ -795,7 +836,31 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                         boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      Actions
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Actions</span>
+                        <Tooltip title={`Sort by Date Created (${sortOrder === 'desc' ? 'Newest First' : 'Oldest First'})`}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSortAnchorEl(e.currentTarget);
+                            }}
+                            sx={{
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+                              color: '#ffffff',
+                              padding: '8px',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                                transform: 'scale(1.05)',
+                              },
+                              transition: 'all 0.2s ease',
+                              boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)',
+                            }}
+                          >
+                            <SortIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -803,7 +868,7 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
                   {filteredCandidates.map((candidate, index) => [
                     <TableRow
                       key={`${candidate._id}-main`}
-                      onClick={() => handleExpandCandidate(candidate._id)}
+                      onClick={() => handleViewCandidateDetails(candidate._id)}
                       sx={{
                         background: "rgba(255, 255, 255, 0.02)",
                         transition: "all 0.2s ease",
@@ -1382,6 +1447,104 @@ const CandidateList = ({ candidates, accessLevel, loading = false }) => {
         allSkills={allSkills}
         talentPools={talentPools}
       />
+
+      {/* Sort Menu */}
+      <Menu
+        anchorEl={sortAnchorEl}
+        open={sortMenuOpen}
+        onClose={() => setSortAnchorEl(null)}
+        PaperProps={{
+          sx: {
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            onSortChange('desc');
+            setSortAnchorEl(null);
+          }}
+          selected={sortOrder === 'desc'}
+          sx={{
+            color: '#1e293b',
+            '&.Mui-selected': {
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+            }
+          }}
+        >
+          Newest First
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            onSortChange('asc');
+            setSortAnchorEl(null);
+          }}
+          selected={sortOrder === 'asc'}
+          sx={{
+            color: '#1e293b',
+            '&.Mui-selected': {
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+            }
+          }}
+        >
+          Oldest First
+        </MenuItem>
+      </Menu>
+
+      {/* Pagination Controls */}
+      {pagination.totalPages > 1 && (
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          gap: 2,
+          mt: 4,
+          mb: 2,
+          py: 2,
+          borderTop: '2px solid rgba(139, 92, 246, 0.2)'
+        }}>
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
+            Page {pagination.currentPage} of {pagination.totalPages} ({pagination.totalCandidates} total candidates)
+          </Typography>
+          <Pagination
+            count={pagination.totalPages}
+            page={pagination.currentPage}
+            onChange={(event, page) => onPageChange(page)}
+            color="primary"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: '#2563eb',
+                fontWeight: 600,
+                '&.Mui-selected': {
+                  backgroundColor: '#8b5cf6',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#7c3aed',
+                  }
+                },
+                '&:hover': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                }
+              }
+            }}
+          />
+        </Box>
+      )}
+
+      {/* Candidate Details Modal */}
+      {selectedCandidateForDetails && (
+        <CandidateDetailsModal
+          open={showDetailsModal}
+          onClose={() => {
+            setShowDetailsModal(false);
+            setSelectedCandidateForDetails(null);
+          }}
+          candidate={selectedCandidateForDetails}
+          preferences={null}
+        />
+      )}
 
       {/* Feature Under Development Dialog */}
       <Dialog
