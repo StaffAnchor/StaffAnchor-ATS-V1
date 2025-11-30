@@ -20,7 +20,11 @@ import {
   Select,
   MenuItem,
   Chip,
-  Autocomplete
+  Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -40,7 +44,8 @@ import {
   Group as GroupIcon,
   CloudUpload as CloudUploadIcon,
   InsertDriveFile as FileIcon,
-  CheckCircle as CheckCircleIcon
+  CheckCircle as CheckCircleIcon,
+  WarningAmber as WarningAmberIcon
 } from '@mui/icons-material';
 import { useLocationDropdowns } from './useLocationDropdowns';
 import ExpertiseSelector from './ExpertiseSelector';
@@ -94,6 +99,8 @@ const AddCandidate = () => {
   const [uploadingResume, setUploadingResume] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [selectedJobs, setSelectedJobs] = useState([]);
+  const [fromResumeParsing, setFromResumeParsing] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const skillCategories = [
     { value: 'sales-and-business-development', label: 'Sales and Business Development' },
@@ -148,6 +155,79 @@ const AddCandidate = () => {
     }
   }, [location.state, jobs]);
 
+  // Handle resume parsing data
+  React.useEffect(() => {
+    if (location.state?.fromResumeParsing && location.state?.parsedData) {
+      const data = location.state.parsedData;
+
+      // Set basic form fields
+      setForm(prev => ({
+        ...prev,
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        linkedin: data.linkedin ? `https://linkedin.com/in/${data.linkedin}` : '',
+        totalExperienceYears: data.totalExperienceYears || '',
+        totalExperienceMonths: data.totalExperienceMonths || ''
+      }));
+
+      // Set experience
+      if (data.experience && data.experience.length > 0) {
+        setExperience(data.experience);
+      }
+
+      // Set education
+      if (data.education && data.education.length > 0) {
+        setEducation(data.education);
+      }
+
+      // Set current location
+      if (data.currentLocation) {
+        setCurrentLocation(data.currentLocation);
+      }
+
+      // Set preferred locations
+      if (data.preferredLocations && data.preferredLocations.length > 0) {
+        setPreferredLocations(data.preferredLocations);
+      }
+
+      // Set domain first (important: must be set before talent pools and skills)
+      if (data.selectedDomain) {
+        setSelectedDomain(data.selectedDomain);
+      }
+
+      // Use setTimeout to ensure domain is set and talent pools are fetched before setting selections
+      // This gives the ExpertiseSelector time to load talent pools for the selected domain
+      setTimeout(() => {
+        // Set talent pools
+        if (data.selectedTalentPools && data.selectedTalentPools.length > 0) {
+          setSelectedExpertiseTalentPools(data.selectedTalentPools);
+          
+          // Set skills after another delay to ensure talent pools are set first
+          setTimeout(() => {
+            if (data.selectedSkills && data.selectedSkills.length > 0) {
+              setSelectedExpertiseSkills(data.selectedSkills);
+            }
+          }, 300);
+        }
+      }, 800); // Wait 800ms for ExpertiseSelector to fetch and load talent pool options
+
+      // Set resume file
+      if (location.state?.resumeFile) {
+        setResumeFile(location.state.resumeFile);
+        setResumeFileName(location.state.resumeFile.name);
+      }
+
+      // Mark as from resume parsing
+      setFromResumeParsing(true);
+
+      // Show success message
+      toast.success('Resume parsed successfully! Please review the auto-filled information.', {
+        autoClose: 5000
+      });
+    }
+  }, [location.state]);
+
   // Fetch skills when category changes
   React.useEffect(() => {
     const fetchSkillsByCategory = async () => {
@@ -163,7 +243,6 @@ const AddCandidate = () => {
           headers: { Authorization: `Bearer ${token}` },
           params: { category: selectedCategory }
         });
-        //console.log('Skills response for category', selectedCategory, ':', skillsResponse.data);
         setAvailableSkills(skillsResponse.data.map(skill => skill.name));
         setSelectedSkills([]); // Clear selected skills when category changes
       } catch (error) {
@@ -378,7 +457,18 @@ const AddCandidate = () => {
       setLoading(false);
       return;
     }
-    
+
+    // If data is from resume parsing, show confirmation dialog
+    if (fromResumeParsing) {
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    // Otherwise proceed with submission
+    await submitCandidate();
+  };
+
+  const submitCandidate = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('jwt');
@@ -1795,6 +1885,95 @@ const AddCandidate = () => {
           </Box>
         </Box>
       </Paper>
+
+      {/* Confirmation Dialog for Resume-Parsed Data */}
+      <Dialog
+        open={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          fontWeight: 600
+        }}>
+          <WarningAmberIcon />
+          Verify AI-Extracted Information
+        </DialogTitle>
+        <DialogContent sx={{ mt: 3 }}>
+          <Typography variant="body1" sx={{ color: '#1e293b', mb: 2, lineHeight: 1.6 }}>
+            The candidate information has been automatically extracted and matched using AI. Please verify that all data is accurate and appropriate before proceeding.
+          </Typography>
+          <Box sx={{ 
+            backgroundColor: 'rgba(245, 158, 11, 0.1)', 
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            borderRadius: 1,
+            p: 2,
+            mt: 2
+          }}>
+            <Typography variant="body2" sx={{ color: '#92400e', fontWeight: 500, mb: 1 }}>
+              ⚠️ Please verify the following:
+            </Typography>
+            <ul style={{ margin: '8px 0 0 0', paddingLeft: '24px', color: '#92400e' }}>
+              <li>Name, email, and phone number are correct</li>
+              <li>Total experience calculation is accurate</li>
+              <li>Domain selection matches candidate's expertise</li>
+              <li>Talent pools are appropriate for the candidate</li>
+              <li>Selected skills match the candidate's profile</li>
+              <li>Work experience and education details are complete</li>
+              <li>Location information is accurate</li>
+            </ul>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button
+            onClick={() => setShowConfirmDialog(false)}
+            sx={{
+              color: '#64748b',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              }
+            }}
+          >
+            Review Again
+          </Button>
+          <Button
+            onClick={async () => {
+              setShowConfirmDialog(false);
+              setFromResumeParsing(false); // Prevent showing dialog again
+              await submitCandidate();
+            }}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+              }
+            }}
+          >
+            Yes, I have verified
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

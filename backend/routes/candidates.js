@@ -11,6 +11,9 @@ router.post('/:candidateId/resume/public', upload.single('resume'), candidateCon
 // All other routes require authentication
 router.use(authenticateToken);
 
+// Resume parsing route (must be before generic routes)
+router.post('/parse-resume', upload.single('resume'), candidateController.parseResume);
+
 // Get candidates who applied to a specific job
 router.get('/job/:jobId/applicants', candidateController.getCandidatesByJobApplication);
 
