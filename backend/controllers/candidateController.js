@@ -2,7 +2,14 @@ const Candidate = require('../models/Candidate');
 const Job = require('../models/Job');
 const Skill = require('../models/Skill');
 const CandidateJobLink = require('../models/CandidateJobLink');
+const Domain = require('../models/Domain');
+const TalentPool = require('../models/TalentPool');
 const { uploadResume, deleteResume } = require('../config/cloudinary');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const textract = require('textract');
+const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
 
 // Helper function to save skills to database
 const saveSkillsToDatabase = async (skills, userId, organization) => {
@@ -77,6 +84,162 @@ exports.addCandidate = async (req, res) => {
     }
     console.error('Error adding candidate:', err);
     res.status(500).json({ error: 'Add candidate failed' });
+  }
+};
+
+// Parse resume using Google Gemini AI
+exports.parseResume = async (req, res) => {
+  let tempFilePath = null;
+  
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Save buffer to temporary file for textract
+    const fileExt = path.extname(req.file.originalname);
+    const tempFileName = `resume_${Date.now()}${fileExt}`;
+    tempFilePath = path.join(os.tmpdir(), tempFileName);
+    await fs.writeFile(tempFilePath, req.file.buffer);
+
+    // Extract text from resume
+    const resumeText = await new Promise((resolve, reject) => {
+      textract.fromFileWithPath(tempFilePath, (error, text) => {
+        if (error) reject(error);
+        else resolve(text);
+      });
+    });
+
+    // Fetch available domains, talent pools, and skills from database
+    const [domains, talentPools, skills] = await Promise.all([
+      Domain.find({}).select('_id name description'),
+      TalentPool.find({}).populate('domain', 'name').select('_id name description domain'),
+      Skill.find({}).populate('talentPool', 'name').select('_id name talentPool')
+    ]);
+
+    // Initialize Gemini API
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // Create structured prompt for Gemini
+    const prompt = `You are an intelligent resume parser and candidate profiling system. Analyze the following resume and extract structured information. You must also intelligently match the candidate to the most appropriate domain, talent pools, and skills from the available options.
+
+RESUME TEXT:
+${resumeText}
+
+AVAILABLE DOMAINS:
+${domains.map(d => `- ID: ${d._id}, Name: ${d.name}, Description: ${d.description || 'N/A'}`).join('\n')}
+
+AVAILABLE TALENT POOLS (with their domains):
+${talentPools.map(tp => `- ID: ${tp._id}, Name: ${tp.name}, Domain: ${tp.domain?.name || 'N/A'}, Description: ${tp.description || 'N/A'}`).join('\n')}
+
+AVAILABLE SKILLS (with their talent pools):
+${skills.slice(0, 200).map(s => `- ID: ${s._id}, Name: ${s.name}, Talent Pool: ${s.talentPool?.name || 'N/A'}`).join('\n')}
+${skills.length > 200 ? `\n... and ${skills.length - 200} more skills` : ''}
+
+INSTRUCTIONS:
+1. Extract basic information: name, email, phone, LinkedIn username
+2. Calculate total experience in years (as a number)
+3. Extract current location (city, state, country) - if not found, leave empty
+4. Set preferred locations to be same as current location
+5. Extract all work experience entries with company, position, role/description, start date, end date
+6. Extract all education entries with institution name, degree/course, start date, end date
+7. **MOST IMPORTANT**: Analyze the candidate's background and INTELLIGENTLY select:
+   - ONE most appropriate domain (must be from the AVAILABLE DOMAINS list)
+   - 1-3 most relevant talent pools (must be from the AVAILABLE TALENT POOLS list and should belong to the selected domain)
+   - 3-10 most relevant skills (must be from the AVAILABLE SKILLS list and should belong to the selected talent pools)
+
+Be very careful with the selections - they must match the candidate's actual experience and expertise.
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks, just raw JSON):
+{
+  "name": "Full Name",
+  "email": "email@example.com",
+  "phone": "phone number",
+  "linkedin": "linkedin-username-only",
+  "totalExperienceYears": 5,
+  "totalExperienceMonths": 0,
+  "currentLocation": {
+    "country": "Country",
+    "state": "State",
+    "city": "City"
+  },
+  "preferredLocations": [
+    {
+      "country": "Country",
+      "state": "State",
+      "city": "City"
+    }
+  ],
+  "experience": [
+    {
+      "company": "Company Name",
+      "position": "Job Title",
+      "role": "Brief description of role and responsibilities",
+      "start": "Month Year or Year",
+      "end": "Month Year or Year or Present",
+      "ctc": ""
+    }
+  ],
+  "education": [
+    {
+      "clg": "Institution Name",
+      "course": "Degree/Program",
+      "start": "Year",
+      "end": "Year"
+    }
+  ],
+  "selectedDomain": "domain_id_from_list",
+  "selectedTalentPools": ["talent_pool_id_1", "talent_pool_id_2"],
+  "selectedSkills": ["skill_id_1", "skill_id_2", "skill_id_3"]
+}`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+
+    // Parse the JSON response
+    let parsedData;
+    try {
+      // Remove markdown code blocks if present
+      const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsedData = JSON.parse(cleanedText);
+    } catch (parseError) {
+      throw new Error('Failed to parse AI response. Please try again.');
+    }
+
+    // Clean up temp file
+    try {
+      await fs.unlink(tempFilePath);
+    } catch (cleanupError) {
+      // Ignore cleanup errors
+    }
+
+    res.json(parsedData);
+
+  } catch (err) {
+    // Check if it's a rate limit error
+    if (err.status === 429 || err.message?.includes('quota') || err.message?.includes('rate limit')) {
+      return res.status(429).json({ 
+        error: 'AI_RATE_LIMIT',
+        message: 'The AI service is currently busy. Please try again in a minute.',
+        details: 'Rate limit reached'
+      });
+    }
+    
+    // Clean up temp file if exists
+    if (tempFilePath) {
+      try {
+        await fs.unlink(tempFilePath);
+      } catch (cleanupError) {
+        // Ignore cleanup errors
+      }
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to parse resume',
+      details: err.message 
+    });
   }
 };
 
@@ -483,7 +646,6 @@ exports.deleteCandidate = async (req, res) => {
     if (candidate.resume && candidate.resume.publicId) {
       try {
         await deleteResume(candidate.resume.publicId);
-        //console.log('Resume deleted from Cloudinary');
       } catch (cloudinaryError) {
         console.error('Error deleting resume from Cloudinary:', cloudinaryError);
         // Continue with candidate deletion even if Cloudinary deletion fails
@@ -518,7 +680,6 @@ exports.uploadResume = async (req, res) => {
     if (candidate.resume && candidate.resume.publicId) {
       try {
         await deleteResume(candidate.resume.publicId);
-        //console.log('Old resume deleted from Cloudinary');
       } catch (cloudinaryError) {
         console.error('Error deleting old resume:', cloudinaryError);
       }

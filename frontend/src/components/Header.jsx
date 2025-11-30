@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import logo from '../assets/StaffanchorLogoFinal.png';
-import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, Avatar } from '@mui/material';
+import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, Avatar, CircularProgress } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon } from '@mui/icons-material';
+import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import Profile from '../pages/Profile';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import API_URL from '../config/api';
 
 const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, setUser }) => {
   const navigate = useNavigate ? useNavigate() : () => {};
@@ -11,6 +14,8 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [parsingResume, setParsingResume] = useState(false);
+  const [showResumeUploadDialog, setShowResumeUploadDialog] = useState(false);
   
   const handleLogoClick = () => {
     if (user) {
@@ -43,7 +48,75 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
 
   const handleAddByResume = () => {
     handleCloseMenu();
-    setShowFeatureDialog(true);
+    setShowResumeUploadDialog(true);
+  };
+
+  const handleResumeUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only PDF and DOC/DOCX files are allowed');
+      return;
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB');
+      return;
+    }
+
+    setParsingResume(true);
+    setShowResumeUploadDialog(false);
+
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const token = localStorage.getItem('jwt');
+      const response = await axios.post(
+        `${API_URL}/api/candidates/parse-resume`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      const parsedData = response.data;
+      
+      // Navigate to AddCandidate with parsed data and the file
+      navigate('/dashboard', { 
+        state: { 
+          parsedData,
+          resumeFile: file,
+          fromResumeParsing: true
+        } 
+      });
+      
+      if (setView) setView('addCandidate');
+      toast.success('Resume parsed successfully!');
+    } catch (error) {
+      // Check if it's a rate limit error
+      if (error.response?.status === 429 || error.response?.data?.error === 'AI_RATE_LIMIT') {
+        toast.error('⏳ AI service is busy. Please try again in a minute.', {
+          autoClose: 8000,
+          style: {
+            background: '#FEF3C7',
+            color: '#92400E',
+            border: '1px solid #F59E0B'
+          }
+        });
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to parse resume. Please try again.');
+      }
+    } finally {
+      setParsingResume(false);
+    }
   };
 
   const handleAnalytics = () => {
@@ -483,6 +556,96 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             OK
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Resume Upload Dialog */}
+      <Dialog
+        open={showResumeUploadDialog}
+        onClose={() => setShowResumeUploadDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
+          <CloudUploadIcon sx={{ fontSize: 64, color: '#8b5cf6', mb: 2 }} />
+          <Typography variant="h6" sx={{ color: '#1e293b', fontWeight: 600, mb: 2 }}>
+            Upload Resume for AI Parsing
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
+            Upload a PDF or DOC/DOCX file. Our AI will automatically extract information and intelligently match the candidate to appropriate domains, talent pools, and skills.
+          </Typography>
+          <input
+            accept=".pdf,.doc,.docx"
+            style={{ display: 'none' }}
+            id="resume-upload-input"
+            type="file"
+            onChange={handleResumeUpload}
+          />
+          <label htmlFor="resume-upload-input">
+            <Button
+              variant="contained"
+              component="span"
+              disabled={parsingResume}
+              sx={{
+                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                textTransform: 'none',
+                px: 4,
+                py: 1.5,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+                }
+              }}
+            >
+              Choose File
+            </Button>
+          </label>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setShowResumeUploadDialog(false)}
+            sx={{
+              color: '#64748b',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              }
+            }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Parsing Resume Dialog */}
+      <Dialog
+        open={parsingResume}
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            borderRadius: 2,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', py: 4, px: 4 }}>
+          <CircularProgress sx={{ color: '#8b5cf6', mb: 2 }} />
+          <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
+            Parsing resume with AI...
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 1 }}>
+            This may take 5-10 seconds
+          </Typography>
+        </DialogContent>
       </Dialog>
 
       {/* Profile Dialog */}
