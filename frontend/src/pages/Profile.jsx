@@ -23,7 +23,8 @@ import {
   Lock as LockIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-  Edit as EditIcon
+  Edit as EditIcon,
+  ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 
 const Profile = ({ open, onClose, user, setUser }) => {
@@ -40,6 +41,17 @@ const Profile = ({ open, onClose, user, setUser }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleCopyCandidateFormLink = () => {
+    const baseUrl = window.location.origin;
+    const candidateFormUrl = `${baseUrl}/candidate-form`;
+    
+    navigator.clipboard.writeText(candidateFormUrl).then(() => {
+      toast.success('Candidate form link copied to clipboard!');
+    }).catch(() => {
+      toast.error('Failed to copy link');
+    });
+  };
 
   React.useEffect(() => {
     if (user) {
@@ -192,11 +204,28 @@ const Profile = ({ open, onClose, user, setUser }) => {
           pb: 2
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <PersonIcon sx={{ color: '#8b5cf6', fontSize: 28 }} />
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
-            My Profile
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <PersonIcon sx={{ color: '#8b5cf6', fontSize: 28 }} />
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#1e293b' }}>
+              My Profile
+            </Typography>
+          </Box>
+          <Button
+            onClick={handleCopyCandidateFormLink}
+            startIcon={<ContentCopyIcon />}
+            sx={{
+              color: '#1976d2',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              '&:hover': {
+                backgroundColor: 'rgba(25, 118, 210, 0.08)',
+              }
+            }}
+          >
+            Candidate Form
+          </Button>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {!editMode && (

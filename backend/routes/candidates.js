@@ -6,6 +6,7 @@ const upload = require('../middleware/upload');
 
 // Public routes (no authentication required)
 router.post('/public/apply/:jobId', candidateController.submitPublicJobApplication);
+router.post('/public/submit', candidateController.submitPublicCandidate);
 router.post('/:candidateId/resume/public', upload.single('resume'), candidateController.uploadResume);
 
 // All other routes require authentication

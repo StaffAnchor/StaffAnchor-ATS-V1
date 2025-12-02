@@ -853,6 +853,52 @@ exports.submitPublicJobApplication = async (req, res) => {
   }
 };
 
+// Public general candidate submission (no auth required, no specific job)
+exports.submitPublicCandidate = async (req, res) => {
+  try {
+    // Check if candidate with this email already exists
+    let candidate = await Candidate.findOne({ email: req.body.email });
+    
+    if (candidate) {
+      // Candidate exists - update their data
+      Object.assign(candidate, req.body);
+      await candidate.save();
+    } else {
+      // Create new candidate without applied jobs
+      candidate = new Candidate(req.body);
+      await candidate.save();
+
+      // Add candidate to talent pools if provided
+      if (req.body.talentPools && req.body.talentPools.length > 0) {
+        const TalentPool = require('../models/TalentPool');
+        for (const poolId of req.body.talentPools) {
+          try {
+            await TalentPool.findByIdAndUpdate(
+              poolId,
+              { $addToSet: { candidates: candidate._id } }
+            );
+          } catch (poolError) {
+            console.error('Error adding candidate to talent pool:', poolError);
+            // Don't fail the submission if pool linking fails
+          }
+        }
+      }
+    }
+    
+    res.json({ 
+      message: 'Profile submitted successfully!',
+      candidate: {
+        _id: candidate._id,
+        name: candidate.name,
+        email: candidate.email
+      }
+    });
+  } catch (err) {
+    console.error('Error submitting candidate profile:', err);
+    res.status(500).json({ error: 'Failed to submit profile', details: err.message });
+  }
+};
+
 // Get candidates who applied to a specific job
 exports.getCandidatesByJobApplication = async (req, res) => {
   try {

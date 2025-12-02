@@ -73,6 +73,36 @@ const ExpertiseSelector = ({
     }
   }, [selectedTalentPools.join(',')]); // Use join to create dependency
 
+  // Validate selected skills against loaded skills and remove invalid IDs
+  useEffect(() => {
+    if (skills.length > 0 && selectedSkills.length > 0) {
+      const validSkillIds = skills.map(s => s._id);
+      const validatedSkills = selectedSkills.filter(id => validSkillIds.includes(id));
+      
+      // If some skills were invalid, update the selection
+      if (validatedSkills.length !== selectedSkills.length) {
+        const invalidIds = selectedSkills.filter(id => !validSkillIds.includes(id));
+        console.warn('Removed invalid skill IDs:', invalidIds);
+        onSkillsChange(validatedSkills);
+      }
+    }
+  }, [skills]);
+
+  // Validate selected talent pools against loaded talent pools and remove invalid IDs
+  useEffect(() => {
+    if (talentPools.length > 0 && selectedTalentPools.length > 0) {
+      const validPoolIds = talentPools.map(tp => tp._id);
+      const validatedPools = selectedTalentPools.filter(id => validPoolIds.includes(id));
+      
+      // If some pools were invalid, update the selection
+      if (validatedPools.length !== selectedTalentPools.length) {
+        const invalidIds = selectedTalentPools.filter(id => !validPoolIds.includes(id));
+        console.warn('Removed invalid talent pool IDs:', invalidIds);
+        onTalentPoolsChange(validatedPools);
+      }
+    }
+  }, [talentPools]);
+
   const fetchDomains = async () => {
     try {
       setLoading(true);
@@ -139,12 +169,12 @@ const ExpertiseSelector = ({
 
   const getTalentPoolName = (id) => {
     const pool = talentPools.find(tp => tp._id === id);
-    return pool ? pool.name : id;
+    return pool ? pool.name : 'Loading...';
   };
 
   const getSkillName = (id) => {
     const skill = skills.find(s => s._id === id);
-    return skill ? skill.name : id;
+    return skill ? skill.name : 'Loading...';
   };
 
   return (

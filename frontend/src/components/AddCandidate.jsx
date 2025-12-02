@@ -391,7 +391,7 @@ const AddCandidate = () => {
       // Validate file type
       const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Only PDF and DOCX files are allowed');
+        toast.error('Only PDF and DOC/DOCX files are allowed');
         return;
       }
       
