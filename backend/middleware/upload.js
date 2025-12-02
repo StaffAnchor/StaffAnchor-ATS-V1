@@ -3,7 +3,7 @@ const multer = require('multer');
 // Configure multer to use memory storage (store file in buffer)
 const storage = multer.memoryStorage();
 
-// File filter to accept only PDF and DOCX files
+// File filter to accept only PDF, DOC, and DOCX files
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     'application/pdf',
@@ -14,7 +14,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only PDF and DOCX files are allowed.'), false);
+    cb(new Error('Invalid file type. Only PDF, DOC, and DOCX files are allowed.'), false);
   }
 };
 

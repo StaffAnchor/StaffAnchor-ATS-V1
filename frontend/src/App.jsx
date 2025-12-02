@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Subordinates from './pages/Subordinates.jsx';
 import Banners from './pages/Banners.jsx';
 import PublicJobApplication from './pages/PublicJobApplication.jsx';
+import PublicCandidateForm from './pages/PublicCandidateForm.jsx';
 import Clients from './pages/Clients.jsx';
 import AddClient from './components/AddClient.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -88,8 +89,9 @@ function App() {
       <ToastContainer position="top-center" autoClose={3000} theme="light" />
       {user && <ActiveBanner onHeightChange={setBannerHeight} />}
       <Routes>
-        {/* Public route - no header, no authentication */}
+        {/* Public routes - no header, no authentication */}
         <Route path="/apply/:jobId" element={<PublicJobApplication />} />
+        <Route path="/candidate-form" element={<PublicCandidateForm />} />
         
         {/* Authenticated routes */}
         <Route path="/*" element={
