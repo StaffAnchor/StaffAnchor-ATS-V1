@@ -245,7 +245,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just r
 
 exports.listCandidates = async (req, res) => {
   try {
-    const { domain, talentPools, page = 1, limit = 20, sortBy = '_id', sortOrder = 'desc' } = req.query;
+    const { domain, talentPools, expertiseSkills, page = 1, limit = 20, sortBy = '_id', sortOrder = 'desc' } = req.query;
     
     // Build query based on filters
     const query = {};
@@ -253,9 +253,28 @@ exports.listCandidates = async (req, res) => {
       query.domain = domain;
     }
     if (talentPools) {
-      // Support both single and multiple talent pools
-      const talentPoolArray = Array.isArray(talentPools) ? talentPools : [talentPools];
-      query.talentPools = { $in: talentPoolArray };
+      // Support comma-separated string or array
+      let talentPoolArray;
+      if (typeof talentPools === 'string') {
+        talentPoolArray = talentPools.split(',').filter(id => id.trim());
+      } else {
+        talentPoolArray = Array.isArray(talentPools) ? talentPools : [talentPools];
+      }
+      if (talentPoolArray.length > 0) {
+        query.talentPools = { $in: talentPoolArray };
+      }
+    }
+    if (expertiseSkills) {
+      // Support comma-separated string or array
+      let skillsArray;
+      if (typeof expertiseSkills === 'string') {
+        skillsArray = expertiseSkills.split(',').filter(id => id.trim());
+      } else {
+        skillsArray = Array.isArray(expertiseSkills) ? expertiseSkills : [expertiseSkills];
+      }
+      if (skillsArray.length > 0) {
+        query.expertiseSkills = { $in: skillsArray };
+      }
     }
     
     // Calculate pagination

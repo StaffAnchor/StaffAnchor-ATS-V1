@@ -10,7 +10,6 @@ import axios from 'axios';
 import API_URL from '../config/api';
 
 const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
-  // View is now managed by App.jsx and passed through Header
   const [candidates, setCandidates] = useState([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [pagination, setPagination] = useState({
@@ -22,37 +21,80 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
     hasPrevPage: false
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
+  const [sortOrder, setSortOrder] = useState('desc');
+  
+  // Server-side filters for expertise
+  const [serverFilters, setServerFilters] = useState({
+    domain: '',
+    expertiseTalentPools: [],
+    expertiseSkills: []
+  });
+  
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handler to change sort order and reset to first page
   const handleSortChange = (newSortOrder) => {
     setSortOrder(newSortOrder);
-    setCurrentPage(1); // Reset to first page when sorting changes
+    setCurrentPage(1);
+  };
+
+  // Handler for applying filters - called from CandidateList
+  const handleApplyServerFilters = (filters) => {
+    const newServerFilters = {
+      domain: filters.domain || '',
+      expertiseTalentPools: filters.expertiseTalentPools || [],
+      expertiseSkills: filters.expertiseSkills || []
+    };
+    setServerFilters(newServerFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  // Handler for clearing filters
+  const handleClearServerFilters = () => {
+    setServerFilters({
+      domain: '',
+      expertiseTalentPools: [],
+      expertiseSkills: []
+    });
+    setCurrentPage(1);
   };
 
   useEffect(() => {
-    // Check if there's a view state from navigation
     if (location.state?.view && setView) {
       setView(location.state.view);
     }
   }, [location.state, setView]);
 
+  // Fetch candidates with server-side filters
   useEffect(() => {
     if (view === 'candidates') {
       const fetchCandidates = async () => {
         try {
           setLoadingCandidates(true);
           const token = localStorage.getItem('jwt');
+          
+          // Build params
+          const params = {
+            page: currentPage,
+            limit: 20,
+            sortBy: '_id',
+            sortOrder: sortOrder
+          };
+          
+          // Add expertise filters if present
+          if (serverFilters.domain) {
+            params.domain = serverFilters.domain;
+          }
+          if (serverFilters.expertiseTalentPools && serverFilters.expertiseTalentPools.length > 0) {
+            params.talentPools = serverFilters.expertiseTalentPools.join(',');
+          }
+          if (serverFilters.expertiseSkills && serverFilters.expertiseSkills.length > 0) {
+            params.expertiseSkills = serverFilters.expertiseSkills.join(',');
+          }
+          
           const res = await axios.get(`${API_URL}/api/candidates`, {
             headers: { Authorization: `Bearer ${token}` },
-            params: {
-              page: currentPage,
-              limit: 20,
-              sortBy: '_id', // Use _id for sorting (contains timestamp)
-              sortOrder: sortOrder
-            }
+            params
           });
           setCandidates(res.data.candidates || []);
           setPagination(res.data.pagination || {});
@@ -64,72 +106,55 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
       };
       fetchCandidates();
     }
-  }, [view, currentPage, sortOrder]);
+  }, [view, currentPage, sortOrder, serverFilters]);
 
-  // Listen for workflow creation event from LinkedCandidates
+  // Listen for workflow creation event
   useEffect(() => {
     const handleCreateWorkflowEvent = () => {
       if (setView) {
         setView('workflows');
       }
     };
-
     window.addEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
-    return () => {
-      window.removeEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
-    };
+    return () => window.removeEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
   }, [setView]);
 
   // Listen for candidate deletion event
   useEffect(() => {
     const handleCandidateDeleted = (event) => {
       const { candidateId } = event.detail;
-      setCandidates(prevCandidates => 
-        prevCandidates.filter(candidate => candidate._id !== candidateId)
-      );
+      setCandidates(prev => prev.filter(c => c._id !== candidateId));
     };
-
     window.addEventListener('candidateDeleted', handleCandidateDeleted);
-    return () => {
-      window.removeEventListener('candidateDeleted', handleCandidateDeleted);
-    };
+    return () => window.removeEventListener('candidateDeleted', handleCandidateDeleted);
   }, []);
 
   // Listen for candidate addition event
   useEffect(() => {
     const handleCandidateAdded = (event) => {
       const { candidate } = event.detail;
-      setCandidates(prevCandidates => [candidate, ...prevCandidates]);
+      setCandidates(prev => [candidate, ...prev]);
     };
-
     window.addEventListener('candidateAdded', handleCandidateAdded);
-    return () => {
-      window.removeEventListener('candidateAdded', handleCandidateAdded);
-    };
+    return () => window.removeEventListener('candidateAdded', handleCandidateAdded);
   }, []);
 
-  // Listen for candidate update event (e.g., resume upload/deletion)
+  // Listen for candidate update event
   useEffect(() => {
     const handleCandidateUpdated = async (event) => {
       const { candidateId } = event.detail;
-      // Refetch the specific candidate to get updated data
       try {
         const token = localStorage.getItem('jwt');
         const response = await axios.get(`${API_URL}/api/candidates/${candidateId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setCandidates(prevCandidates => 
-          prevCandidates.map(c => c._id === candidateId ? response.data : c)
-        );
+        setCandidates(prev => prev.map(c => c._id === candidateId ? response.data : c));
       } catch (error) {
         console.error('Error fetching updated candidate:', error);
       }
     };
-
     window.addEventListener('candidateUpdated', handleCandidateUpdated);
-    return () => {
-      window.removeEventListener('candidateUpdated', handleCandidateUpdated);
-    };
+    return () => window.removeEventListener('candidateUpdated', handleCandidateUpdated);
   }, []);
 
   return (
@@ -140,7 +165,6 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
       border: 'none', 
       padding: '0 20px'
     }}>
-      {/* Navigation is now in the Header component */}
       <div>
         {view === 'jobs' && <JobList accessLevel={user.accessLevel} userId={user._id} />}
         {view === 'candidates' && (
@@ -153,6 +177,9 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
             onPageChange={setCurrentPage}
             sortOrder={sortOrder}
             onSortChange={handleSortChange}
+            onApplyServerFilters={handleApplyServerFilters}
+            onClearServerFilters={handleClearServerFilters}
+            serverFilters={serverFilters}
           />
         )}
         {view === 'addJob' && <AddJob user={user} />}
