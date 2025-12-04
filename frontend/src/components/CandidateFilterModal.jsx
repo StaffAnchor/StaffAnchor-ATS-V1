@@ -15,29 +15,124 @@ import {
   Chip,
   Button,
   IconButton,
-  Autocomplete
+  Autocomplete,
+  Divider,
+  Paper,
+  CircularProgress
 } from '@mui/material';
 import {
   Clear as ClearIcon,
   Person as PersonIcon,
   Work as WorkIcon,
   School as SchoolIcon,
-  Star as StarIcon,
-  Group as GroupIcon
+  Psychology as PsychologyIcon,
+  Build as BuildIcon
 } from '@mui/icons-material';
+import axios from 'axios';
+import API_URL from '../config/api';
 
-const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters, allSkills = [], talentPools = [] }) => {
+const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters, allSkills = [] }) => {
   const [localFilters, setLocalFilters] = useState(filters);
+  
+  // Expertise filter state
+  const [domains, setDomains] = useState([]);
+  const [expertiseTalentPools, setExpertiseTalentPools] = useState([]);
+  const [expertiseSkillsList, setExpertiseSkillsList] = useState([]);
+  const [loadingDomains, setLoadingDomains] = useState(false);
+  const [loadingPools, setLoadingPools] = useState(false);
+  const [loadingSkills, setLoadingSkills] = useState(false);
 
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters, open]);
 
+  // Fetch domains when modal opens
+  useEffect(() => {
+    if (open) {
+      fetchDomains();
+    }
+  }, [open]);
+
+  // Fetch talent pools when domain changes
+  useEffect(() => {
+    if (localFilters.domain) {
+      fetchTalentPools(localFilters.domain);
+    } else {
+      setExpertiseTalentPools([]);
+      setExpertiseSkillsList([]);
+    }
+  }, [localFilters.domain]);
+
+  // Fetch skills when talent pools change
+  useEffect(() => {
+    const pools = localFilters.expertiseTalentPools;
+    if (pools && pools.length > 0) {
+      fetchSkills(pools);
+    } else {
+      setExpertiseSkillsList([]);
+    }
+  }, [localFilters.expertiseTalentPools?.join(',')]);
+
+  const fetchDomains = async () => {
+    try {
+      setLoadingDomains(true);
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/domains`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setDomains(response.data);
+    } catch (err) {
+      console.error('Error fetching domains:', err);
+    } finally {
+      setLoadingDomains(false);
+    }
+  };
+
+  const fetchTalentPools = async (domainId) => {
+    try {
+      setLoadingPools(true);
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/domains/${domainId}/talent-pools`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setExpertiseTalentPools(response.data);
+    } catch (err) {
+      console.error('Error fetching talent pools:', err);
+    } finally {
+      setLoadingPools(false);
+    }
+  };
+
+  const fetchSkills = async (poolIds) => {
+    try {
+      setLoadingSkills(true);
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/skills`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { talentPoolIds: poolIds.join(',') }
+      });
+      setExpertiseSkillsList(response.data);
+    } catch (err) {
+      console.error('Error fetching skills:', err);
+    } finally {
+      setLoadingSkills(false);
+    }
+  };
+
   const handleFilterChange = (field, value) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setLocalFilters(prev => {
+      const newFilters = { ...prev, [field]: value };
+      
+      // Clear dependent fields when parent changes
+      if (field === 'domain') {
+        newFilters.expertiseTalentPools = [];
+        newFilters.expertiseSkills = [];
+      } else if (field === 'expertiseTalentPools') {
+        newFilters.expertiseSkills = [];
+      }
+      
+      return newFilters;
+    });
   };
 
   const handleApply = () => {
@@ -60,7 +155,9 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
       x: '',
       company: '',
       position: '',
-      talentPools: []
+      domain: '',
+      expertiseTalentPools: [],
+      expertiseSkills: []
     };
     setLocalFilters(clearedFilters);
     onClearFilters();
@@ -87,6 +184,16 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
     'Marketing Manager', 'Sales Representative', 'HR Manager', 'Finance Analyst'
   ];
 
+  const getTalentPoolName = (id) => {
+    const pool = expertiseTalentPools.find(tp => tp._id === id);
+    return pool ? pool.name : 'Loading...';
+  };
+
+  const getSkillName = (id) => {
+    const skill = expertiseSkillsList.find(s => s._id === id);
+    return skill ? skill.name : 'Loading...';
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -105,11 +212,11 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
         justifyContent: 'space-between', 
         alignItems: 'center',
         borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
-        pb: 2
+        pb: 2,
+        fontWeight: 700,
+        color: '#8b5cf6'
       }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#8b5cf6' }}>
-          Candidate Filters
-        </Typography>
+        Candidate Filters
         <IconButton onClick={onClose} size="small">
           <ClearIcon />
         </IconButton>
@@ -127,7 +234,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <TextField
                 fullWidth
                 label="Name"
-                value={localFilters.name}
+                value={localFilters.name || ''}
                 onChange={(e) => handleFilterChange('name', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -140,7 +247,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <TextField
                 fullWidth
                 label="Email"
-                value={localFilters.email}
+                value={localFilters.email || ''}
                 onChange={(e) => handleFilterChange('email', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -153,7 +260,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <TextField
                 fullWidth
                 label="Phone"
-                value={localFilters.phone}
+                value={localFilters.phone || ''}
                 onChange={(e) => handleFilterChange('phone', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -166,16 +273,129 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
             </Box>
           </Box>
 
-          {/* Skills */}
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+
+          {/* Expertise Filter */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <StarIcon sx={{ color: '#8b5cf6' }} />
-              <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>Skills</Typography>
+              <PsychologyIcon sx={{ color: '#8b5cf6' }} />
+              <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>Expertise Filter</Typography>
+            </Box>
+            <Paper sx={{ p: 3, background: 'rgba(139, 92, 246, 0.05)', border: '1px solid rgba(139, 92, 246, 0.1)' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {/* Domain Selection */}
+                <FormControl fullWidth>
+                  <InputLabel>Domain</InputLabel>
+                  <Select
+                    value={localFilters.domain || ''}
+                    onChange={(e) => handleFilterChange('domain', e.target.value)}
+                    label="Domain"
+                    disabled={loadingDomains}
+                  >
+                    <MenuItem value="">
+                      <em>Select Domain</em>
+                    </MenuItem>
+                    {domains.map((domain) => (
+                      <MenuItem key={domain._id} value={domain._id}>
+                        {domain.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* Talent Pool Selection */}
+                <FormControl fullWidth disabled={!localFilters.domain}>
+                  <InputLabel>Talent Pools</InputLabel>
+                  <Select
+                    multiple
+                    value={localFilters.expertiseTalentPools || []}
+                    onChange={(e) => handleFilterChange('expertiseTalentPools', e.target.value)}
+                    label="Talent Pools"
+                    disabled={loadingPools || !localFilters.domain}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip 
+                            key={value} 
+                            label={getTalentPoolName(value)} 
+                            size="small"
+                            sx={{ backgroundColor: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {expertiseTalentPools.length === 0 ? (
+                      <MenuItem disabled>
+                        {localFilters.domain ? 'No talent pools available' : 'Select a domain first'}
+                      </MenuItem>
+                    ) : (
+                      expertiseTalentPools.map((pool) => (
+                        <MenuItem key={pool._id} value={pool._id}>
+                          {pool.name}
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+
+                {/* Skills Selection */}
+                <FormControl fullWidth disabled={!localFilters.expertiseTalentPools || localFilters.expertiseTalentPools.length === 0}>
+                  <InputLabel>Skills</InputLabel>
+                  <Select
+                    multiple
+                    value={localFilters.expertiseSkills || []}
+                    onChange={(e) => handleFilterChange('expertiseSkills', e.target.value)}
+                    label="Skills"
+                    disabled={loadingSkills || !localFilters.expertiseTalentPools || localFilters.expertiseTalentPools.length === 0}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip 
+                            key={value} 
+                            label={getSkillName(value)} 
+                            size="small"
+                            sx={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: '#2563eb' }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {expertiseSkillsList.length === 0 ? (
+                      <MenuItem disabled>
+                        {localFilters.expertiseTalentPools?.length > 0 ? 'No skills available' : 'Select talent pool(s) first'}
+                      </MenuItem>
+                    ) : (
+                      expertiseSkillsList.map((skill) => (
+                        <MenuItem key={skill._id} value={skill._id}>
+                          {skill.name}
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+
+                {(loadingDomains || loadingPools || loadingSkills) && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                    <CircularProgress size={20} sx={{ color: '#8b5cf6' }} />
+                  </Box>
+                )}
+              </Box>
+            </Paper>
+          </Box>
+
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+
+          {/* Miscellaneous Skills */}
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <BuildIcon sx={{ color: '#8b5cf6' }} />
+              <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>Miscellaneous Skills</Typography>
             </Box>
             <Autocomplete
               multiple
               options={allSkills}
-              value={localFilters.skills}
+              value={localFilters.skills || []}
               onChange={(e, newValue) => handleFilterChange('skills', newValue)}
               renderInput={(params) => (
                 <TextField
@@ -196,15 +416,14 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
                     {...getTagProps({ index })}
                     key={option}
                     label={option}
-                    sx={{ 
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)', 
-                      color: '#8b5cf6'
-                    }}
+                    sx={{ backgroundColor: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6' }}
                   />
                 ))
               }
             />
           </Box>
+
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Experience */}
           <Box>
@@ -216,7 +435,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <TextField
                 fullWidth
                 label="Company"
-                value={localFilters.company}
+                value={localFilters.company || ''}
                 onChange={(e) => handleFilterChange('company', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -229,13 +448,9 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <FormControl fullWidth>
                 <InputLabel>Position</InputLabel>
                 <Select
-                  value={localFilters.position}
+                  value={localFilters.position || ''}
                   onChange={(e) => handleFilterChange('position', e.target.value)}
-                  sx={{
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(139, 92, 246, 0.4)' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
-                  }}
+                  label="Position"
                 >
                   <MenuItem value="">All Positions</MenuItem>
                   {positions.map((position) => (
@@ -246,24 +461,19 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <Box>
                 <Typography sx={{ color: '#64748b', mb: 2 }}>Years of Experience</Typography>
                 <Slider
-                  value={localFilters.experience}
+                  value={localFilters.experience || [0, 20]}
                   onChange={(e, newValue) => handleFilterChange('experience', newValue)}
                   valueLabelDisplay="auto"
                   min={0}
                   max={20}
                   marks={experienceMarks}
-                  sx={{
-                    color: '#8b5cf6',
-                    '& .MuiSlider-thumb': { backgroundColor: '#8b5cf6' },
-                    '& .MuiSlider-track': { backgroundColor: '#8b5cf6' },
-                    '& .MuiSlider-rail': { backgroundColor: 'rgba(0, 0, 0, 0.08)' },
-                  }}
+                  sx={{ color: '#8b5cf6' }}
                 />
               </Box>
               <TextField
                 fullWidth
                 label="Lowest CTC (LPA)"
-                value={localFilters.ctcLow}
+                value={localFilters.ctcLow || ''}
                 onChange={(e) => handleFilterChange('ctcLow', e.target.value)}
                 placeholder="e.g., 10"
                 sx={{
@@ -277,7 +487,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               <TextField
                 fullWidth
                 label="Highest CTC (LPA)"
-                value={localFilters.ctcHigh}
+                value={localFilters.ctcHigh || ''}
                 onChange={(e) => handleFilterChange('ctcHigh', e.target.value)}
                 placeholder="e.g., 25"
                 sx={{
@@ -291,6 +501,8 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
             </Box>
           </Box>
 
+          <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+
           {/* Education */}
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -300,13 +512,9 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
             <FormControl fullWidth>
               <InputLabel>Education Level</InputLabel>
               <Select
-                value={localFilters.education}
+                value={localFilters.education || ''}
                 onChange={(e) => handleFilterChange('education', e.target.value)}
-                sx={{
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(139, 92, 246, 0.4)' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#8b5cf6' },
-                }}
+                label="Education Level"
               >
                 <MenuItem value="">All Education Levels</MenuItem>
                 {educationLevels.map((level) => (
@@ -315,66 +523,19 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
               </Select>
             </FormControl>
           </Box>
-
-          {/* Talent Pools */}
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <GroupIcon sx={{ color: '#8b5cf6' }} />
-              <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>Talent Pools</Typography>
-            </Box>
-            <Autocomplete
-              multiple
-              options={talentPools}
-              getOptionLabel={(option) => option.name}
-              value={talentPools.filter(pool => localFilters.talentPools?.includes(pool._id))}
-              onChange={(e, newValue) => handleFilterChange('talentPools', newValue.map(pool => pool._id))}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select Talent Pools"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                      '&:hover fieldset': { borderColor: 'rgba(139, 92, 246, 0.4)' },
-                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                    }
-                  }}
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option._id}
-                    label={option.name}
-                    sx={{ 
-                      backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                      color: '#2563eb'
-                    }}
-                  />
-                ))
-              }
-            />
-          </Box>
         </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 3, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
         <Button 
           onClick={handleClear}
-          sx={{ 
-            color: '#64748b',
-            '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
-          }}
+          sx={{ color: '#64748b', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}
         >
           Clear All
         </Button>
         <Button 
           onClick={onClose}
-          sx={{ 
-            color: '#64748b',
-            '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
-          }}
+          sx={{ color: '#64748b', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}
         >
           Cancel
         </Button>
@@ -385,9 +546,7 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
             background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
             color: '#fff',
             fontWeight: 600,
-            '&:hover': {
-              background: 'linear-gradient(135deg, #3a7bd5 0%, #7c3aed 100%)',
-            }
+            '&:hover': { background: 'linear-gradient(135deg, #3a7bd5 0%, #7c3aed 100%)' }
           }}
         >
           Apply Filters
@@ -398,4 +557,3 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
 };
 
 export default CandidateFilterModal;
-

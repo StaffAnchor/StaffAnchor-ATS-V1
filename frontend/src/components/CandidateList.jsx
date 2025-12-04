@@ -62,7 +62,10 @@ const CandidateList = ({
   currentPage = 1,
   onPageChange = () => {},
   sortOrder = 'desc',
-  onSortChange = () => {}
+  onSortChange = () => {},
+  onApplyServerFilters = () => {},
+  onClearServerFilters = () => {},
+  serverFilters = {}
 }) => {
   const [expandedCandidateId, setExpandedCandidateId] = useState(null);
   const [expandedJobsCandidateId, setExpandedJobsCandidateId] = useState(null);
@@ -85,7 +88,9 @@ const CandidateList = ({
     x: "",
     company: "",
     position: "",
-    talentPools: []
+    domain: "",
+    expertiseTalentPools: [],
+    expertiseSkills: []
   });
   const [showResultsPopup, setShowResultsPopup] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -160,6 +165,8 @@ const CandidateList = ({
 
   const applyFilters = (filters) => {
     setActiveFilters(filters);
+    // Call parent handler for server-side filtering (expertise filters)
+    onApplyServerFilters(filters);
   };
 
   const clearFilters = () => {
@@ -177,8 +184,12 @@ const CandidateList = ({
       x: "",
       company: "",
       position: "",
-      talentPools: []
+      domain: "",
+      expertiseTalentPools: [],
+      expertiseSkills: []
     });
+    // Clear server-side filters too
+    onClearServerFilters();
   };
 
   const getCTC = (c) => {
@@ -495,20 +506,7 @@ const CandidateList = ({
       return false;
     }
     
-    // Filter by talent pools
-    if (activeFilters.talentPools && activeFilters.talentPools.length > 0) {
-      const candidatePools = c.talentPools || [];
-      const candidatePoolIds = candidatePools.map(pool => 
-        typeof pool === 'string' ? pool : pool._id
-      );
-      
-      // Check if candidate is in any of the selected pools
-      const isInSelectedPool = activeFilters.talentPools.some(poolId =>
-        candidatePoolIds.includes(poolId)
-      );
-      
-      if (!isInSelectedPool) return false;
-    }
+    // Note: domain, expertiseTalentPools, and expertiseSkills filters are handled server-side
 
     return true;
   });
@@ -1445,7 +1443,6 @@ const CandidateList = ({
         onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
         allSkills={allSkills}
-        talentPools={talentPools}
       />
 
       {/* Sort Menu */}
