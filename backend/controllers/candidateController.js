@@ -660,7 +660,8 @@ exports.findSuitableJobs = async (req, res) => {
         industry: item.job.industry,
         description: item.job.description,
         remote: item.job.remote,
-        ctc: item.job.ctc,
+        ctcMin: item.job.ctcMin,
+        ctcMax: item.job.ctcMax,
         score: item.score,
         matchDetails: item.matchDetails
       }));

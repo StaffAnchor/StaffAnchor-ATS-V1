@@ -333,6 +333,22 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>{candidate.phone || 'Not provided'}</TableCell>
                   </TableRow>
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                    <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Current CTC</TableCell>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
+                      {candidate.currentCTC 
+                        ? `₹ ${candidate.currentCTC} LPA`
+                        : (candidate.experience && candidate.experience.length > 0 && candidate.experience[0].ctc)
+                          ? `₹ ${candidate.experience[0].ctc} LPA (from last job)`
+                          : 'Not Mentioned'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                    <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Expected CTC</TableCell>
+                    <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
+                      {candidate.expectedCTC ? `₹ ${candidate.expectedCTC} LPA` : 'Not Mentioned'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{fontWeight: 700, color: '#90caf9', width: 120, borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>Skills</TableCell>
                     <TableCell sx={{color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)'}}>
                       {candidate.skills && candidate.skills.length > 0 ? (
@@ -744,9 +760,9 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                   <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                     Industry: {job.industry}
                   </Typography>
-                  {job.ctc && (
+                  {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
                     <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
-                      CTC: ₹ {job.ctc}
+                      CTC: ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA
                     </Typography>
                   )}
                 </Box>

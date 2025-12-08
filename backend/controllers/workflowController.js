@@ -146,7 +146,7 @@ const createWorkflow = async (req, res) => {
       await existingWorkflow.save();
       
       const populatedWorkflow = await Workflow.findById(existingWorkflow._id)
-        .populate('jobId', 'title organization description location remote experience ctc industry recruiters')
+        .populate('jobId', 'title organization description location remote experience ctcMin ctcMax industry recruiters')
         .populate('candidateStatuses.candidateId', 'name email phone skills organization')
         .populate('createdBy', 'name email');
       
@@ -191,7 +191,7 @@ const createWorkflow = async (req, res) => {
     await Job.findByIdAndUpdate(jobId, { status: 'Ongoing client process' });
     
     const populatedWorkflow = await Workflow.findById(workflow._id)
-      .populate('jobId', 'title organization description location remote experience ctc industry recruiters')
+      .populate('jobId', 'title organization description location remote experience ctcMin ctcMax industry recruiters')
       .populate('candidateStatuses.candidateId', 'name email phone skills organization')
       .populate('createdBy', 'name email');
     
@@ -240,7 +240,7 @@ const updateWorkflow = async (req, res) => {
       workflowId,
       updates,
       { new: true, runValidators: true }
-    ).populate('jobId', 'title organization description location remote experience ctc industry recruiters')
+    ).populate('jobId', 'title organization description location remote experience ctcMin ctcMax industry recruiters')
      .populate('phases.candidates', 'name email phone skills organization')
      .populate('createdBy', 'name email');
     

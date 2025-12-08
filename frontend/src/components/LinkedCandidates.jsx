@@ -520,6 +520,26 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     fontWeight: 700,
                     fontSize: '0.95rem',
                     borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
+                    minWidth: 120
+                  }}>
+                    Current CTC
+                  </TableCell>
+                  <TableCell sx={{ 
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
+                    minWidth: 120
+                  }}>
+                    Expected CTC
+                  </TableCell>
+                  <TableCell sx={{ 
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 160
                   }}>
                     Source
@@ -646,6 +666,32 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           Not provided
                         </Typography>
                       )}
+                    </TableCell>
+
+                    {/* Current CTC */}
+                    <TableCell sx={{ 
+                      color: '#64748b',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                      py: 2
+                    }}>
+                      <Typography variant="body2" sx={{ color: '#1e293b' }}>
+                        {candidate.currentCTC 
+                          ? `₹ ${candidate.currentCTC} LPA`
+                          : (candidate.experience && candidate.experience.length > 0 && candidate.experience[0].ctc)
+                            ? `₹ ${candidate.experience[0].ctc} LPA`
+                            : 'Not Mentioned'}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Expected CTC */}
+                    <TableCell sx={{ 
+                      color: '#64748b',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                      py: 2
+                    }}>
+                      <Typography variant="body2" sx={{ color: '#1e293b' }}>
+                        {candidate.expectedCTC ? `₹ ${candidate.expectedCTC} LPA` : 'Not Mentioned'}
+                      </Typography>
                     </TableCell>
 
                     {/* Source */}

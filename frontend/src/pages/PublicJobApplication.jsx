@@ -190,34 +190,14 @@ const PublicJobApplication = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
+    // Validation - Only Name, Email, Phone, and Resume are required
     if (!form.name || !form.email || !form.phone) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    if (!selectedDomain) {
-      toast.error('Please select a domain');
-      return;
-    }
-
-    if (selectedExpertiseTalentPools.length === 0) {
-      toast.error('Please select at least one talent pool');
-      return;
-    }
-
-    if (selectedExpertiseSkills.length === 0) {
-      toast.error('Please select at least one skill');
+      toast.error('Please fill in Name, Email, and Phone');
       return;
     }
 
     if (!resumeFile) {
       toast.error('Please upload your resume');
-      return;
-    }
-
-    if (selectedPreferredLocations.length === 0) {
-      toast.error('Please select at least one preferred location');
       return;
     }
 
@@ -473,7 +453,7 @@ const PublicJobApplication = () => {
                   <Typography sx={{ 
                     color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' }
-                  }}>₹ {job.ctc} LPA</Typography>
+                  }}>₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -541,7 +521,7 @@ const PublicJobApplication = () => {
 
             <form onSubmit={handleSubmit}>
               <Stack spacing={{ xs: 2, sm: 3 }}>
-                {/* Basic Information */}
+                {/* Basic Information - Required Fields */}
                 <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                   <Grid item xs={12}>
                     <TextField
@@ -578,6 +558,142 @@ const PublicJobApplication = () => {
                     />
                   </Grid>
                 </Grid>
+
+                {/* Resume Upload - Required */}
+                <Box>
+                  <Typography variant="h6" sx={{ 
+                    color: '#475569', 
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                  }}>
+                    Resume / CV <span style={{ color: '#e74c3c' }}>*</span>
+                  </Typography>
+                  <Paper sx={{ 
+                    p: { xs: 2, sm: 3 }, 
+                    background: '#ffffff',
+                    border: '2px dashed #ddd',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    {!resumeFile ? (
+                      <>
+                        <CloudUploadIcon sx={{ 
+                          fontSize: { xs: 36, sm: 48 }, 
+                          color: '#1976d2', 
+                          mb: { xs: 1.5, sm: 2 } 
+                        }} />
+                        <Typography variant="body1" sx={{ 
+                          color: '#475569', 
+                          mb: { xs: 1.5, sm: 2 },
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          px: { xs: 1, sm: 0 }
+                        }}>
+                          Upload your resume (PDF, DOC, or DOCX) <span style={{ color: '#e74c3c' }}>*</span>
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          component="label"
+                          sx={{
+                            backgroundColor: '#1976d2',
+                            color: '#ffffff',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            px: { xs: 3, sm: 4 },
+                            py: { xs: 0.75, sm: 1 },
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            '&:hover': { backgroundColor: '#1565c0' }
+                          }}
+                        >
+                          Choose File
+                          <input
+                            type="file"
+                            hidden
+                            accept=".pdf,.doc,.docx"
+                            onChange={handleResumeChange}
+                          />
+                        </Button>
+                        <Typography variant="caption" sx={{ 
+                          color: '#475569', 
+                          display: 'block', 
+                          mt: { xs: 1.5, sm: 2 },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                        }}>
+                          Maximum file size: 5MB
+                        </Typography>
+                      </>
+                    ) : (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: { xs: 1.5, sm: 2 },
+                        textAlign: { xs: 'center', sm: 'left' }
+                      }}>
+                        <CheckCircleIcon sx={{ 
+                          color: '#4caf50', 
+                          fontSize: { xs: 28, sm: 32 } 
+                        }} />
+                        <Box sx={{ 
+                          textAlign: { xs: 'center', sm: 'left' },
+                          flex: 1
+                        }}>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: { xs: 'center', sm: 'flex-start' },
+                            gap: 1,
+                            flexWrap: 'wrap'
+                          }}>
+                            <FileIcon sx={{ 
+                              color: '#1976d2',
+                              fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                            }} />
+                            <Typography sx={{ 
+                              color: '#1e293b', 
+                              fontWeight: 600,
+                              fontSize: { xs: '0.875rem', sm: '1rem' },
+                              wordBreak: 'break-word'
+                            }}>
+                              {resumeFileName}
+                            </Typography>
+                          </Box>
+                          <Typography variant="caption" sx={{ 
+                            color: '#4caf50',
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                          }}>
+                            Ready to upload
+                          </Typography>
+                        </Box>
+                        <IconButton 
+                          onClick={() => {
+                            setResumeFile(null);
+                            setResumeFileName('');
+                          }}
+                          sx={{ 
+                            color: '#f44336',
+                            padding: { xs: '4px', sm: '8px' }
+                          }}
+                          size={window.innerWidth < 600 ? 'small' : 'medium'}
+                        >
+                          <DeleteIcon fontSize={window.innerWidth < 600 ? 'small' : 'medium'} />
+                        </IconButton>
+                      </Box>
+                    )}
+                  </Paper>
+                </Box>
+
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
+
+                {/* ===== OPTIONAL FIELDS BELOW ===== */}
+                <Typography variant="h6" sx={{ 
+                  color: '#475569', 
+                  mt: 1,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontStyle: 'italic'
+                }}>
+                  The following fields are optional
+                </Typography>
 
                 {/* Total Experience */}
                 <Box>
@@ -721,7 +837,7 @@ const PublicJobApplication = () => {
 
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
-                {/* Expertise Selection (Domain → Talent Pools → Skills) */}
+                {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                   <PublicExpertiseSelector
                     selectedDomain={selectedDomain}
@@ -733,7 +849,7 @@ const PublicJobApplication = () => {
                     singleDomain={true}
                     multipleTalentPools={true}
                     multipleSkills={true}
-                    required={true}
+                    required={false}
                   />
                 </Box>
 
@@ -963,132 +1079,6 @@ const PublicJobApplication = () => {
                       </Grid>
                     </Paper>
                   ))}
-                </Box>
-
-                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
-
-                {/* Resume Upload */}
-                <Box>
-                  <Typography variant="h6" sx={{ 
-                    color: '#475569', 
-                    mb: { xs: 1.5, sm: 2 },
-                    fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-                  }}>
-                    Resume / CV
-                  </Typography>
-                  <Paper sx={{ 
-                    p: { xs: 2, sm: 3 }, 
-                    background: '#ffffff',
-                    border: '2px dashed #ddd',
-                    borderRadius: '8px',
-                    textAlign: 'center'
-                  }}>
-                    {!resumeFile ? (
-                      <>
-                        <CloudUploadIcon sx={{ 
-                          fontSize: { xs: 36, sm: 48 }, 
-                          color: '#1976d2', 
-                          mb: { xs: 1.5, sm: 2 } 
-                        }} />
-                        <Typography variant="body1" sx={{ 
-                          color: '#475569', 
-                          mb: { xs: 1.5, sm: 2 },
-                          fontSize: { xs: '0.875rem', sm: '1rem' },
-                          px: { xs: 1, sm: 0 }
-                        }}>
-                          Upload your resume (PDF, DOC, or DOCX) <span style={{ color: '#e74c3c' }}>*</span>
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          component="label"
-                          sx={{
-                            backgroundColor: '#1976d2',
-                            color: '#ffffff',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            px: { xs: 3, sm: 4 },
-                            py: { xs: 0.75, sm: 1 },
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                            '&:hover': { backgroundColor: '#1565c0' }
-                          }}
-                        >
-                          Choose File
-                          <input
-                            type="file"
-                            hidden
-                            accept=".pdf,.doc,.docx"
-                            onChange={handleResumeChange}
-                          />
-                        </Button>
-                        <Typography variant="caption" sx={{ 
-                          color: '#475569', 
-                          display: 'block', 
-                          mt: { xs: 1.5, sm: 2 },
-                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                        }}>
-                          Maximum file size: 5MB
-                        </Typography>
-                      </>
-                    ) : (
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        gap: { xs: 1.5, sm: 2 },
-                        textAlign: { xs: 'center', sm: 'left' }
-                      }}>
-                        <CheckCircleIcon sx={{ 
-                          color: '#4caf50', 
-                          fontSize: { xs: 28, sm: 32 } 
-                        }} />
-                        <Box sx={{ 
-                          textAlign: { xs: 'center', sm: 'left' },
-                          flex: 1
-                        }}>
-                          <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: { xs: 'center', sm: 'flex-start' },
-                            gap: 1,
-                            flexWrap: 'wrap'
-                          }}>
-                            <FileIcon sx={{ 
-                              color: '#1976d2',
-                              fontSize: { xs: '1.2rem', sm: '1.5rem' }
-                            }} />
-                            <Typography sx={{ 
-                              color: '#1e293b', 
-                              fontWeight: 600,
-                              fontSize: { xs: '0.875rem', sm: '1rem' },
-                              wordBreak: 'break-word'
-                            }}>
-                              {resumeFileName}
-                            </Typography>
-                          </Box>
-                          <Typography variant="caption" sx={{ 
-                            color: '#4caf50',
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                          }}>
-                            Ready to upload
-                          </Typography>
-                        </Box>
-                        <IconButton 
-                          onClick={() => {
-                            setResumeFile(null);
-                            setResumeFileName('');
-                          }}
-                          sx={{ 
-                            color: '#f44336',
-                            padding: { xs: '4px', sm: '8px' }
-                          }}
-                          size={window.innerWidth < 600 ? 'small' : 'medium'}
-                        >
-                          <DeleteIcon fontSize={window.innerWidth < 600 ? 'small' : 'medium'} />
-                        </IconButton>
-                      </Box>
-                    )}
-                  </Paper>
                 </Box>
 
                 {/* Submit Button */}

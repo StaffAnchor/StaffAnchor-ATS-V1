@@ -439,22 +439,14 @@ const AddCandidate = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     
-    // Validation
-    if (!selectedDomain) {
-      toast.error('Please select a domain');
-      setLoading(false);
+    // Validation - Only Name, Email, Phone, and Resume are required
+    if (!form.name || !form.email || !form.phone) {
+      toast.error('Please fill in Name, Email, and Phone');
       return;
     }
-    
-    if (selectedExpertiseTalentPools.length === 0) {
-      toast.error('Please select at least one talent pool');
-      setLoading(false);
-      return;
-    }
-    
-    if (selectedExpertiseSkills.length === 0) {
-      toast.error('Please select at least one skill');
-      setLoading(false);
+
+    if (!resumeFile) {
+      toast.error('Please upload a resume');
       return;
     }
 
@@ -502,13 +494,7 @@ const AddCandidate = () => {
         }
       }
 
-      // Upload resume (required)
-      if (!resumeFile) {
-        toast.error('Please upload a resume');
-        setLoading(false);
-        return;
-      }
-      
+      // Upload resume (already validated in handleSubmit)
       await uploadResumeForCandidate(candidateId);
 
       // Link candidate to selected jobs
@@ -689,6 +675,67 @@ const AddCandidate = () => {
               />
             </Box>
 
+            {/* Resume Upload - Required */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" sx={{ color: '#8b5cf6', mb: 1, fontWeight: 600 }}>
+                Resume (Required)
+              </Typography>
+              <input
+                accept=".pdf,.doc,.docx"
+                style={{ display: 'none' }}
+                id="resume-upload"
+                type="file"
+                onChange={handleResumeChange}
+              />
+              <label htmlFor="resume-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  fullWidth
+                  startIcon={resumeFile ? <CheckCircleIcon /> : <CloudUploadIcon />}
+                  sx={{
+                    borderColor: resumeFile ? '#51cf66' : 'rgba(255, 255, 255, 0.3)',
+                    color: resumeFile ? '#51cf66' : '#b8c5d6',
+                    py: 1.5,
+                    '&:hover': {
+                      borderColor: resumeFile ? '#51cf66' : 'rgba(238, 187, 195, 0.5)',
+                      backgroundColor: resumeFile ? 'rgba(81, 207, 102, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                    },
+                  }}
+                >
+                  {resumeFile ? 'Resume Selected' : 'Upload Resume *'}
+                </Button>
+              </label>
+              {resumeFileName && (
+                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
+                  <Typography variant="caption" sx={{ color: '#2563eb' }}>
+                    {resumeFileName}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setResumeFile(null);
+                      setResumeFileName('');
+                    }}
+                    sx={{ color: '#ff6b6b', ml: 'auto' }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
+              <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+                Accepted formats: PDF, DOC, DOCX (Max 5MB)
+              </Typography>
+            </Box>
+
+            <Divider sx={{ my: 3, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+
+            {/* ===== OPTIONAL FIELDS BELOW ===== */}
+            <Typography variant="subtitle1" sx={{ color: '#64748b', mb: 2, fontStyle: 'italic' }}>
+              The following fields are optional
+            </Typography>
+
             {/* Total Experience */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1 }}>
@@ -782,7 +829,7 @@ const AddCandidate = () => {
               />
             </Box>
 
-            {/* Expertise Selection (Domain → Talent Pools → Skills) */}
+            {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
             <Box sx={{ mb: 3 }}>
               <ExpertiseSelector
                 selectedDomain={selectedDomain}
@@ -794,7 +841,7 @@ const AddCandidate = () => {
                 singleDomain={true}
                 multipleTalentPools={true}
                 multipleSkills={true}
-                required={true}
+                required={false}
               />
             </Box>
 
@@ -819,57 +866,6 @@ const AddCandidate = () => {
                   '& .MuiInputBase-input': { color: '#1e293b' },
                 }}
               />
-            </Box>
-
-            {/* Resume Upload */}
-            <Box sx={{ mb: 3 }}>
-              <input
-                accept=".pdf,.doc,.docx"
-                style={{ display: 'none' }}
-                id="resume-upload"
-                type="file"
-                onChange={handleResumeChange}
-              />
-              <label htmlFor="resume-upload">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  fullWidth
-                  startIcon={resumeFile ? <CheckCircleIcon /> : <CloudUploadIcon />}
-                  sx={{
-                    borderColor: resumeFile ? '#51cf66' : 'rgba(255, 255, 255, 0.3)',
-                    color: resumeFile ? '#51cf66' : '#b8c5d6',
-                    py: 1.5,
-                    '&:hover': {
-                      borderColor: resumeFile ? '#51cf66' : 'rgba(238, 187, 195, 0.5)',
-                      backgroundColor: resumeFile ? 'rgba(81, 207, 102, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                    },
-                  }}
-                >
-                  {resumeFile ? 'Resume Selected' : 'Upload Resume (Required)'}
-                </Button>
-              </label>
-              {resumeFileName && (
-                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-                  <Typography variant="caption" sx={{ color: '#2563eb' }}>
-                    {resumeFileName}
-                  </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      setResumeFile(null);
-                      setResumeFileName('');
-                    }}
-                    sx={{ color: '#ff6b6b', ml: 'auto' }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              )}
-              <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
-                Accepted formats: PDF, DOC, DOCX (Max 5MB) <span style={{ color: '#ff6b6b' }}>* Required</span>
-              </Typography>
             </Box>
           </Box>
 
