@@ -335,13 +335,23 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         return;
       }
 
+      // Validate CTC range if provided
+      const ctcMinVal = editJob.ctcMin !== '' && editJob.ctcMin !== undefined ? parseFloat(editJob.ctcMin) : undefined;
+      const ctcMaxVal = editJob.ctcMax !== '' && editJob.ctcMax !== undefined ? parseFloat(editJob.ctcMax) : undefined;
+      
+      if (ctcMinVal !== undefined && ctcMaxVal !== undefined && ctcMinVal > ctcMaxVal) {
+        toast.error('Minimum CTC cannot be greater than Maximum CTC');
+        return;
+      }
+
       // Prepare the data to send
       const jobDataToUpdate = {
         title: editJob.title.trim(),
         organization: editJob.organization.trim(),
         location: editJob.location.trim(),
         experience: editJob.experience && editJob.experience !== '' ? parseInt(editJob.experience) : undefined,
-        ctc: editJob.ctc && editJob.ctc.trim() !== '' ? editJob.ctc.trim() : undefined,
+        ctcMin: ctcMinVal,
+        ctcMax: ctcMaxVal,
         industry: editJob.industry && editJob.industry.trim() !== '' ? editJob.industry.trim() : undefined,
         remote: editJob.remote || false,
         description: editJob.description && editJob.description.trim() !== '' ? editJob.description.trim() : undefined,
@@ -481,9 +491,9 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
             <Typography variant="body1" sx={{color: '#1e293b'}}>
               <strong>Experience:</strong> {job.experience} years
             </Typography>
-            {job.ctc && (
+            {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
               <Typography variant="body1" sx={{color: '#1e293b'}}>
-                <strong>CTC:</strong> ₹ {job.ctc} LPA
+                <strong>CTC:</strong> ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA
               </Typography>
             )}
             {job.industry && (
@@ -660,7 +670,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                   </TableRow>
                   
                   {/* CTC */}
-                  {job.ctc && (
+                  {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
                     <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                       <TableCell sx={{ 
                         color: '#90caf9', 
@@ -675,7 +685,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                         py: 2
                       }}>
-                        ₹ {job.ctc} LPA
+                        ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA
                       </TableCell>
                     </TableRow>
                   )}
@@ -1018,23 +1028,56 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 }}
               />
               
-              {/* CTC */}
-              <TextField
-                label="CTC (LPA)"
-                name="ctc"
-                value={editJob.ctc}
-                onChange={handleEditChange}
-                fullWidth
-                sx={{ 
-                  '& .MuiInputBase-input': { color: '#1e293b' }, 
-                  '& .MuiInputLabel-root': { color: '#64748b' },
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                  }
-                }}
-              />
+              {/* CTC Range */}
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: '#8b5cf6', fontWeight: 600, mb: 1 }}>
+                  CTC Range (LPA)
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Minimum CTC"
+                      name="ctcMin"
+                      type="number"
+                      value={editJob.ctcMin ?? ''}
+                      onChange={handleEditChange}
+                      fullWidth
+                      inputProps={{ step: "0.1", min: "0" }}
+                      placeholder="e.g., 8.5"
+                      sx={{ 
+                        '& .MuiInputBase-input': { color: '#1e293b' }, 
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Maximum CTC"
+                      name="ctcMax"
+                      type="number"
+                      value={editJob.ctcMax ?? ''}
+                      onChange={handleEditChange}
+                      fullWidth
+                      inputProps={{ step: "0.1", min: "0" }}
+                      placeholder="e.g., 12.5"
+                      sx={{ 
+                        '& .MuiInputBase-input': { color: '#1e293b' }, 
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                        }
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
               
               {/* Industry */}
               <TextField

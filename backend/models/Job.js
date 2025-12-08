@@ -74,9 +74,13 @@ const JobSchema = new mongoose.Schema({
       message: 'Experience must be a whole number'
     }
   },
-  ctc: {
-    type: String,
-    trim: true
+  ctcMin: {
+    type: Number,
+    min: 0
+  },
+  ctcMax: {
+    type: Number,
+    min: 0
   },
   description: {
     type: String,

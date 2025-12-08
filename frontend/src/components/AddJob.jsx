@@ -53,7 +53,8 @@ const AddJob = ({ user }) => {
     location: '', 
     remote: false, 
     experience: '', 
-    ctc: '', 
+    ctcMin: '', 
+    ctcMax: '', 
     description: '',
   });
   const [msg, setMsg] = useState('');
@@ -197,9 +198,25 @@ const AddJob = ({ user }) => {
     setLoading(true);
     
     // Validate required fields
-    if (!form.title || !form.organization || !form.clientContact || !form.experience || !form.ctc || !form.description) {
+    if (!form.title || !form.organization || !form.clientContact || !form.experience || !form.ctcMin || !form.ctcMax || !form.description) {
       setMsg('Please fill in all required fields');
       toast.error('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+    
+    // Validate CTC range
+    const ctcMinVal = parseFloat(form.ctcMin);
+    const ctcMaxVal = parseFloat(form.ctcMax);
+    if (isNaN(ctcMinVal) || isNaN(ctcMaxVal) || ctcMinVal < 0 || ctcMaxVal < 0) {
+      setMsg('CTC values must be valid positive numbers');
+      toast.error('CTC values must be valid positive numbers');
+      setLoading(false);
+      return;
+    }
+    if (ctcMinVal > ctcMaxVal) {
+      setMsg('Minimum CTC cannot be greater than Maximum CTC');
+      toast.error('Minimum CTC cannot be greater than Maximum CTC');
       setLoading(false);
       return;
     }
@@ -236,7 +253,8 @@ const AddJob = ({ user }) => {
         locations: validLocations,
         remote: form.remote,
         experience: parseInt(form.experience),
-        ctc: form.ctc,
+        ctcMin: parseFloat(form.ctcMin),
+        ctcMax: parseFloat(form.ctcMax),
         description: form.description,
         status: 'New',
         domain: selectedDomain,
@@ -276,7 +294,8 @@ const AddJob = ({ user }) => {
         location: '', 
         remote: false, 
         experience: '', 
-        ctc: '', 
+        ctcMin: '', 
+        ctcMax: '', 
         description: ''
       });
       setJobLocations([{ country: '', state: '', city: '' }]);
@@ -593,28 +612,60 @@ const AddJob = ({ user }) => {
             />
           </Box>
 
-          {/* CTC */}
+          {/* CTC Range */}
           <Box sx={{ mb: 3 }}>
-            <TextField
-              name="ctc"
-              label="CTC (LPA)"
-              value={form.ctc}
-              onChange={handleChange}
-              required
-              fullWidth
-              InputProps={{
-                startAdornment: <MoneyIcon sx={{ color: '#64748b', mr: 1 }} />,
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
-                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
-                },
-                '& .MuiInputLabel-root': { color: '#64748b' },
-                '& .MuiInputBase-input': { color: '#1e293b' },
-              }}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <MoneyIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="subtitle1" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                CTC Range (LPA) *
+              </Typography>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="ctcMin"
+                  label="Minimum CTC"
+                  value={form.ctcMin}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  type="number"
+                  inputProps={{ step: "0.1", min: "0" }}
+                  placeholder="e.g., 8.5"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                      '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="ctcMax"
+                  label="Maximum CTC"
+                  value={form.ctcMax}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  type="number"
+                  inputProps={{ step: "0.1", min: "0" }}
+                  placeholder="e.g., 12.5"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                      '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Box>
 
           {/* Expertise Selection (Domain → Talent Pools → Skills) */}

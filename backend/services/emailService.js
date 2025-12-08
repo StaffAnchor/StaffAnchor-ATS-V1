@@ -38,7 +38,7 @@ const emailTemplates = {
                 <div class="detail-row"><span class="label">Company:</span> ${job.organization}</div>
                 <div class="detail-row"><span class="label">Location:</span> ${job.location}${job.remote ? ' (Remote Available)' : ''}</div>
                 ${job.experience ? `<div class="detail-row"><span class="label">Experience Required:</span> ${job.experience} years</div>` : ''}
-                ${job.ctc ? `<div class="detail-row"><span class="label">CTC:</span> ${job.ctc}</div>` : ''}
+                ${(job.ctcMin !== undefined || job.ctcMax !== undefined) ? `<div class="detail-row"><span class="label">CTC:</span> ₹ ${job.ctcMin ?? '-'} - ${job.ctcMax ?? '-'} LPA</div>` : ''}
                 ${job.industry ? `<div class="detail-row"><span class="label">Industry:</span> ${job.industry}</div>` : ''}
                 ${job.description ? `<div class="detail-row"><span class="label">Description:</span><br/>${job.description}</div>` : ''}
               </div>
@@ -107,7 +107,7 @@ const emailTemplates = {
                 <div class="detail-row"><span class="label">Company:</span> ${job.organization}</div>
                 <div class="detail-row"><span class="label">Location:</span> ${job.location}</div>
                 ${job.experience ? `<div class="detail-row"><span class="label">Experience:</span> ${job.experience} years</div>` : ''}
-                ${job.ctc ? `<div class="detail-row"><span class="label">CTC:</span> ${job.ctc}</div>` : ''}
+                ${(job.ctcMin !== undefined || job.ctcMax !== undefined) ? `<div class="detail-row"><span class="label">CTC:</span> ₹ ${job.ctcMin ?? '-'} - ${job.ctcMax ?? '-'} LPA</div>` : ''}
               </div>
 
               <div class="job-details">
@@ -184,7 +184,7 @@ const emailTemplates = {
                 <div class="detail-row"><span class="label">Company:</span> ${job.organization}</div>
                 <div class="detail-row"><span class="label">Location:</span> ${job.location}${job.remote ? ' (Remote Available)' : ''}</div>
                 ${job.experience ? `<div class="detail-row"><span class="label">Experience Required:</span> ${job.experience} years</div>` : ''}
-                ${job.ctc ? `<div class="detail-row"><span class="label">CTC:</span> ${job.ctc}</div>` : ''}
+                ${(job.ctcMin !== undefined || job.ctcMax !== undefined) ? `<div class="detail-row"><span class="label">CTC:</span> ₹ ${job.ctcMin ?? '-'} - ${job.ctcMax ?? '-'} LPA</div>` : ''}
                 ${job.industry ? `<div class="detail-row"><span class="label">Industry:</span> ${job.industry}</div>` : ''}
                 ${job.description ? `
                   <div class="detail-row">

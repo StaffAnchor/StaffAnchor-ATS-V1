@@ -42,6 +42,7 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   Description as DescriptionIcon,
   Construction as ConstructionIcon,
+  Sort as SortIcon,
 } from "@mui/icons-material";
 import API_URL from '../config/api';
 
@@ -54,6 +55,8 @@ const JobList = ({ accessLevel, userId }) => {
   const [statusFilterAnchor, setStatusFilterAnchor] = useState(null);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [subordinates, setSubordinates] = useState([]);
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
   const [activeFilters, setActiveFilters] = useState({
     jobId: "",
     title: "",
@@ -227,17 +230,17 @@ const JobList = ({ accessLevel, userId }) => {
     ) {
       return false;
     }
-    if (activeFilters.ctcLow && job.ctc) {
-      const jobCtc = parseInt(job.ctc.replace(/[^\d]/g, ""));
-      const filterCtcLow = parseInt(activeFilters.ctcLow);
-      if (!isNaN(jobCtc) && !isNaN(filterCtcLow) && jobCtc < filterCtcLow) {
+    if (activeFilters.ctcLow && (job.ctcMin !== undefined || job.ctcMax !== undefined)) {
+      const jobCtcMax = job.ctcMax ?? job.ctcMin;
+      const filterCtcLow = parseFloat(activeFilters.ctcLow);
+      if (!isNaN(jobCtcMax) && !isNaN(filterCtcLow) && jobCtcMax < filterCtcLow) {
         return false;
       }
     }
-    if (activeFilters.ctcHigh && job.ctc) {
-      const jobCtc = parseInt(job.ctc.replace(/[^\d]/g, ""));
-      const filterCtcHigh = parseInt(activeFilters.ctcHigh);
-      if (!isNaN(jobCtc) && !isNaN(filterCtcHigh) && jobCtc > filterCtcHigh) {
+    if (activeFilters.ctcHigh && (job.ctcMin !== undefined || job.ctcMax !== undefined)) {
+      const jobCtcMin = job.ctcMin ?? job.ctcMax;
+      const filterCtcHigh = parseFloat(activeFilters.ctcHigh);
+      if (!isNaN(jobCtcMin) && !isNaN(filterCtcHigh) && jobCtcMin > filterCtcHigh) {
         return false;
       }
     }
@@ -252,6 +255,18 @@ const JobList = ({ accessLevel, userId }) => {
   //console.log('Total jobs:', jobs.length);
   //console.log('Filtered jobs:', filteredJobs.length);
   //console.log('Filtered jobs data:', filteredJobs);
+
+  // Sort filtered jobs by date created
+  const sortedJobs = [...filteredJobs].sort((a, b) => {
+    const dateA = new Date(a.createdAt || 0);
+    const dateB = new Date(b.createdAt || 0);
+    return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+  });
+
+  const handleSortChange = (newSortOrder) => {
+    setSortOrder(newSortOrder);
+    setSortAnchorEl(null);
+  };
 
   const handleExpandClick = (jobId) => {
     setExpandedJobId((prev) => (prev === jobId ? null : jobId));
@@ -581,12 +596,36 @@ const JobList = ({ accessLevel, userId }) => {
                         fontSize: "0.95rem",
                       }}
                     >
-                      Actions
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                        <span>Actions</span>
+                        <Tooltip title={`Sort by Date Created (${sortOrder === 'desc' ? 'Newest First' : 'Oldest First'})`}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSortAnchorEl(e.currentTarget);
+                            }}
+                            sx={{
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+                              color: '#ffffff',
+                              padding: '6px',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                                transform: 'scale(1.05)',
+                              },
+                              transition: 'all 0.2s ease',
+                              boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)',
+                            }}
+                          >
+                            <SortIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredJobs.length === 0 ? (
+                  {sortedJobs.length === 0 ? (
                     <TableRow>
                       <TableCell 
                         colSpan={7} 
@@ -605,7 +644,7 @@ const JobList = ({ accessLevel, userId }) => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredJobs.map((job) => (
+                    sortedJobs.map((job) => (
                     <React.Fragment key={job._id}>
                       <TableRow
                         onClick={() => handleExpandClick(job._id)}
@@ -827,6 +866,45 @@ const JobList = ({ accessLevel, userId }) => {
           onApplyFilters={applyFilters}
           onClearFilters={clearFilters}
         />
+
+        {/* Sort Menu */}
+        <Menu
+          anchorEl={sortAnchorEl}
+          open={Boolean(sortAnchorEl)}
+          onClose={() => setSortAnchorEl(null)}
+          PaperProps={{
+            sx: {
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+            }
+          }}
+        >
+          <MenuItem
+            onClick={() => handleSortChange('desc')}
+            selected={sortOrder === 'desc'}
+            sx={{
+              color: '#1e293b',
+              '&.Mui-selected': {
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+              }
+            }}
+          >
+            Newest First
+          </MenuItem>
+          <MenuItem
+            onClick={() => handleSortChange('asc')}
+            selected={sortOrder === 'asc'}
+            sx={{
+              color: '#1e293b',
+              '&.Mui-selected': {
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+              }
+            }}
+          >
+            Oldest First
+          </MenuItem>
+        </Menu>
 
         {/* Status Filter Menu */}
         <Menu

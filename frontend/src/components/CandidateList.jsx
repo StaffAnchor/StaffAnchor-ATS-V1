@@ -1256,8 +1256,8 @@ const CandidateList = ({
                                     )}
                                     
                                     {/* CTC */}
-                                    {job.ctc && (
-                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>CTC:</strong> ₹ {job.ctc}</Typography>
+                                    {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>CTC:</strong> ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA</Typography>
                                     )}
                                     
                                     {/* Job Description */}

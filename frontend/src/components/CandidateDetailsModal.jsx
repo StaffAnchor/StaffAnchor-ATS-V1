@@ -150,6 +150,22 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                   <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Phone</TableCell>
                   <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.phone || 'Not provided'}</TableCell>
                 </TableRow>
+                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Current CTC</TableCell>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    {displayCandidate.currentCTC 
+                      ? `₹ ${displayCandidate.currentCTC} LPA`
+                      : (displayCandidate.experience && displayCandidate.experience.length > 0 && displayCandidate.experience[0].ctc)
+                        ? `₹ ${displayCandidate.experience[0].ctc} LPA (from last job)`
+                        : 'Not Mentioned'}
+                  </TableCell>
+                </TableRow>
+                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Expected CTC</TableCell>
+                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    {displayCandidate.expectedCTC ? `₹ ${displayCandidate.expectedCTC} LPA` : 'Not Mentioned'}
+                  </TableCell>
+                </TableRow>
                 {displayCandidate.currentLocation && (
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
                     <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Current Location</TableCell>
