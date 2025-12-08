@@ -513,40 +513,30 @@ const PublicCandidateForm = () => {
                   }}>
                     Total Experience
                   </Typography>
-                  <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Years"
-                        name="totalExperienceYears"
-                        type="number"
-                        value={form.totalExperienceYears}
-                        onChange={handleInputChange}
-                        placeholder="Enter years"
-                        inputProps={{ min: 0, max: 50 }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Months"
-                        name="totalExperienceMonths"
-                        type="number"
-                        value={form.totalExperienceMonths}
-                        onChange={handleInputChange}
-                        placeholder="Enter months"
-                        inputProps={{ min: 0, max: 50 }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                  </Grid>
+                  <Box sx={{ display: 'flex', gap: { xs: 1.5, sm: 2 } }}>
+                    <TextField
+                      label="Years"
+                      name="totalExperienceYears"
+                      type="number"
+                      value={form.totalExperienceYears}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      inputProps={{ min: 0, max: 50 }}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{ ...inputStyles, flex: 1, minWidth: '100px' }}
+                    />
+                    <TextField
+                      label="Months"
+                      name="totalExperienceMonths"
+                      type="number"
+                      value={form.totalExperienceMonths}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      inputProps={{ min: 0, max: 11 }}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{ ...inputStyles, flex: 1, minWidth: '100px' }}
+                    />
+                  </Box>
                 </Box>
 
                 {/* CTC Information */}

@@ -33,7 +33,9 @@ import {
   Delete as DeleteIcon,
   CloudUpload as CloudUploadIcon,
   CheckCircle as CheckCircleIcon,
-  Description as FileIcon
+  Description as FileIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon
 } from '@mui/icons-material';
 import API_URL from '../config/api';
 import staffAnchorLogo from '../assets/StaffanchorLogoFinalSVG.svg';
@@ -57,6 +59,9 @@ const PublicJobApplication = () => {
   // Resume upload state
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeFileName, setResumeFileName] = useState('');
+
+  // Job description expansion state
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -486,15 +491,43 @@ const PublicJobApplication = () => {
                 }}>
                   Job Description
                 </Typography>
-                <Typography sx={{ 
-                  color: '#475569', 
-                  whiteSpace: 'pre-wrap',
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                  lineHeight: { xs: 1.5, sm: 1.6 },
-                  wordBreak: 'break-word'
-                }}>
-                  {job.description}
-                </Typography>
+                <Box sx={{ position: 'relative' }}>
+                  <Typography sx={{ 
+                    color: '#475569', 
+                    whiteSpace: 'pre-wrap',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    lineHeight: { xs: 1.5, sm: 1.6 },
+                    wordBreak: 'break-word',
+                    ...(!isDescriptionExpanded && {
+                      display: '-webkit-box',
+                      WebkitLineClamp: 6,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    })
+                  }}>
+                    {job.description}
+                  </Typography>
+                  {job.description.split('\n').length > 6 || job.description.length > 400 ? (
+                    <Button
+                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                      endIcon={isDescriptionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      sx={{
+                        mt: 1,
+                        color: '#1976d2',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        p: 0,
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          textDecoration: 'underline'
+                        }
+                      }}
+                    >
+                      {isDescriptionExpanded ? 'View Less' : 'View More'}
+                    </Button>
+                  ) : null}
+                </Box>
               </>
             )}
           </CardContent>
@@ -704,32 +737,30 @@ const PublicJobApplication = () => {
                   }}>
                     Total Experience
                   </Typography>
-                  <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Years"
-                        name="totalExperienceYears"
-                        type="number"
-                        value={form.totalExperienceYears}
-                        onChange={handleInputChange}
-                        inputProps={{ min: 0, max: 50 }}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Months"
-                        name="totalExperienceMonths"
-                        type="number"
-                        value={form.totalExperienceMonths}
-                        onChange={handleInputChange}
-                        inputProps={{ min: 0, max: 50 }}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                  </Grid>
+                  <Box sx={{ display: 'flex', gap: { xs: 1.5, sm: 2 } }}>
+                    <TextField
+                      label="Years"
+                      name="totalExperienceYears"
+                      type="number"
+                      value={form.totalExperienceYears}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      inputProps={{ min: 0, max: 50 }}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{ ...inputStyles, flex: 1, minWidth: '100px' }}
+                    />
+                    <TextField
+                      label="Months"
+                      name="totalExperienceMonths"
+                      type="number"
+                      value={form.totalExperienceMonths}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      inputProps={{ min: 0, max: 11 }}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{ ...inputStyles, flex: 1, minWidth: '100px' }}
+                    />
+                  </Box>
                 </Box>
 
                 {/* CTC Information */}
@@ -767,10 +798,10 @@ const PublicJobApplication = () => {
                     mb: { xs: 1.5, sm: 2 },
                     fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
                   }}>
-                    Preferred Location(s) *
+                    Preferred Location(s) (Optional)
                   </Typography>
                   {job && getJobLocations().length > 0 ? (
-                    <FormControl fullWidth required>
+                    <FormControl fullWidth>
                       <InputLabel sx={{ color: '#64748b' }}>Select Location(s)</InputLabel>
                       <Select
                         multiple
