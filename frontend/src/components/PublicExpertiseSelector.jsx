@@ -9,7 +9,9 @@ import {
   Typography,
   Paper,
   CircularProgress,
-  Alert
+  Alert,
+  Checkbox,
+  ListItemText
 } from '@mui/material';
 import axios from 'axios';
 import API_URL from '../config/api';
@@ -184,10 +186,17 @@ const PublicExpertiseSelector = ({
     <Box>
       <Typography variant="h6" sx={{ 
         color: '#475569', 
-        mb: { xs: 1.5, sm: 2 },
+        mb: { xs: 0.5, sm: 1 },
         fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
       }}>
-        Expertise *
+        Expertise (Optional)
+      </Typography>
+      <Typography variant="body2" sx={{ 
+        color: '#64748b', 
+        mb: { xs: 1.5, sm: 2 },
+        fontSize: { xs: '0.75rem', sm: '0.875rem' }
+      }}>
+        You can select multiple talent pools and skills
       </Typography>
 
       {error && (
@@ -234,123 +243,161 @@ const PublicExpertiseSelector = ({
         </FormControl>
 
         {/* Talent Pool Selection */}
-        <FormControl fullWidth required={required} disabled={!selectedDomain}>
-          <InputLabel sx={{ color: '#64748b' }}>Talent Pool{multipleTalentPools ? 's' : ''}</InputLabel>
-          <Select
-            multiple={multipleTalentPools}
-            value={multipleTalentPools ? selectedTalentPools : (selectedTalentPools[0] || '')}
-            onChange={handleTalentPoolsChange}
-            label={`Talent Pool${multipleTalentPools ? 's' : ''}`}
-            disabled={loading || !selectedDomain}
-            renderValue={multipleTalentPools ? (selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip 
-                    key={value} 
-                    label={getTalentPoolName(value)} 
-                    size="small"
-                    sx={{ 
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #ddd',
-                      color: '#1e293b'
-                    }}
-                  />
-                ))}
-              </Box>
-            ) : undefined}
-            sx={selectStyles}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  '& .MuiMenuItem-root': {
-                    color: '#1e293b',
-                    '&:hover': {
-                      backgroundColor: '#f5f5f5'
-                    },
-                    '&.Mui-selected': {
-                      backgroundColor: '#f0f0f0',
-                      color: '#1e293b'
+        <Box>
+          <FormControl fullWidth required={required} disabled={!selectedDomain}>
+            <InputLabel sx={{ color: '#64748b' }}>Talent Pool{multipleTalentPools ? 's' : ''}</InputLabel>
+            <Select
+              multiple={multipleTalentPools}
+              value={multipleTalentPools ? selectedTalentPools : (selectedTalentPools[0] || '')}
+              onChange={handleTalentPoolsChange}
+              label={`Talent Pool${multipleTalentPools ? 's' : ''}`}
+              disabled={loading || !selectedDomain}
+              renderValue={multipleTalentPools ? (selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip 
+                      key={value} 
+                      label={getTalentPoolName(value)} 
+                      size="small"
+                      sx={{ 
+                        backgroundColor: '#e3f2fd',
+                        border: '1px solid #1976d2',
+                        color: '#1976d2'
+                      }}
+                    />
+                  ))}
+                </Box>
+              ) : undefined}
+              sx={selectStyles}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    maxHeight: 300,
+                    '& .MuiMenuItem-root': {
+                      color: '#1e293b',
+                      padding: '8px 16px',
+                      '&:hover': {
+                        backgroundColor: '#f5f5f5'
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#e3f2fd',
+                        color: '#1e293b',
+                        '&:hover': {
+                          backgroundColor: '#bbdefb'
+                        }
+                      }
                     }
                   }
                 }
-              }
-            }}
-          >
-            {talentPools.length === 0 ? (
-              <MenuItem disabled>
-                {selectedDomain ? 'No talent pools available' : 'Select a domain first'}
-              </MenuItem>
-            ) : (
-              talentPools.map((pool) => (
-                <MenuItem key={pool._id} value={pool._id}>
-                  {pool.name}
+              }}
+            >
+              {talentPools.length === 0 ? (
+                <MenuItem disabled>
+                  {selectedDomain ? 'No talent pools available' : 'Select a domain first'}
                 </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+              ) : (
+                talentPools.map((pool) => (
+                  <MenuItem key={pool._id} value={pool._id}>
+                    <Checkbox 
+                      checked={selectedTalentPools.indexOf(pool._id) > -1} 
+                      sx={{ 
+                        color: '#1976d2',
+                        '&.Mui-checked': { color: '#1976d2' }
+                      }}
+                    />
+                    <ListItemText primary={pool.name} />
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+          {multipleTalentPools && selectedDomain && (
+            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+              Select one or more talent pools
+            </Typography>
+          )}
+        </Box>
 
         {/* Skills Selection */}
-        <FormControl fullWidth required={required} disabled={!selectedTalentPools || selectedTalentPools.length === 0}>
-          <InputLabel sx={{ color: '#64748b' }}>Skill{multipleSkills ? 's' : ''}</InputLabel>
-          <Select
-            multiple={multipleSkills}
-            value={multipleSkills ? selectedSkills : (selectedSkills[0] || '')}
-            onChange={handleSkillsChange}
-            label={`Skill${multipleSkills ? 's' : ''}`}
-            disabled={loading || !selectedTalentPools || selectedTalentPools.length === 0}
-            renderValue={multipleSkills ? (selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip 
-                    key={value} 
-                    label={getSkillName(value)} 
-                    size="small"
-                    sx={{ 
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #ddd',
+        <Box>
+          <FormControl fullWidth required={required} disabled={!selectedTalentPools || selectedTalentPools.length === 0}>
+            <InputLabel sx={{ color: '#64748b' }}>Skill{multipleSkills ? 's' : ''}</InputLabel>
+            <Select
+              multiple={multipleSkills}
+              value={multipleSkills ? selectedSkills : (selectedSkills[0] || '')}
+              onChange={handleSkillsChange}
+              label={`Skill${multipleSkills ? 's' : ''}`}
+              disabled={loading || !selectedTalentPools || selectedTalentPools.length === 0}
+              renderValue={multipleSkills ? (selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip 
+                      key={value} 
+                      label={getSkillName(value)} 
+                      size="small"
+                      sx={{ 
+                        backgroundColor: '#e8f5e9',
+                        border: '1px solid #4caf50',
+                        color: '#2e7d32',
+                        textTransform: 'capitalize'
+                      }}
+                    />
+                  ))}
+                </Box>
+              ) : undefined}
+              sx={selectStyles}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    maxHeight: 300,
+                    '& .MuiMenuItem-root': {
                       color: '#1e293b',
-                      textTransform: 'capitalize'
-                    }}
-                  />
-                ))}
-              </Box>
-            ) : undefined}
-            sx={selectStyles}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  '& .MuiMenuItem-root': {
-                    color: '#1e293b',
-                    '&:hover': {
-                      backgroundColor: '#f5f5f5'
-                    },
-                    '&.Mui-selected': {
-                      backgroundColor: '#f0f0f0',
-                      color: '#1e293b'
+                      padding: '8px 16px',
+                      '&:hover': {
+                        backgroundColor: '#f5f5f5'
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: '#e8f5e9',
+                        color: '#1e293b',
+                        '&:hover': {
+                          backgroundColor: '#c8e6c9'
+                        }
+                      }
                     }
                   }
                 }
-              }
-            }}
-          >
-            {skills.length === 0 ? (
-              <MenuItem disabled>
-                {selectedTalentPools.length > 0 ? 'No skills available' : 'Select talent pool(s) first'}
-              </MenuItem>
-            ) : (
-              skills.map((skill) => (
-                <MenuItem key={skill._id} value={skill._id}>
-                  {skill.name}
+              }}
+            >
+              {skills.length === 0 ? (
+                <MenuItem disabled>
+                  {selectedTalentPools.length > 0 ? 'No skills available' : 'Select talent pool(s) first'}
                 </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+              ) : (
+                skills.map((skill) => (
+                  <MenuItem key={skill._id} value={skill._id}>
+                    <Checkbox 
+                      checked={selectedSkills.indexOf(skill._id) > -1} 
+                      sx={{ 
+                        color: '#4caf50',
+                        '&.Mui-checked': { color: '#4caf50' }
+                      }}
+                    />
+                    <ListItemText primary={skill.name} sx={{ '& .MuiTypography-root': { textTransform: 'capitalize' } }} />
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+          {multipleSkills && selectedTalentPools.length > 0 && (
+            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+              Select one or more skills
+            </Typography>
+          )}
+        </Box>
 
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>

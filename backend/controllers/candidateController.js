@@ -808,6 +808,30 @@ exports.submitPublicJobApplication = async (req, res) => {
       return res.status(404).json({ error: 'Job not found' });
     }
 
+    // Clean up optional fields - remove empty strings that would fail ObjectId validation
+    const cleanedData = { ...req.body };
+    
+    // Remove domain if empty or not a valid ObjectId
+    if (!cleanedData.domain || cleanedData.domain === '') {
+      delete cleanedData.domain;
+    }
+    
+    // Filter out empty values from talentPools array
+    if (cleanedData.talentPools) {
+      cleanedData.talentPools = cleanedData.talentPools.filter(id => id && id !== '');
+      if (cleanedData.talentPools.length === 0) {
+        delete cleanedData.talentPools;
+      }
+    }
+    
+    // Filter out empty values from expertiseSkills array
+    if (cleanedData.expertiseSkills) {
+      cleanedData.expertiseSkills = cleanedData.expertiseSkills.filter(id => id && id !== '');
+      if (cleanedData.expertiseSkills.length === 0) {
+        delete cleanedData.expertiseSkills;
+      }
+    }
+
     // Check if candidate with this email already exists
     let candidate = await Candidate.findOne({ email: req.body.email });
     
@@ -820,7 +844,7 @@ exports.submitPublicJobApplication = async (req, res) => {
     } else {
       // Create new candidate with applied job
       candidate = new Candidate({
-        ...req.body,
+        ...cleanedData,
         appliedJobs: [jobId]
       });
       await candidate.save();
@@ -876,16 +900,40 @@ exports.submitPublicJobApplication = async (req, res) => {
 // Public general candidate submission (no auth required, no specific job)
 exports.submitPublicCandidate = async (req, res) => {
   try {
+    // Clean up optional fields - remove empty strings that would fail ObjectId validation
+    const cleanedData = { ...req.body };
+    
+    // Remove domain if empty or not a valid ObjectId
+    if (!cleanedData.domain || cleanedData.domain === '') {
+      delete cleanedData.domain;
+    }
+    
+    // Filter out empty values from talentPools array
+    if (cleanedData.talentPools) {
+      cleanedData.talentPools = cleanedData.talentPools.filter(id => id && id !== '');
+      if (cleanedData.talentPools.length === 0) {
+        delete cleanedData.talentPools;
+      }
+    }
+    
+    // Filter out empty values from expertiseSkills array
+    if (cleanedData.expertiseSkills) {
+      cleanedData.expertiseSkills = cleanedData.expertiseSkills.filter(id => id && id !== '');
+      if (cleanedData.expertiseSkills.length === 0) {
+        delete cleanedData.expertiseSkills;
+      }
+    }
+
     // Check if candidate with this email already exists
     let candidate = await Candidate.findOne({ email: req.body.email });
     
     if (candidate) {
       // Candidate exists - update their data
-      Object.assign(candidate, req.body);
+      Object.assign(candidate, cleanedData);
       await candidate.save();
     } else {
       // Create new candidate without applied jobs
-      candidate = new Candidate(req.body);
+      candidate = new Candidate(cleanedData);
       await candidate.save();
 
       // Add candidate to talent pools if provided
