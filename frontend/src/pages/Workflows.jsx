@@ -1495,6 +1495,7 @@ const Workflows = ({ user }) => {
         }}
         candidate={selectedCandidate}
         preferences={null}
+        accessLevel={user?.accessLevel || 0}
       />
 
       {/* Status Filter Menu */}

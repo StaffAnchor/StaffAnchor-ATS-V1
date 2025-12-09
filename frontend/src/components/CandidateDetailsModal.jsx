@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import {
   Dialog,
   DialogTitle,
@@ -18,47 +19,59 @@ import {
   Link,
   Divider,
   CircularProgress,
+  TextField,
+  Stack,
 } from '@mui/material';
-import { InsertDriveFile as FileIcon, Close as CloseIcon } from '@mui/icons-material';
+import { InsertDriveFile as FileIcon, Close as CloseIcon, Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material';
 import CandidateScoreDisplay from './CandidateScoreDisplay';
+import ExpertiseSelector from './ExpertiseSelector';
 import API_URL from '../config/api';
 
-const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
+const CandidateDetailsModal = ({ open, onClose, candidate, preferences, accessLevel = 0 }) => {
   const [fullCandidateData, setFullCandidateData] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Edit mode state
+  const [editMode, setEditMode] = useState(false);
+  const [editCandidate, setEditCandidate] = useState({});
+  const [saving, setSaving] = useState(false);
+  
+  // Expertise hierarchy state (Domain → Talent Pools → Skills)
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedExpertiseTalentPools, setSelectedExpertiseTalentPools] = useState([]);
+  const [selectedExpertiseSkills, setSelectedExpertiseSkills] = useState([]);
+
+  const fetchFullCandidateData = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/candidates/${candidate._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Merge the fetched data with scoring information from the original candidate
+      // This preserves the score, individualScores, matchDetails, and preferences
+      const mergedCandidate = {
+        ...response.data,
+        // Preserve scoring data from the original candidate if it exists
+        score: candidate.score,
+        individualScores: candidate.individualScores,
+        matchDetails: candidate.matchDetails,
+        preferences: candidate.preferences
+      };
+      
+      setFullCandidateData(mergedCandidate);
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      // Fallback to the candidate data passed as prop
+      setFullCandidateData(candidate);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (open && candidate && candidate._id) {
-      // Fetch full candidate data from API to ensure we have all fields including resume
-      const fetchFullCandidateData = async () => {
-        setLoading(true);
-        try {
-          const token = localStorage.getItem('jwt');
-          const response = await axios.get(`${API_URL}/api/candidates/${candidate._id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          // Merge the fetched data with scoring information from the original candidate
-          // This preserves the score, individualScores, matchDetails, and preferences
-          const mergedCandidate = {
-            ...response.data,
-            // Preserve scoring data from the original candidate if it exists
-            score: candidate.score,
-            individualScores: candidate.individualScores,
-            matchDetails: candidate.matchDetails,
-            preferences: candidate.preferences
-          };
-          
-          setFullCandidateData(mergedCandidate);
-        } catch (error) {
-          console.error('Error fetching candidate details:', error);
-          // Fallback to the candidate data passed as prop
-          setFullCandidateData(candidate);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchFullCandidateData();
     } else if (open && candidate) {
       // If we already have candidate data, use it
@@ -71,8 +84,86 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
     if (!open) {
       setFullCandidateData(null);
       setLoading(false);
+      setEditMode(false);
+      setEditCandidate({});
     }
   }, [open]);
+
+  // Initialize edit form when entering edit mode
+  useEffect(() => {
+    if (editMode && fullCandidateData) {
+      setEditCandidate({ ...fullCandidateData });
+      
+      // Set domain (could be an object with _id or just an _id string)
+      if (fullCandidateData.domain) {
+        const domainId = typeof fullCandidateData.domain === 'object' ? fullCandidateData.domain._id : fullCandidateData.domain;
+        setSelectedDomain(domainId || '');
+      } else {
+        setSelectedDomain('');
+      }
+      
+      // Set talent pools (could be array of objects or array of IDs)
+      if (fullCandidateData.talentPools && Array.isArray(fullCandidateData.talentPools)) {
+        const poolIds = fullCandidateData.talentPools.map(tp => typeof tp === 'object' ? tp._id : tp);
+        setSelectedExpertiseTalentPools(poolIds);
+      } else {
+        setSelectedExpertiseTalentPools([]);
+      }
+      
+      // Set expertise skills (could be array of objects or array of IDs)
+      if (fullCandidateData.expertiseSkills && Array.isArray(fullCandidateData.expertiseSkills)) {
+        const skillIds = fullCandidateData.expertiseSkills.map(skill => typeof skill === 'object' ? skill._id : skill);
+        setSelectedExpertiseSkills(skillIds);
+      } else {
+        setSelectedExpertiseSkills([]);
+      }
+    }
+  }, [editMode, fullCandidateData]);
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditCandidate({ ...editCandidate, [name]: value });
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const token = localStorage.getItem('jwt');
+      
+      // Prepare the update data including expertise fields
+      const updateData = {
+        ...editCandidate,
+        domain: selectedDomain || null,
+        talentPools: selectedExpertiseTalentPools || [],
+        expertiseSkills: selectedExpertiseSkills || []
+      };
+      
+      await axios.put(`${API_URL}/api/candidates/${candidate._id}`, updateData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Candidate updated successfully!');
+      setEditMode(false);
+      
+      // Refresh the candidate data
+      await fetchFullCandidateData();
+      
+      // Dispatch event to notify parent components to refresh
+      window.dispatchEvent(new CustomEvent('candidateUpdated', { 
+        detail: { candidateId: candidate._id } 
+      }));
+    } catch (error) {
+      console.error('Error updating candidate:', error);
+      toast.error(error.response?.data?.error || 'Error updating candidate');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setEditCandidate({});
+  };
 
   if (!open || !candidate) return null;
 
@@ -105,27 +196,129 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
         pb: 2
       }}>
         <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 700 }}>
-          {displayCandidate.name} - Candidate Details
+          {displayCandidate.name} - {editMode ? 'Edit Candidate' : 'Candidate Details'}
         </Typography>
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          sx={{
-            minWidth: 'auto',
-            color: '#64748b',
-            '&:hover': { color: '#8b5cf6' }
-          }}
-        >
-          <CloseIcon />
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {!editMode && (accessLevel === 1 || accessLevel === 2) && (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditMode(true);
+              }}
+              variant="outlined"
+              startIcon={<EditIcon />}
+              sx={{
+                color: '#8b5cf6',
+                borderColor: 'rgba(139, 92, 246, 0.5)',
+                '&:hover': { 
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                  borderColor: '#8b5cf6',
+                }
+              }}
+            >
+              Edit
+            </Button>
+          )}
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (editMode) {
+                handleCancelEdit();
+              } else {
+                onClose();
+              }
+            }}
+            sx={{
+              minWidth: 'auto',
+              color: '#64748b',
+              '&:hover': { color: '#8b5cf6' }
+            }}
+          >
+            <CloseIcon />
+          </Button>
+        </Box>
       </DialogTitle>
 
       <DialogContent sx={{ mt: 2 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
             <CircularProgress sx={{ color: '#2563eb' }} />
+          </Box>
+        ) : editMode ? (
+          /* Edit Mode Form */
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Stack spacing={2}>
+              <TextField
+                label="Name"
+                name="name"
+                value={editCandidate.name || ''}
+                onChange={handleEditChange}
+                fullWidth
+                sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+              />
+              <TextField
+                label="Email"
+                name="email"
+                value={editCandidate.email || ''}
+                onChange={handleEditChange}
+                fullWidth
+                sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+              />
+              <TextField
+                label="Phone"
+                name="phone"
+                value={editCandidate.phone || ''}
+                onChange={handleEditChange}
+                fullWidth
+                sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+              />
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  label="Current CTC (LPA)"
+                  name="currentCTC"
+                  value={editCandidate.currentCTC || ''}
+                  onChange={handleEditChange}
+                  fullWidth
+                  sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+                />
+                <TextField
+                  label="Expected CTC (LPA)"
+                  name="expectedCTC"
+                  value={editCandidate.expectedCTC || ''}
+                  onChange={handleEditChange}
+                  fullWidth
+                  sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+                />
+              </Box>
+              <ExpertiseSelector
+                selectedDomain={selectedDomain}
+                onDomainChange={setSelectedDomain}
+                selectedTalentPools={selectedExpertiseTalentPools}
+                onTalentPoolsChange={setSelectedExpertiseTalentPools}
+                selectedSkills={selectedExpertiseSkills}
+                onSkillsChange={setSelectedExpertiseSkills}
+                singleDomain={true}
+                multipleTalentPools={true}
+                multipleSkills={true}
+                required={false}
+              />
+              <TextField
+                label="LinkedIn"
+                name="linkedin"
+                value={editCandidate.linkedin || ''}
+                onChange={handleEditChange}
+                fullWidth
+                sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+              />
+              <TextField
+                label="X (Twitter)"
+                name="x"
+                value={editCandidate.x || ''}
+                onChange={handleEditChange}
+                fullWidth
+                sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
+              />
+            </Stack>
           </Box>
         ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -257,8 +450,8 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                 )}
                 {displayCandidate.talentPools && displayCandidate.talentPools.length > 0 && (
                   <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: 'none' }}>Talent Pools</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: 'none' }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Talent Pools</TableCell>
+                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {displayCandidate.talentPools.map((pool, idx) => (
                           <Chip 
@@ -269,6 +462,28 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
                               backgroundColor: 'rgba(37, 99, 235, 0.12)', 
                               color: '#2563eb',
                               fontSize: '0.75rem'
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {displayCandidate.expertiseSkills && displayCandidate.expertiseSkills.length > 0 && (
+                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
+                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: 'none' }}>Expertise Skills</TableCell>
+                    <TableCell sx={{ color: '#1e293b', borderBottom: 'none' }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {displayCandidate.expertiseSkills.map((skill, idx) => (
+                          <Chip 
+                            key={idx} 
+                            label={typeof skill === 'object' ? skill.name : skill}
+                            size="small"
+                            sx={{ 
+                              backgroundColor: 'rgba(139, 92, 246, 0.15)', 
+                              color: '#8b5cf6',
+                              fontSize: '0.75rem',
+                              textTransform: 'capitalize'
                             }}
                           />
                         ))}
@@ -568,21 +783,61 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences }) => {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
-        <Button 
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          variant="contained"
-          sx={{
-            backgroundColor: '#2563eb',
-            color: '#ffffff',
-            '&:hover': { backgroundColor: '#3d7be8' }
-          }}
-        >
-          Close
-        </Button>
+      <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0, 0, 0, 0.05)', justifyContent: editMode ? 'space-between' : 'flex-end' }}>
+        {editMode ? (
+          <>
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancelEdit();
+              }}
+              variant="outlined"
+              startIcon={<CancelIcon />}
+              sx={{
+                color: '#64748b',
+                borderColor: 'rgba(100, 116, 139, 0.3)',
+                '&:hover': { 
+                  backgroundColor: 'rgba(100, 116, 139, 0.08)',
+                  borderColor: '#64748b',
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSave();
+              }}
+              variant="contained"
+              startIcon={saving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />}
+              disabled={saving}
+              sx={{
+                backgroundColor: '#4caf50',
+                color: '#ffffff',
+                '&:hover': { backgroundColor: '#43a047' },
+                '&:disabled': { backgroundColor: 'rgba(76, 175, 80, 0.5)' }
+              }}
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </>
+        ) : (
+          <Button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              '&:hover': { backgroundColor: '#3d7be8' }
+            }}
+          >
+            Close
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

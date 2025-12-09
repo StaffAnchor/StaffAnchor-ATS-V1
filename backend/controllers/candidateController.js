@@ -293,9 +293,10 @@ exports.listCandidates = async (req, res) => {
     // Fetch candidates with pagination and sorting
     // Only return basic fields, not full nested arrays
     const candidates = await Candidate.find(query)
-      .select('name email phone currentLocation domain talentPools skills resume createdAt updatedAt')
+      .select('name email phone currentLocation domain talentPools expertiseSkills skills resume createdAt updatedAt')
       .populate('domain', 'name')
       .populate('talentPools', 'name')
+      .populate('expertiseSkills', 'name')
       .sort(sort)
       .skip(skip)
       .limit(limitNum);
@@ -332,17 +333,104 @@ exports.candidateDetails = async (req, res) => {
 
 exports.updateCandidate = async (req, res) => {
   try {
-    const candidate = await Candidate.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!candidate) return res.status(404).json({ error: 'Candidate not found' });
+    // Get the existing candidate to track talent pool changes
+    const existingCandidate = await Candidate.findById(req.params.id);
+    if (!existingCandidate) {
+      return res.status(404).json({ error: 'Candidate not found' });
+    }
+
+    // Clean up optional fields - remove empty strings that would fail ObjectId validation
+    const cleanedData = { ...req.body };
+    
+    // Remove domain if empty or not a valid ObjectId
+    if (!cleanedData.domain || cleanedData.domain === '') {
+      delete cleanedData.domain;
+    }
+    
+    // Filter out empty values from talentPools array
+    if (cleanedData.talentPools) {
+      cleanedData.talentPools = cleanedData.talentPools.filter(id => id && id !== '');
+      if (cleanedData.talentPools.length === 0) {
+        delete cleanedData.talentPools;
+      }
+    }
+    
+    // Filter out empty values from expertiseSkills array
+    if (cleanedData.expertiseSkills) {
+      cleanedData.expertiseSkills = cleanedData.expertiseSkills.filter(id => id && id !== '');
+      if (cleanedData.expertiseSkills.length === 0) {
+        delete cleanedData.expertiseSkills;
+      }
+    }
+
+    // Update the candidate
+    const candidate = await Candidate.findByIdAndUpdate(
+      req.params.id, 
+      cleanedData, 
+      { new: true, runValidators: true }
+    );
+    
+    if (!candidate) {
+      return res.status(404).json({ error: 'Candidate not found' });
+    }
     
     // Save skills to database if user is authenticated
     if (req.user && req.user.organization && req.body.skills) {
       await saveSkillsToDatabase(req.body.skills, req.user._id, req.user.organization);
     }
+
+    // Handle talent pool relationships (bidirectional updates)
+    if (cleanedData.talentPools !== undefined) {
+      const TalentPool = require('../models/TalentPool');
+      const oldPoolIds = existingCandidate.talentPools 
+        ? existingCandidate.talentPools.map(id => id.toString())
+        : [];
+      const newPoolIds = cleanedData.talentPools 
+        ? cleanedData.talentPools.map(id => id.toString())
+        : [];
+
+      // Find pools to remove (in old but not in new)
+      const poolsToRemove = oldPoolIds.filter(id => !newPoolIds.includes(id));
+      // Find pools to add (in new but not in old)
+      const poolsToAdd = newPoolIds.filter(id => !oldPoolIds.includes(id));
+
+      // Remove candidate from old talent pools
+      for (const poolId of poolsToRemove) {
+        try {
+          await TalentPool.findByIdAndUpdate(
+            poolId,
+            { $pull: { candidates: candidate._id } }
+          );
+        } catch (poolError) {
+          console.error('Error removing candidate from talent pool:', poolError);
+          // Don't fail the update if pool linking fails
+        }
+      }
+
+      // Add candidate to new talent pools
+      for (const poolId of poolsToAdd) {
+        try {
+          await TalentPool.findByIdAndUpdate(
+            poolId,
+            { $addToSet: { candidates: candidate._id } }
+          );
+        } catch (poolError) {
+          console.error('Error adding candidate to talent pool:', poolError);
+          // Don't fail the update if pool linking fails
+        }
+      }
+    }
     
-    res.json(candidate);
+    // Populate the response with related data
+    const populatedCandidate = await Candidate.findById(candidate._id)
+      .populate('domain', 'name description')
+      .populate('talentPools', 'name description')
+      .populate('expertiseSkills', 'name category');
+    
+    res.json(populatedCandidate);
   } catch (err) {
-    res.status(500).json({ error: 'Update candidate failed' });
+    console.error('Error updating candidate:', err);
+    res.status(500).json({ error: 'Update candidate failed', details: err.message });
   }
 };
 
