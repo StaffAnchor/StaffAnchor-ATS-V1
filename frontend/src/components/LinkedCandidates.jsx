@@ -1012,6 +1012,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         }}
         candidate={selectedCandidateForDetails}
         preferences={null}
+        accessLevel={accessLevel}
       />
     )}
     </>

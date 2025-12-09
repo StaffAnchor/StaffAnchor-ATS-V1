@@ -5,9 +5,10 @@ import ResultsLimitPopup from './ResultsLimitPopup.jsx';
 import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
+import ExpertiseSelector from './ExpertiseSelector.jsx';
 import { toast } from 'react-toastify';
-import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Autocomplete, IconButton } from '@mui/material';
-import { Star as StarIcon, InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton } from '@mui/material';
+import { InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
 const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) => {
@@ -20,35 +21,44 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const [showResultsPopup, setShowResultsPopup] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [availableSkills, setAvailableSkills] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
   const [uploadingResume, setUploadingResume] = useState(false);
   const [deletingResume, setDeletingResume] = useState(false);
   const [showAIWarning, setShowAIWarning] = useState(false);
   const [showDeleteResumeConfirm, setShowDeleteResumeConfirm] = useState(false);
+  
+  // Expertise hierarchy state (Domain → Talent Pools → Skills)
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedExpertiseTalentPools, setSelectedExpertiseTalentPools] = useState([]);
+  const [selectedExpertiseSkills, setSelectedExpertiseSkills] = useState([]);
 
   // Sync editMode with initialEditMode prop when it changes
   React.useEffect(() => {
     setEditMode(initialEditMode);
   }, [initialEditMode]);
 
-  // Fetch available skills when component mounts or enters edit mode
+  // Initialize expertise fields from candidate data when entering edit mode
   React.useEffect(() => {
-    if (editMode) {
-      const fetchSkills = async () => {
-        try {
-          const token = localStorage.getItem('jwt');
-          const response = await axios.get(`${API_URL}/api/skills`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setAvailableSkills(response.data.map(skill => skill.name));
-        } catch (error) {
-          console.error('Error fetching skills:', error);
-        }
-      };
-      fetchSkills();
+    if (editMode && candidate) {
+      // Set domain (could be an object with _id or just an _id string)
+      if (candidate.domain) {
+        const domainId = typeof candidate.domain === 'object' ? candidate.domain._id : candidate.domain;
+        setSelectedDomain(domainId || '');
+      }
+      
+      // Set talent pools (could be array of objects or array of IDs)
+      if (candidate.talentPools && Array.isArray(candidate.talentPools)) {
+        const poolIds = candidate.talentPools.map(tp => typeof tp === 'object' ? tp._id : tp);
+        setSelectedExpertiseTalentPools(poolIds);
+      }
+      
+      // Set expertise skills (could be array of objects or array of IDs)
+      if (candidate.expertiseSkills && Array.isArray(candidate.expertiseSkills)) {
+        const skillIds = candidate.expertiseSkills.map(skill => typeof skill === 'object' ? skill._id : skill);
+        setSelectedExpertiseSkills(skillIds);
+      }
     }
-  }, [editMode]);
+  }, [editMode, candidate]);
 
   const findSuitableJobs = () => {
     setShowAIWarning(true);
@@ -128,13 +138,28 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.put(`${API_URL}/api/candidates/${candidate._id}`, editCandidate, {
+      
+      // Prepare the update data including expertise fields
+      const updateData = {
+        ...editCandidate,
+        domain: selectedDomain || null,
+        talentPools: selectedExpertiseTalentPools || [],
+        expertiseSkills: selectedExpertiseSkills || []
+      };
+      
+      await axios.put(`${API_URL}/api/candidates/${candidate._id}`, updateData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Candidate updated!');
       setEditMode(false);
-    } catch {
-      toast.error('Error updating candidate');
+      
+      // Dispatch event to notify parent component to refresh
+      window.dispatchEvent(new CustomEvent('candidateUpdated', { 
+        detail: { candidateId: candidate._id } 
+      }));
+    } catch (error) {
+      console.error('Error updating candidate:', error);
+      toast.error(error.response?.data?.error || 'Error updating candidate');
     }
   };
 
@@ -243,59 +268,17 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               fullWidth
               sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
-            <Autocomplete
-              multiple
-              freeSolo
-              options={availableSkills}
-              value={editCandidate.skills || []}
-              onChange={(e, newValue) => setEditCandidate({
-                ...editCandidate,
-                skills: newValue
-              })}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Skills"
-                  placeholder="Select or type skills..."
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <>
-                        <StarIcon sx={{ color: '#64748b', mr: 1 }} />
-                        {params.InputProps.startAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' },
-                      '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                    },
-                    '& .MuiInputLabel-root': { color: '#64748b' },
-                    '& .MuiInputBase-input': { color: '#1e293b' },
-                  }}
-                />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    sx={{ 
-                      backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                      color: '#2563eb',
-                      textTransform: 'capitalize',
-                      '& .MuiChip-deleteIcon': { color: '#2563eb' }
-                    }}
-                  />
-                ))
-              }
-              sx={{
-                '& .MuiAutocomplete-popupIndicator': { color: '#64748b' },
-                '& .MuiAutocomplete-clearIndicator': { color: '#64748b' },
-              }}
+            <ExpertiseSelector
+              selectedDomain={selectedDomain}
+              onDomainChange={setSelectedDomain}
+              selectedTalentPools={selectedExpertiseTalentPools}
+              onTalentPoolsChange={setSelectedExpertiseTalentPools}
+              selectedSkills={selectedExpertiseSkills}
+              onSkillsChange={setSelectedExpertiseSkills}
+              singleDomain={true}
+              multipleTalentPools={true}
+              multipleSkills={true}
+              required={false}
             />
             <TextField
               label="LinkedIn"

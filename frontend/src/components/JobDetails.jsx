@@ -1445,6 +1445,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         }}
         candidate={selectedCandidate}
         preferences={userPreferences}
+        accessLevel={accessLevel}
       />
 
       {/* Linked Candidates Modal */}

@@ -1540,6 +1540,7 @@ const CandidateList = ({
           }}
           candidate={selectedCandidateForDetails}
           preferences={null}
+          accessLevel={accessLevel}
         />
       )}
 
