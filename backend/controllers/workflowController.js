@@ -302,6 +302,7 @@ const updateCandidateStatus = async (req, res) => {
   try {
     const { workflowId } = req.params;
     const { candidateId, clientSideStatus, notes } = req.body;
+    const userId = req.user?._id;
     
     const workflow = await Workflow.findById(workflowId);
     if (!workflow) {
@@ -314,15 +315,34 @@ const updateCandidateStatus = async (req, res) => {
     );
     
     if (candidateStatus) {
+      // Add to status history before updating
+      if (!candidateStatus.statusHistory) {
+        candidateStatus.statusHistory = [];
+      }
+      candidateStatus.statusHistory.push({
+        status: clientSideStatus,
+        changedBy: userId,
+        changedAt: new Date(),
+        notes: notes || ''
+      });
+      
       // Update existing status
       candidateStatus.clientSideStatus = clientSideStatus;
+      candidateStatus.updatedBy = userId;
       if (notes !== undefined) candidateStatus.notes = notes;
       candidateStatus.updatedAt = new Date();
     } else {
-      // Add new status entry
+      // Add new status entry with history
       workflow.candidateStatuses.push({
         candidateId,
         clientSideStatus,
+        updatedBy: userId,
+        statusHistory: [{
+          status: clientSideStatus,
+          changedBy: userId,
+          changedAt: new Date(),
+          notes: notes || ''
+        }],
         notes: notes || '',
         updatedAt: new Date()
       });
@@ -331,7 +351,8 @@ const updateCandidateStatus = async (req, res) => {
     await workflow.save();
     
     const updatedWorkflow = await Workflow.findById(workflowId)
-      .populate('candidateStatuses.candidateId', 'name email phone');
+      .populate('candidateStatuses.candidateId', 'name email phone')
+      .populate('candidateStatuses.updatedBy', 'fullName email');
     
     res.json(updatedWorkflow);
   } catch (error) {

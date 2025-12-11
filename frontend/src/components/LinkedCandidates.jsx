@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import CommentsModal from './CommentsModal.jsx';
 import CandidateDetailsModal from './CandidateDetailsModal.jsx';
+import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
 import {
   Dialog,
   DialogTitle,
@@ -60,6 +61,15 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   // Candidate details modal state
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedCandidateForDetails, setSelectedCandidateForDetails] = useState(null);
+
+  // Status change confirmation state
+  const [statusChangeConfirm, setStatusChangeConfirm] = useState({
+    open: false,
+    linkId: null,
+    candidateName: '',
+    currentStatus: '',
+    newStatus: ''
+  });
 
   // Get current user info
   useEffect(() => {
@@ -145,7 +155,20 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     }
   };
 
-  const handleStatusChange = async (linkId, newStatus) => {
+  const handleStatusChangeRequest = (linkId, newStatus, candidateName, currentStatus) => {
+    setStatusChangeConfirm({
+      open: true,
+      linkId,
+      candidateName,
+      currentStatus,
+      newStatus
+    });
+  };
+
+  const handleStatusChangeConfirm = async () => {
+    const { linkId, newStatus } = statusChangeConfirm;
+    setStatusChangeConfirm({ open: false, linkId: null, candidateName: '', currentStatus: '', newStatus: '' });
+    
     try {
       setUpdatingStatus(prev => ({ ...prev, [linkId]: true }));
       const token = localStorage.getItem('jwt');
@@ -768,7 +791,12 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           value={candidate.linkInfo.status || 'New'}
                           onChange={(e) => {
                             e.stopPropagation();
-                            handleStatusChange(candidate.linkInfo.linkId, e.target.value);
+                            handleStatusChangeRequest(
+                              candidate.linkInfo.linkId, 
+                              e.target.value, 
+                              candidate.name,
+                              candidate.linkInfo.status || 'New'
+                            );
                           }}
                           onClick={(e) => e.stopPropagation()}
                           disabled={updatingStatus[candidate.linkInfo.linkId]}
@@ -1015,6 +1043,18 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         accessLevel={accessLevel}
       />
     )}
+
+    {/* Status Change Confirmation Dialog */}
+    <StatusChangeConfirmDialog
+      open={statusChangeConfirm.open}
+      onClose={() => setStatusChangeConfirm({ open: false, linkId: null, candidateName: '', currentStatus: '', newStatus: '' })}
+      onConfirm={handleStatusChangeConfirm}
+      title="Confirm Candidate Status Change"
+      currentStatus={statusChangeConfirm.currentStatus}
+      newStatus={statusChangeConfirm.newStatus}
+      itemName={statusChangeConfirm.candidateName}
+      itemType="candidate"
+    />
     </>
   );
 };

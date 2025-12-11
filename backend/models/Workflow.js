@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+// Schema for tracking client-side status change history
+const clientStatusHistorySchema = new mongoose.Schema({
+  status: {
+    type: String,
+    required: true
+  },
+  changedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  changedAt: {
+    type: Date,
+    default: Date.now
+  },
+  notes: String
+}, { _id: false });
+
 const candidateStatusSchema = new mongoose.Schema({
   candidateId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -24,6 +41,13 @@ const candidateStatusSchema = new mongoose.Schema({
     ],
     default: 'Interview Scheduled'
   },
+  // Track who last updated the status
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  // Status change history
+  statusHistory: [clientStatusHistorySchema],
   notes: String,
   updatedAt: {
     type: Date,

@@ -42,6 +42,7 @@ const bannerRoutes = require('./routes/banners');
 const domainRoutes = require('./routes/domains');
 const clientRoutes = require('./routes/clients');
 const locationRoutes = require('./routes/locations');
+const analyticsRoutes = require('./routes/analytics');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
@@ -56,6 +57,7 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/domains', domainRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => {
   res.send('StaffAnchor ATS Backend Running');

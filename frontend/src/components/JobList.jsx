@@ -45,6 +45,7 @@ import {
   Sort as SortIcon,
 } from "@mui/icons-material";
 import API_URL from '../config/api';
+import StatusChangeConfirmDialog from './StatusChangeConfirmDialog';
 
 const JobList = ({ accessLevel, userId }) => {
   const [jobs, setJobs] = useState([]);
@@ -57,6 +58,13 @@ const JobList = ({ accessLevel, userId }) => {
   const [subordinates, setSubordinates] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
   const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const [statusChangeConfirm, setStatusChangeConfirm] = useState({
+    open: false,
+    jobId: null,
+    jobTitle: '',
+    currentStatus: '',
+    newStatus: ''
+  });
   const [activeFilters, setActiveFilters] = useState({
     jobId: "",
     title: "",
@@ -315,7 +323,20 @@ const JobList = ({ accessLevel, userId }) => {
     return subordinates.filter(sub => authorizedUserIds.includes(sub._id.toString()));
   };
 
-  const handleStatusChange = async (jobId, newStatus) => {
+  const handleStatusChangeRequest = (jobId, newStatus, jobTitle, currentStatus) => {
+    setStatusChangeConfirm({
+      open: true,
+      jobId,
+      jobTitle,
+      currentStatus,
+      newStatus
+    });
+  };
+
+  const handleStatusChangeConfirm = async () => {
+    const { jobId, newStatus } = statusChangeConfirm;
+    setStatusChangeConfirm({ open: false, jobId: null, jobTitle: '', currentStatus: '', newStatus: '' });
+    
     try {
       const token = localStorage.getItem('jwt');
       
@@ -753,7 +774,7 @@ const JobList = ({ accessLevel, userId }) => {
                           <FormControl size="small" sx={{ minWidth: 140 }}>
                             <Select
                               value={job.status || 'New'}
-                              onChange={(e) => handleStatusChange(job._id, e.target.value)}
+                              onChange={(e) => handleStatusChangeRequest(job._id, e.target.value, job.title, job.status || 'New')}
                               sx={{
                                 backgroundColor: `${getStatusColor(job.status || 'New')}20`,
                                 color: getStatusColor(job.status || 'New'),
@@ -822,34 +843,35 @@ const JobList = ({ accessLevel, userId }) => {
                       </TableRow>
 
                       {/* Expanded Job Details Row */}
-                      <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          sx={{
-                            py: 0,
-                            borderBottom:
-                              expandedJobId === job._id
-                                ? "1px solid rgba(0, 0, 0, 0.05)"
-                                : "none",
-                          }}
-                        >
-                          <Collapse
-                            in={expandedJobId === job._id}
-                            timeout="auto"
-                            unmountOnExit
+                      {expandedJobId === job._id && (
+                        <TableRow>
+                          <TableCell
+                            colSpan={7}
+                            sx={{
+                              py: 0,
+                              px: 0,
+                              borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+                              backgroundColor: "rgba(248, 250, 252, 0.5)",
+                            }}
                           >
-                            <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
-                              <JobDetails
-                                job={job}
-                                expanded={expandedJobId === job._id}
-                                onExpandClick={() => handleExpandClick(job._id)}
-                                accessLevel={accessLevel}
-                                userId={userId}
-                              />
-                            </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
+                            <Collapse
+                              in={expandedJobId === job._id}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <Box sx={{ p: 3, background: "rgba(255, 255, 255, 0.02)" }}>
+                                <JobDetails
+                                  job={job}
+                                  expanded={expandedJobId === job._id}
+                                  onExpandClick={() => handleExpandClick(job._id)}
+                                  accessLevel={accessLevel}
+                                  userId={userId}
+                                />
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </React.Fragment>
                   )))}
                 </TableBody>
@@ -1041,6 +1063,18 @@ const JobList = ({ accessLevel, userId }) => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Status Change Confirmation Dialog */}
+        <StatusChangeConfirmDialog
+          open={statusChangeConfirm.open}
+          onClose={() => setStatusChangeConfirm({ open: false, jobId: null, jobTitle: '', currentStatus: '', newStatus: '' })}
+          onConfirm={handleStatusChangeConfirm}
+          title="Confirm Job Status Change"
+          currentStatus={statusChangeConfirm.currentStatus}
+          newStatus={statusChangeConfirm.newStatus}
+          itemName={statusChangeConfirm.jobTitle}
+          itemType="job"
+        />
       </Box>
   );
 };
