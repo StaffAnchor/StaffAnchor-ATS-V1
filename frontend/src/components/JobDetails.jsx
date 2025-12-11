@@ -9,6 +9,7 @@ import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import LinkedCandidates from './LinkedCandidates.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
 import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
+import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon } from '@mui/icons-material';
@@ -38,6 +39,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showCompanyNameModal, setShowCompanyNameModal] = useState(false);
   const [existingWorkflow, setExistingWorkflow] = useState(null);
   const [checkingWorkflow, setCheckingWorkflow] = useState(false);
+  const [statusChangeConfirm, setStatusChangeConfirm] = useState({
+    open: false,
+    newStatus: ''
+  });
 
   // Update currentStatus when job prop changes
   useEffect(() => {
@@ -68,7 +73,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     }
   }, [job._id]);
 
-  const handleQuickStatusChange = async (newStatus) => {
+  const handleQuickStatusChangeRequest = (newStatus) => {
     // Check if workflow exists - only allow "Ongoing client process" or "Completed"
     if (existingWorkflow && existingWorkflow.status === 'Active') {
       const allowedStatuses = ['Ongoing client process', 'Completed'];
@@ -77,6 +82,16 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         return;
       }
     }
+    
+    setStatusChangeConfirm({
+      open: true,
+      newStatus
+    });
+  };
+
+  const handleQuickStatusChangeConfirm = async () => {
+    const { newStatus } = statusChangeConfirm;
+    setStatusChangeConfirm({ open: false, newStatus: '' });
     
     try {
       const token = localStorage.getItem('jwt');
@@ -595,31 +610,6 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               >
                 Shareable Link
               </Button>
-              {accessLevel === 2 && (
-                <Button 
-                  variant="outlined" 
-                  color="error"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteJob();
-                  }}
-                  disabled={isDeleting}
-                  sx={{ 
-                    borderColor: 'rgba(244, 67, 54, 0.5)', 
-                    color: '#f44336',
-                    '&:hover': { 
-                      borderColor: '#f44336', 
-                      backgroundColor: 'rgba(244, 67, 54, 0.1)' 
-                    },
-                    '&:disabled': { 
-                      borderColor: 'rgba(244, 67, 54, 0.3)', 
-                      color: 'rgba(244, 67, 54, 0.5)' 
-                    }
-                  }}
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete'}
-                </Button>
-              )}
             </Box>
 
             {/* Job Details - Tabular Format */}
@@ -748,7 +738,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       <FormControl size="small" sx={{ minWidth: 140 }}>
                         <Select
                           value={currentStatus}
-                          onChange={(e) => handleQuickStatusChange(e.target.value)}
+                          onChange={(e) => handleQuickStatusChangeRequest(e.target.value)}
                           sx={{
                             backgroundColor: `${getStatusColor(currentStatus)}20`,
                             color: getStatusColor(currentStatus),
@@ -1464,6 +1454,19 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         onConfirm={handleCompanyNameModalConfirm}
         jobId={job._id}
         organizationName={job.organization}
+        recruiterId={userId}
+      />
+
+      {/* Status Change Confirmation Dialog */}
+      <StatusChangeConfirmDialog
+        open={statusChangeConfirm.open}
+        onClose={() => setStatusChangeConfirm({ open: false, newStatus: '' })}
+        onConfirm={handleQuickStatusChangeConfirm}
+        title="Confirm Job Status Change"
+        currentStatus={currentStatus}
+        newStatus={statusChangeConfirm.newStatus}
+        itemName={job.title}
+        itemType="job"
       />
     </Box>
   );

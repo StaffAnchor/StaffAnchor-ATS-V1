@@ -34,6 +34,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import API_URL from '../config/api';
 import ClientSideStatusCreation from '../components/ClientSideStatusCreation';
+import StatusChangeConfirmDialog from '../components/StatusChangeConfirmDialog';
 
 const clientSideStatuses = [
   'Interview Scheduled',
@@ -74,6 +75,14 @@ const WorkflowsSimple = ({ user }) => {
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, workflowId: null, jobTitle: '' });
   const [showCreationModal, setShowCreationModal] = useState(false);
   const [preSelectedJobId, setPreSelectedJobId] = useState(null);
+  const [statusChangeConfirm, setStatusChangeConfirm] = useState({
+    open: false,
+    workflowId: null,
+    candidateId: null,
+    candidateName: '',
+    currentStatus: '',
+    newStatus: ''
+  });
 
   useEffect(() => {
     fetchWorkflows();
@@ -108,7 +117,21 @@ const WorkflowsSimple = ({ user }) => {
     }
   };
 
-  const handleStatusChange = async (workflowId, candidateId, newStatus) => {
+  const handleStatusChangeRequest = (workflowId, candidateId, newStatus, candidateName, currentStatus) => {
+    setStatusChangeConfirm({
+      open: true,
+      workflowId,
+      candidateId,
+      candidateName,
+      currentStatus,
+      newStatus
+    });
+  };
+
+  const handleStatusChangeConfirm = async () => {
+    const { workflowId, candidateId, newStatus } = statusChangeConfirm;
+    setStatusChangeConfirm({ open: false, workflowId: null, candidateId: null, candidateName: '', currentStatus: '', newStatus: '' });
+    
     const key = `${workflowId}-${candidateId}`;
     try {
       setUpdatingStatus(prev => ({ ...prev, [key]: true }));
@@ -295,7 +318,13 @@ const WorkflowsSimple = ({ user }) => {
                                 <FormControl size="small" fullWidth>
                                   <Select
                                     value={candidateStatus.clientSideStatus || 'Interview Scheduled'}
-                                    onChange={(e) => handleStatusChange(workflow._id, candidate?._id, e.target.value)}
+                                    onChange={(e) => handleStatusChangeRequest(
+                                      workflow._id, 
+                                      candidate?._id, 
+                                      e.target.value,
+                                      candidate?.name || 'N/A',
+                                      candidateStatus.clientSideStatus || 'Interview Scheduled'
+                                    )}
                                     disabled={updatingStatus[key]}
                                     sx={{
                                       color: getStatusColor(candidateStatus.clientSideStatus),
@@ -407,6 +436,18 @@ const WorkflowsSimple = ({ user }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Status Change Confirmation Dialog */}
+      <StatusChangeConfirmDialog
+        open={statusChangeConfirm.open}
+        onClose={() => setStatusChangeConfirm({ open: false, workflowId: null, candidateId: null, candidateName: '', currentStatus: '', newStatus: '' })}
+        onConfirm={handleStatusChangeConfirm}
+        title="Confirm Client Side Status Change"
+        currentStatus={statusChangeConfirm.currentStatus}
+        newStatus={statusChangeConfirm.newStatus}
+        itemName={statusChangeConfirm.candidateName}
+        itemType="client status"
+      />
     </Box>
   );
 };

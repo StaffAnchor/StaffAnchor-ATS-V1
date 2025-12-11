@@ -15,6 +15,7 @@ import Clients from './pages/Clients.jsx';
 import AddClient from './components/AddClient.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ActiveBanner from './components/ActiveBanner.jsx';
+import Analytics from './pages/Analytics.jsx';
 import { setupAxiosInterceptors } from './utils/axiosConfig.js';
 
 function App() {
@@ -176,6 +177,14 @@ function App() {
                         onClose={() => navigate('/clients')}
                         onClientAdded={() => navigate('/clients')}
                       />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/analytics" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      <Analytics />
                     </ProtectedRoute>
                   } 
                 />

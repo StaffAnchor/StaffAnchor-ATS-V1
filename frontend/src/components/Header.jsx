@@ -120,7 +120,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
   };
 
   const handleAnalytics = () => {
-    setShowFeatureDialog(true);
+    navigate('/analytics');
   };
 
   const handleInternalRecruitersTab = () => {
@@ -292,19 +292,12 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             <Button
               onClick={handleAnalytics}
               sx={{
-                background: '#ffffff',
-                color: '#475569',
-                border: '2px solid #e2e8f0',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                ...getTabStyle(location.pathname === '/analytics'),
                 textTransform: 'none',
                 px: 2,
                 py: 1,
                 borderRadius: '8px',
-                minWidth: 'auto',
-                '&:hover': {
-                  backgroundColor: '#f8fafc',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                }
+                minWidth: 'auto'
               }}
             >
               Analytics

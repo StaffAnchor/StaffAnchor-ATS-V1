@@ -956,14 +956,22 @@ exports.submitPublicJobApplication = async (req, res) => {
 
     // Create candidate-job link with source "applied-through-link"
     try {
+      const linkData = {
+        candidateId: candidate._id,
+        jobId,
+        source: 'applied-through-link',
+        status: 'Applied'
+      };
+      
+      // If a recruiter shared this link, track them
+      if (req.body.sharedByRecruiterId) {
+        linkData.sharedByRecruiterId = req.body.sharedByRecruiterId;
+        linkData.linkedBy = req.body.sharedByRecruiterId;
+      }
+      
       await CandidateJobLink.findOneAndUpdate(
         { candidateId: candidate._id, jobId },
-        {
-          candidateId: candidate._id,
-          jobId,
-          source: 'applied-through-link',
-          status: 'Applied'
-        },
+        linkData,
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
     } catch (linkError) {

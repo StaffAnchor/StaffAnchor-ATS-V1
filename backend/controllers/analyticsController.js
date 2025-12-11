@@ -1,0 +1,570 @@
+const CandidateJobLink = require('../models/CandidateJobLink');
+const Candidate = require('../models/Candidate');
+const Job = require('../models/Job');
+const Workflow = require('../models/Workflow');
+const User = require('../models/User');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+// Get all jobs with analytics summary for a user
+exports.getJobsWithAnalytics = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const userAccessLevel = req.user.accessLevel;
+    const { search, company } = req.query;
+
+    // Build query for jobs where user is authorized or created by user
+    const jobQuery = {
+      $or: [
+        { authorizedUsers: userId },
+        { createdBy: userId }
+      ]
+    };
+
+    // Add search filter for job ID or company
+    if (search) {
+      jobQuery.$and = [
+        {
+          $or: [
+            { jobId: { $regex: search, $options: 'i' } },
+            { organization: { $regex: search, $options: 'i' } },
+            { title: { $regex: search, $options: 'i' } }
+          ]
+        }
+      ];
+    }
+
+    if (company) {
+      jobQuery.organization = { $regex: company, $options: 'i' };
+    }
+
+    const jobs = await Job.find(jobQuery)
+      .select('jobId title organization status createdAt createdBy authorizedUsers')
+      .sort({ createdAt: -1 });
+
+    // Get analytics summary for each job
+    const jobsWithAnalytics = await Promise.all(
+      jobs.map(async (job) => {
+        // Get all candidate job links for this job
+        const links = await CandidateJobLink.find({ jobId: job._id });
+
+        // Count candidates by status
+        const linkedCount = links.length;
+        const submittedCount = links.filter(l => 
+          l.status === 'Submitted to Client' || l.status === 'Submitted'
+        ).length;
+
+        // Get workflow data for client-side statuses
+        const workflow = await Workflow.findOne({ jobId: job._id });
+        
+        let selectedCount = 0;
+        let rejectedCount = 0;
+        let ongoingCount = 0;
+
+        if (workflow && workflow.candidateStatuses) {
+          const linkedCandidateIds = links.map(l => l.candidateId.toString());
+
+          workflow.candidateStatuses.forEach(cs => {
+            if (linkedCandidateIds.includes(cs.candidateId.toString())) {
+              const status = cs.clientSideStatus;
+              if (['Offer Accepted', 'Joined'].includes(status)) {
+                selectedCount++;
+              } else if (status === 'Rejected') {
+                rejectedCount++;
+              } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
+                         'Feedback Received', 'Shortlisted', 'On Hold', 'Offered'].includes(status)) {
+                ongoingCount++;
+              }
+            }
+          });
+        }
+
+        // Count unique recruiters (include both linkedBy and sharedByRecruiterId)
+        const recruiterIds = new Set();
+        links.forEach(l => {
+          if (l.linkedBy) recruiterIds.add(l.linkedBy.toString());
+          if (l.sharedByRecruiterId) recruiterIds.add(l.sharedByRecruiterId.toString());
+        });
+
+        return {
+          _id: job._id,
+          jobId: job.jobId,
+          title: job.title,
+          organization: job.organization,
+          status: job.status,
+          createdAt: job.createdAt,
+          recruiterCount: recruiterIds.size,
+          analytics: {
+            linked: linkedCount,
+            sentToClient: submittedCount,
+            selected: selectedCount,
+            rejected: rejectedCount,
+            ongoing: ongoingCount
+          }
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      jobs: jobsWithAnalytics
+    });
+  } catch (error) {
+    console.error('Error fetching jobs with analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch jobs with analytics' });
+  }
+};
+
+// Get detailed analytics for a specific job - PER RECRUITER
+exports.getJobAnalytics = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    // Get the job with all details
+    const job = await Job.findById(jobId)
+      .populate('clientId', 'name')
+      .populate('createdBy', 'fullName email')
+      .populate('authorizedUsers', 'fullName email')
+      .select('jobId title organization status clientContact createdAt createdBy authorizedUsers');
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Get ALL candidate job links for this job
+    const links = await CandidateJobLink.find({ jobId })
+      .populate({
+        path: 'candidateId',
+        select: 'name email phone resume'
+      })
+      .populate('linkedBy', 'fullName email')
+      .populate('sharedByRecruiterId', 'fullName email')
+      .populate('submittedBy', 'fullName email')
+      .populate('statusChangedBy', 'fullName email');
+
+    // Filter out links with null candidates (deleted candidates)
+    const validLinks = links.filter(l => l.candidateId);
+
+    // Get workflow data for client-side statuses
+    const workflow = await Workflow.findOne({ jobId })
+      .populate('candidateStatuses.updatedBy', 'fullName email');
+
+    // Build a map of candidateId to client-side status info
+    const clientStatusMap = new Map();
+    if (workflow && workflow.candidateStatuses) {
+      workflow.candidateStatuses.forEach(cs => {
+        clientStatusMap.set(cs.candidateId.toString(), {
+          clientSideStatus: cs.clientSideStatus,
+          updatedBy: cs.updatedBy,
+          updatedAt: cs.updatedAt,
+          statusHistory: cs.statusHistory || []
+        });
+      });
+    }
+
+    // Group candidates by recruiter (use linkedBy or sharedByRecruiterId for applied-through-link candidates)
+    const recruiterMap = new Map();
+    
+    validLinks.forEach(link => {
+      // For candidates who applied through a shared link, use sharedByRecruiterId
+      // Otherwise, use linkedBy
+      const recruiter = link.sharedByRecruiterId || link.linkedBy;
+      const recruiterId = recruiter?._id?.toString() || 'unknown';
+      const recruiterName = recruiter?.fullName || 'Unknown Recruiter';
+      const recruiterEmail = recruiter?.email || '';
+      
+      if (!recruiterMap.has(recruiterId)) {
+        recruiterMap.set(recruiterId, {
+          recruiterId,
+          recruiterName,
+          recruiterEmail,
+          candidates: {
+            linked: [],
+            sentToClient: [],
+            selected: [],
+            rejected: [],
+            ongoing: []
+          },
+          timeline: [],
+          stats: {
+            totalLinked: 0,
+            totalSentToClient: 0,
+            totalSelected: 0,
+            totalRejected: 0,
+            totalOngoing: 0
+          }
+        });
+      }
+      
+      const recruiterData = recruiterMap.get(recruiterId);
+      
+      // Build candidate info
+      const candidateInfo = {
+        _id: link.candidateId._id,
+        name: link.candidateId.name,
+        email: link.candidateId.email,
+        phone: link.candidateId.phone,
+        resume: link.candidateId.resume,
+        linkStatus: link.status,
+        linkedAt: link.createdAt,
+        submittedAt: link.submittedAt,
+        submittedBy: link.submittedBy,
+        statusHistory: link.statusHistory || []
+      };
+      
+      // Add client-side status if available
+      const clientStatus = clientStatusMap.get(link.candidateId._id.toString());
+      if (clientStatus) {
+        candidateInfo.clientSideStatus = clientStatus.clientSideStatus;
+        candidateInfo.clientStatusUpdatedBy = clientStatus.updatedBy;
+        candidateInfo.clientStatusUpdatedAt = clientStatus.updatedAt;
+        candidateInfo.clientStatusHistory = clientStatus.statusHistory;
+      }
+      
+      // Categorize candidate
+      recruiterData.candidates.linked.push(candidateInfo);
+      recruiterData.stats.totalLinked++;
+      
+      // Add to timeline
+      recruiterData.timeline.push({
+        action: 'linked',
+        candidateName: link.candidateId.name,
+        date: link.createdAt
+      });
+      
+      // Check if sent to client
+      if (link.status === 'Submitted to Client' || link.status === 'Submitted') {
+        recruiterData.candidates.sentToClient.push(candidateInfo);
+        recruiterData.stats.totalSentToClient++;
+        
+        if (link.submittedAt) {
+          recruiterData.timeline.push({
+            action: 'submitted',
+            candidateName: link.candidateId.name,
+            date: link.submittedAt
+          });
+        }
+      }
+      
+      // Check client-side status for selected/rejected/ongoing
+      if (clientStatus) {
+        const status = clientStatus.clientSideStatus;
+        if (['Offer Accepted', 'Joined'].includes(status)) {
+          recruiterData.candidates.selected.push(candidateInfo);
+          recruiterData.stats.totalSelected++;
+          
+          recruiterData.timeline.push({
+            action: 'selected',
+            candidateName: link.candidateId.name,
+            date: clientStatus.updatedAt,
+            status: status
+          });
+        } else if (status === 'Rejected') {
+          recruiterData.candidates.rejected.push(candidateInfo);
+          recruiterData.stats.totalRejected++;
+          
+          recruiterData.timeline.push({
+            action: 'rejected',
+            candidateName: link.candidateId.name,
+            date: clientStatus.updatedAt
+          });
+        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
+                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered', 'Offer Declined', 'No Show'].includes(status)) {
+          recruiterData.candidates.ongoing.push(candidateInfo);
+          recruiterData.stats.totalOngoing++;
+        }
+      }
+    });
+    
+    // Sort timelines by date
+    recruiterMap.forEach(data => {
+      data.timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+    
+    // Convert map to array
+    const recruitersAnalytics = Array.from(recruiterMap.values());
+    
+    // Calculate overall job stats
+    const overallStats = {
+      totalLinked: validLinks.length,
+      totalSentToClient: validLinks.filter(l => 
+        l.status === 'Submitted to Client' || l.status === 'Submitted'
+      ).length,
+      totalSelected: 0,
+      totalRejected: 0,
+      totalOngoing: 0
+    };
+    
+    recruitersAnalytics.forEach(r => {
+      overallStats.totalSelected += r.stats.totalSelected;
+      overallStats.totalRejected += r.stats.totalRejected;
+      overallStats.totalOngoing += r.stats.totalOngoing;
+    });
+    
+    // Build activity timeline for graphs (group by date)
+    const activityByDate = {};
+    validLinks.forEach(link => {
+      const dateStr = new Date(link.createdAt).toISOString().split('T')[0];
+      if (!activityByDate[dateStr]) {
+        activityByDate[dateStr] = { date: dateStr, linked: 0, submitted: 0 };
+      }
+      activityByDate[dateStr].linked++;
+      
+      if (link.submittedAt) {
+        const submitDateStr = new Date(link.submittedAt).toISOString().split('T')[0];
+        if (!activityByDate[submitDateStr]) {
+          activityByDate[submitDateStr] = { date: submitDateStr, linked: 0, submitted: 0 };
+        }
+        activityByDate[submitDateStr].submitted++;
+      }
+    });
+    
+    const activityTimeline = Object.values(activityByDate).sort((a, b) => 
+      new Date(a.date) - new Date(b.date)
+    );
+
+    res.json({
+      success: true,
+      job: {
+        _id: job._id,
+        jobId: job.jobId,
+        title: job.title,
+        organization: job.organization,
+        status: job.status,
+        client: job.clientId?.name || job.organization,
+        clientContact: job.clientContact,
+        createdAt: job.createdAt,
+        createdBy: job.createdBy
+      },
+      overallStats,
+      recruitersAnalytics,
+      activityTimeline,
+      totalRecruiters: recruitersAnalytics.length
+    });
+  } catch (error) {
+    console.error('Error fetching job analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch job analytics' });
+  }
+};
+
+// Generate AI performance report for ALL recruiters
+exports.generatePerformanceReport = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    // Get job details
+    const job = await Job.findById(jobId)
+      .select('jobId title organization status createdBy');
+
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Get all links for this job
+    const links = await CandidateJobLink.find({ jobId })
+      .populate('linkedBy', 'fullName email')
+      .populate('sharedByRecruiterId', 'fullName email')
+      .populate('candidateId', 'name');
+
+    const validLinks = links.filter(l => l.candidateId);
+
+    // Get workflow data
+    const workflow = await Workflow.findOne({ jobId });
+
+    // Build a map of candidateId to client-side status
+    const clientStatusMap = new Map();
+    if (workflow && workflow.candidateStatuses) {
+      workflow.candidateStatuses.forEach(cs => {
+        clientStatusMap.set(cs.candidateId.toString(), cs.clientSideStatus);
+      });
+    }
+
+    // Group by recruiter and calculate stats (use linkedBy or sharedByRecruiterId)
+    const recruiterStats = new Map();
+    
+    validLinks.forEach(link => {
+      // For candidates who applied through a shared link, use sharedByRecruiterId
+      const recruiter = link.sharedByRecruiterId || link.linkedBy;
+      const recruiterId = recruiter?._id?.toString() || 'unknown';
+      const recruiterName = recruiter?.fullName || 'Unknown Recruiter';
+      
+      if (!recruiterStats.has(recruiterId)) {
+        recruiterStats.set(recruiterId, {
+          name: recruiterName,
+          linked: 0,
+          submitted: 0,
+          selected: 0,
+          rejected: 0,
+          ongoing: 0,
+          firstActivity: link.createdAt,
+          lastActivity: link.createdAt
+        });
+      }
+      
+      const stats = recruiterStats.get(recruiterId);
+      stats.linked++;
+      
+      // Track activity dates
+      if (new Date(link.createdAt) < new Date(stats.firstActivity)) {
+        stats.firstActivity = link.createdAt;
+      }
+      if (new Date(link.updatedAt) > new Date(stats.lastActivity)) {
+        stats.lastActivity = link.updatedAt;
+      }
+      
+      if (link.status === 'Submitted to Client' || link.status === 'Submitted') {
+        stats.submitted++;
+      }
+      
+      const clientStatus = clientStatusMap.get(link.candidateId._id.toString());
+      if (clientStatus) {
+        if (['Offer Accepted', 'Joined'].includes(clientStatus)) {
+          stats.selected++;
+        } else if (clientStatus === 'Rejected') {
+          stats.rejected++;
+        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
+                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered'].includes(clientStatus)) {
+          stats.ongoing++;
+        }
+      }
+    });
+
+    // Build report data for each recruiter
+    const recruitersData = Array.from(recruiterStats.entries()).map(([id, stats]) => {
+      const submissionRate = stats.linked > 0 ? ((stats.submitted / stats.linked) * 100).toFixed(1) : 0;
+      const selectionRate = stats.submitted > 0 ? ((stats.selected / stats.submitted) * 100).toFixed(1) : 0;
+      const rejectionRate = stats.submitted > 0 ? ((stats.rejected / stats.submitted) * 100).toFixed(1) : 0;
+      
+      return {
+        name: stats.name,
+        linked: stats.linked,
+        submitted: stats.submitted,
+        selected: stats.selected,
+        rejected: stats.rejected,
+        ongoing: stats.ongoing,
+        submissionRate,
+        selectionRate,
+        rejectionRate,
+        firstActivity: stats.firstActivity,
+        lastActivity: stats.lastActivity
+      };
+    });
+
+    // Calculate overall stats
+    const overallStats = {
+      totalLinked: validLinks.length,
+      totalSubmitted: validLinks.filter(l => 
+        l.status === 'Submitted to Client' || l.status === 'Submitted'
+      ).length,
+      totalSelected: 0,
+      totalRejected: 0,
+      totalOngoing: 0
+    };
+    
+    recruitersData.forEach(r => {
+      overallStats.totalSelected += r.selected;
+      overallStats.totalRejected += r.rejected;
+      overallStats.totalOngoing += r.ongoing;
+    });
+
+    // Generate AI report using Gemini
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // Build detailed prompt with per-recruiter data
+    let recruiterDetails = recruitersData.map((r, i) => `
+RECRUITER ${i + 1}: ${r.name}
+- Candidates Linked: ${r.linked}
+- Candidates Submitted to Client: ${r.submitted} (${r.submissionRate}% of linked)
+- Candidates Selected: ${r.selected} (${r.selectionRate}% of submitted)
+- Candidates Rejected: ${r.rejected} (${r.rejectionRate}% of submitted)
+- Candidates in Ongoing Process: ${r.ongoing}
+- First Activity: ${new Date(r.firstActivity).toLocaleDateString()}
+- Last Activity: ${new Date(r.lastActivity).toLocaleDateString()}
+`).join('\n');
+
+    const prompt = `You are an HR analytics expert and recruitment performance analyst. Analyze the following recruitment performance data for a job and generate a comprehensive performance report.
+
+JOB DETAILS:
+- Job Title: ${job.title}
+- Company: ${job.organization}
+- Job ID: ${job.jobId}
+- Current Status: ${job.status}
+- Total Recruiters Working: ${recruitersData.length}
+
+OVERALL JOB METRICS:
+- Total Candidates Linked: ${overallStats.totalLinked}
+- Total Submitted to Client: ${overallStats.totalSubmitted}
+- Total Selected: ${overallStats.totalSelected}
+- Total Rejected: ${overallStats.totalRejected}
+- Total Ongoing: ${overallStats.totalOngoing}
+
+PER-RECRUITER PERFORMANCE:
+${recruiterDetails}
+
+Please provide a detailed performance report (250-300 words) including:
+
+1. **Overall Job Performance Summary**: How is the recruitment for this job progressing?
+
+2. **Individual Recruiter Analysis**: Evaluate each recruiter's performance. Who is performing well? Who needs improvement?
+
+3. **Key Metrics Comparison**: Compare submission rates, selection rates, and rejection rates across recruiters.
+
+4. **Strengths & Weaknesses**: Identify what's working and what's not.
+
+5. **Recommendations**: Specific, actionable recommendations for each recruiter to improve their performance.
+
+6. **Performance Rankings**: Rank the recruiters based on overall effectiveness (considering selection rate, volume, and quality).
+
+Keep the tone professional and constructive. Use bullet points and clear sections for readability.`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const report = response.text();
+
+    res.json({
+      success: true,
+      job: {
+        jobId: job.jobId,
+        title: job.title,
+        organization: job.organization
+      },
+      overallStats,
+      recruitersData,
+      report
+    });
+  } catch (error) {
+    console.error('Error generating performance report:', error);
+    
+    // Check if it's a rate limit error
+    if (error.status === 429 || error.message?.includes('quota') || error.message?.includes('rate limit')) {
+      return res.status(429).json({ 
+        error: 'AI_RATE_LIMIT',
+        message: 'The AI service is currently busy. Please try again in a minute.'
+      });
+    }
+    
+    res.status(500).json({ error: 'Failed to generate performance report' });
+  }
+};
+
+// Get list of unique companies for filtering
+exports.getCompanies = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const jobs = await Job.find({
+      $or: [
+        { authorizedUsers: userId },
+        { createdBy: userId }
+      ]
+    }).distinct('organization');
+
+    res.json({
+      success: true,
+      companies: jobs.sort()
+    });
+  } catch (error) {
+    console.error('Error fetching companies:', error);
+    res.status(500).json({ error: 'Failed to fetch companies' });
+  }
+};

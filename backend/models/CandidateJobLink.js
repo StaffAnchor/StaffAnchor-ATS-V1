@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+// Schema for tracking status change history
+const StatusHistorySchema = new mongoose.Schema({
+  status: {
+    type: String,
+    required: true
+  },
+  changedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  changedAt: {
+    type: Date,
+    default: Date.now
+  },
+  notes: String
+}, { _id: false });
+
 const CandidateJobLinkSchema = new mongoose.Schema({
   candidateId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +68,29 @@ const CandidateJobLinkSchema = new mongoose.Schema({
     ],
     default: 'New'
   },
+  // Track who last changed the status
+  statusChangedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  statusChangedAt: {
+    type: Date
+  },
+  // Track who submitted to client
+  submittedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  submittedAt: {
+    type: Date
+  },
+  // Track which recruiter shared the application link (for applied-through-link source)
+  sharedByRecruiterId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  // Status change history for audit trail
+  statusHistory: [StatusHistorySchema],
   notes: {
     type: String,
     trim: true

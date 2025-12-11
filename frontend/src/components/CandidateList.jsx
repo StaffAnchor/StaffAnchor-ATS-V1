@@ -1155,38 +1155,6 @@ const CandidateList = ({
                               </Button>
                             </Tooltip>
                           )}
-                          {accessLevel === 2 && (
-                            <Tooltip title="Delete Candidate">
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                color="error"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCandidate(candidate);
-                                }}
-                                disabled={isDeleting[candidate._id]}
-                                sx={{
-                                  borderColor: "rgba(244, 67, 54, 0.5)",
-                                  color: "#f44336",
-                                  fontSize: "0.75rem",
-                                  padding: "4px 8px",
-                                  minWidth: "auto",
-                                  borderRadius: 1,
-                                  "&:hover": {
-                                    borderColor: "#f44336",
-                                    backgroundColor: "rgba(244, 67, 54, 0.1)",
-                                  },
-                                  "&:disabled": {
-                                    borderColor: "rgba(244, 67, 54, 0.3)",
-                                    color: "rgba(244, 67, 54, 0.5)",
-                                  }
-                                }}
-                              >
-                                {isDeleting[candidate._id] ? '...' : 'Delete'}
-                              </Button>
-                            </Tooltip>
-                          )}
                         </Box>
                       </TableCell>
                     </TableRow>,

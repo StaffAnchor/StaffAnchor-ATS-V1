@@ -20,7 +20,7 @@ import {
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
 
-const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizationName }) => {
+const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizationName, recruiterId }) => {
   const [showCompanyName, setShowCompanyName] = useState('show');
   const [alternateName, setAlternateName] = useState('');
   const [error, setError] = useState('');
@@ -35,17 +35,22 @@ const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizat
     // Reset error
     setError('');
 
-    // Build the shareable URL
+    // Build the shareable URL with recruiter tracking
     const baseUrl = `${window.location.origin}/apply/${jobId}`;
-    let shareableUrl = baseUrl;
-
-    if (showCompanyName === 'hide') {
-      const params = new URLSearchParams({
-        hideCompany: 'true',
-        altName: alternateName.trim()
-      });
-      shareableUrl = `${baseUrl}?${params.toString()}`;
+    const params = new URLSearchParams();
+    
+    // Always add recruiter ID for tracking
+    if (recruiterId) {
+      params.append('ref', recruiterId);
     }
+    
+    if (showCompanyName === 'hide') {
+      params.append('hideCompany', 'true');
+      params.append('altName', alternateName.trim());
+    }
+    
+    const queryString = params.toString();
+    const shareableUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
 
     // Copy to clipboard
     navigator.clipboard.writeText(shareableUrl).then(() => {

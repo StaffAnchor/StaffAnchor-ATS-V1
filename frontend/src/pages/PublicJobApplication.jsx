@@ -80,17 +80,26 @@ const PublicJobApplication = () => {
     fetchJobDetails();
   }, [jobId]);
 
-  // Check URL parameters for company name visibility when job is loaded
+  // State for tracking which recruiter shared the link
+  const [sharedByRecruiterId, setSharedByRecruiterId] = useState(null);
+
+  // Check URL parameters for company name visibility and recruiter tracking when job is loaded
   useEffect(() => {
     if (job) {
       const urlParams = new URLSearchParams(window.location.search);
       const hideCompany = urlParams.get('hideCompany');
       const altName = urlParams.get('altName');
+      const refRecruiterId = urlParams.get('ref');
       
       if (hideCompany === 'true' && altName) {
         setDisplayCompanyName(altName);
       } else {
         setDisplayCompanyName(job.organization);
+      }
+      
+      // Store the recruiter ID if present in URL
+      if (refRecruiterId) {
+        setSharedByRecruiterId(refRecruiterId);
       }
     }
   }, [job]);
@@ -227,7 +236,9 @@ const PublicJobApplication = () => {
         talentPools: selectedExpertiseTalentPools,
         expertiseSkills: selectedExpertiseSkills,
         experience: form.experience.filter(exp => exp.company || exp.position),
-        education: form.education.filter(edu => edu.clg || edu.course)
+        education: form.education.filter(edu => edu.clg || edu.course),
+        // Include the recruiter ID who shared this link for tracking
+        sharedByRecruiterId: sharedByRecruiterId
       };
 
       const response = await axios.post(`${API_URL}/api/candidates/public/apply/${jobId}`, candidateData);

@@ -167,25 +167,66 @@ exports.updateLinkStatus = async (req, res) => {
   try {
     const { linkId } = req.params;
     const { status, notes } = req.body;
+    const userId = req.user?._id;
 
     if (!linkId) {
       return res.status(400).json({ error: 'linkId is required' });
     }
 
+    // First get the current link to track history
+    const existingLink = await CandidateJobLink.findById(linkId);
+    if (!existingLink) {
+      return res.status(404).json({ error: 'Link not found' });
+    }
+
     const updateData = {};
-    if (status) updateData.status = status;
+    if (status) {
+      updateData.status = status;
+      updateData.statusChangedBy = userId;
+      updateData.statusChangedAt = new Date();
+      
+      // Track if submitted to client
+      if (status === 'Submitted to Client' || status === 'Submitted') {
+        updateData.submittedBy = userId;
+        updateData.submittedAt = new Date();
+      }
+      
+      // Add to status history
+      const historyEntry = {
+        status: status,
+        changedBy: userId,
+        changedAt: new Date(),
+        notes: notes || ''
+      };
+      
+      updateData.$push = { statusHistory: historyEntry };
+    }
     if (notes !== undefined) updateData.notes = notes;
 
-    const link = await CandidateJobLink.findByIdAndUpdate(
-      linkId,
-      updateData,
-      { new: true }
-    )
-      .populate('candidateId')
-      .populate('linkedBy', 'fullName email');
-
-    if (!link) {
-      return res.status(404).json({ error: 'Link not found' });
+    // Use findOneAndUpdate with $push separately if needed
+    let link;
+    if (updateData.$push) {
+      const pushData = updateData.$push;
+      delete updateData.$push;
+      link = await CandidateJobLink.findByIdAndUpdate(
+        linkId,
+        { ...updateData, $push: pushData },
+        { new: true }
+      )
+        .populate('candidateId')
+        .populate('linkedBy', 'fullName email')
+        .populate('statusChangedBy', 'fullName email')
+        .populate('submittedBy', 'fullName email');
+    } else {
+      link = await CandidateJobLink.findByIdAndUpdate(
+        linkId,
+        updateData,
+        { new: true }
+      )
+        .populate('candidateId')
+        .populate('linkedBy', 'fullName email')
+        .populate('statusChangedBy', 'fullName email')
+        .populate('submittedBy', 'fullName email');
     }
 
     res.json({
