@@ -547,6 +547,405 @@ Keep the tone professional and constructive. Use bullet points and clear section
   }
 };
 
+// Get recruiter-specific analytics with date range filtering
+exports.getRecruiterAnalytics = async (req, res) => {
+  try {
+    const { recruiterId } = req.params;
+    const { startDate, endDate } = req.query;
+
+    // Verify recruiter exists
+    const recruiter = await User.findById(recruiterId);
+    if (!recruiter) {
+      return res.status(404).json({ error: 'Recruiter not found' });
+    }
+
+    // Build date filter
+    let dateFilter = {};
+    if (startDate || endDate) {
+      dateFilter.createdAt = {};
+      if (startDate) {
+        dateFilter.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.createdAt.$lte = end;
+      }
+    }
+
+    // Get all candidate job links associated with this recruiter
+    const linkQuery = {
+      $or: [
+        { linkedBy: recruiterId },
+        { sharedByRecruiterId: recruiterId }
+      ],
+      ...dateFilter
+    };
+
+    const links = await CandidateJobLink.find(linkQuery)
+      .populate({
+        path: 'candidateId',
+        select: 'name email phone'
+      })
+      .populate({
+        path: 'jobId',
+        select: 'jobId title organization status createdAt'
+      })
+      .sort({ createdAt: -1 });
+
+    // Filter out links with null candidates or jobs
+    const validLinks = links.filter(l => l.candidateId && l.jobId);
+
+    // Get unique jobs this recruiter has worked on
+    const jobIds = [...new Set(validLinks.map(l => l.jobId._id.toString()))];
+    
+    // Get workflow data for client-side statuses
+    const workflows = await Workflow.find({ jobId: { $in: jobIds } });
+    
+    // Build a map of candidateId+jobId to client-side status
+    const clientStatusMap = new Map();
+    workflows.forEach(workflow => {
+      if (workflow.candidateStatuses) {
+        workflow.candidateStatuses.forEach(cs => {
+          const key = `${cs.candidateId.toString()}_${workflow.jobId.toString()}`;
+          clientStatusMap.set(key, {
+            clientSideStatus: cs.clientSideStatus,
+            updatedAt: cs.updatedAt
+          });
+        });
+      }
+    });
+
+    // Calculate overall stats
+    let overallStats = {
+      totalLinked: 0,
+      appliedThroughLink: 0,
+      addedByRecruiter: 0,
+      submittedToClient: 0,
+      selectedByClient: 0,
+      rejectedByClient: 0,
+      ongoingProcess: 0,
+      interviewScheduled: 0,
+      interviewCompleted: 0,
+      offered: 0,
+      offerAccepted: 0,
+      joined: 0
+    };
+
+    // Track candidates by source
+    const candidatesBySource = {
+      'applied-through-link': 0,
+      'added-by-recruiter': 0,
+      'manual-link': 0,
+      'ai-suggested': 0
+    };
+
+    // Track per-job analytics
+    const jobAnalyticsMap = new Map();
+
+    validLinks.forEach(link => {
+      const jobIdStr = link.jobId._id.toString();
+      
+      // Initialize job analytics if not exists
+      if (!jobAnalyticsMap.has(jobIdStr)) {
+        jobAnalyticsMap.set(jobIdStr, {
+          job: {
+            _id: link.jobId._id,
+            jobId: link.jobId.jobId,
+            title: link.jobId.title,
+            organization: link.jobId.organization,
+            status: link.jobId.status,
+            createdAt: link.jobId.createdAt
+          },
+          stats: {
+            totalLinked: 0,
+            appliedThroughLink: 0,
+            addedByRecruiter: 0,
+            submittedToClient: 0,
+            selectedByClient: 0,
+            rejectedByClient: 0,
+            ongoingProcess: 0,
+            interviewScheduled: 0,
+            interviewCompleted: 0,
+            offered: 0
+          },
+          candidates: [],
+          timeline: []
+        });
+      }
+
+      const jobAnalytics = jobAnalyticsMap.get(jobIdStr);
+      
+      // Count by source
+      overallStats.totalLinked++;
+      jobAnalytics.stats.totalLinked++;
+      
+      if (link.source === 'applied-through-link') {
+        overallStats.appliedThroughLink++;
+        jobAnalytics.stats.appliedThroughLink++;
+      } else if (link.source === 'added-by-recruiter' || link.source === 'manual-link') {
+        overallStats.addedByRecruiter++;
+        jobAnalytics.stats.addedByRecruiter++;
+      }
+      candidatesBySource[link.source] = (candidatesBySource[link.source] || 0) + 1;
+
+      // Check if submitted to client
+      if (link.status === 'Submitted to Client' || link.status === 'Submitted') {
+        overallStats.submittedToClient++;
+        jobAnalytics.stats.submittedToClient++;
+      }
+
+      // Check client-side status
+      const key = `${link.candidateId._id.toString()}_${jobIdStr}`;
+      const clientStatus = clientStatusMap.get(key);
+      
+      if (clientStatus) {
+        const status = clientStatus.clientSideStatus;
+        
+        if (['Offer Accepted', 'Joined'].includes(status)) {
+          overallStats.selectedByClient++;
+          jobAnalytics.stats.selectedByClient++;
+          if (status === 'Joined') overallStats.joined++;
+          if (status === 'Offer Accepted') overallStats.offerAccepted++;
+        } else if (status === 'Rejected') {
+          overallStats.rejectedByClient++;
+          jobAnalytics.stats.rejectedByClient++;
+        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
+                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered', 'Offer Declined', 'No Show'].includes(status)) {
+          overallStats.ongoingProcess++;
+          jobAnalytics.stats.ongoingProcess++;
+          
+          if (status === 'Interview Scheduled') {
+            overallStats.interviewScheduled++;
+            jobAnalytics.stats.interviewScheduled++;
+          }
+          if (status === 'Interview Completed') {
+            overallStats.interviewCompleted++;
+            jobAnalytics.stats.interviewCompleted++;
+          }
+          if (status === 'Offered') {
+            overallStats.offered++;
+            jobAnalytics.stats.offered++;
+          }
+        }
+      }
+
+      // Add candidate info to job analytics
+      jobAnalytics.candidates.push({
+        _id: link.candidateId._id,
+        name: link.candidateId.name,
+        email: link.candidateId.email,
+        status: link.status,
+        source: link.source,
+        linkedAt: link.createdAt,
+        clientSideStatus: clientStatus?.clientSideStatus || null
+      });
+
+      // Add to timeline
+      jobAnalytics.timeline.push({
+        date: link.createdAt,
+        action: 'linked',
+        candidateName: link.candidateId.name,
+        source: link.source
+      });
+      
+      if (link.submittedAt) {
+        jobAnalytics.timeline.push({
+          date: link.submittedAt,
+          action: 'submitted',
+          candidateName: link.candidateId.name
+        });
+      }
+    });
+
+    // Sort job analytics timelines
+    jobAnalyticsMap.forEach(data => {
+      data.timeline.sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+
+    // Convert map to array and sort by most active
+    const jobAnalytics = Array.from(jobAnalyticsMap.values())
+      .sort((a, b) => b.stats.totalLinked - a.stats.totalLinked);
+
+    // Calculate conversion rates
+    const conversionRates = {
+      linkToSubmission: overallStats.totalLinked > 0 
+        ? ((overallStats.submittedToClient / overallStats.totalLinked) * 100).toFixed(1) 
+        : 0,
+      submissionToSelection: overallStats.submittedToClient > 0 
+        ? ((overallStats.selectedByClient / overallStats.submittedToClient) * 100).toFixed(1) 
+        : 0,
+      submissionToRejection: overallStats.submittedToClient > 0 
+        ? ((overallStats.rejectedByClient / overallStats.submittedToClient) * 100).toFixed(1) 
+        : 0,
+      linkToSelection: overallStats.totalLinked > 0 
+        ? ((overallStats.selectedByClient / overallStats.totalLinked) * 100).toFixed(1) 
+        : 0
+    };
+
+    // Build activity timeline by date (for graphs)
+    const activityByDate = {};
+    validLinks.forEach(link => {
+      const dateStr = new Date(link.createdAt).toISOString().split('T')[0];
+      if (!activityByDate[dateStr]) {
+        activityByDate[dateStr] = { 
+          date: dateStr, 
+          linked: 0, 
+          submitted: 0, 
+          appliedThroughLink: 0,
+          addedByRecruiter: 0 
+        };
+      }
+      activityByDate[dateStr].linked++;
+      
+      if (link.source === 'applied-through-link') {
+        activityByDate[dateStr].appliedThroughLink++;
+      } else {
+        activityByDate[dateStr].addedByRecruiter++;
+      }
+      
+      if (link.submittedAt) {
+        const submitDateStr = new Date(link.submittedAt).toISOString().split('T')[0];
+        if (!activityByDate[submitDateStr]) {
+          activityByDate[submitDateStr] = { 
+            date: submitDateStr, 
+            linked: 0, 
+            submitted: 0, 
+            appliedThroughLink: 0,
+            addedByRecruiter: 0 
+          };
+        }
+        activityByDate[submitDateStr].submitted++;
+      }
+    });
+
+    const activityTimeline = Object.values(activityByDate).sort((a, b) => 
+      new Date(a.date) - new Date(b.date)
+    );
+
+    // Build status distribution for pie chart
+    const statusDistribution = {
+      'New': 0,
+      'Pre-screening': 0,
+      'Stage 2 Screening': 0,
+      'Shortlisted (Internal)': 0,
+      'Not Reachable': 0,
+      'Candidate Not Interested': 0,
+      'Rejected (Internal)': 0,
+      'Submitted to Client': 0
+    };
+
+    validLinks.forEach(link => {
+      if (statusDistribution.hasOwnProperty(link.status)) {
+        statusDistribution[link.status]++;
+      } else {
+        // Group legacy statuses
+        if (link.status === 'Submitted') {
+          statusDistribution['Submitted to Client']++;
+        } else if (link.status === 'Pre screening') {
+          statusDistribution['Pre-screening']++;
+        } else if (link.status === 'Stage 2 screening') {
+          statusDistribution['Stage 2 Screening']++;
+        }
+      }
+    });
+
+    // Client-side status distribution
+    const clientStatusDistribution = {
+      'Interview Scheduled': 0,
+      'Interview Completed': 0,
+      'Awaiting Feedback': 0,
+      'Feedback Received': 0,
+      'Shortlisted': 0,
+      'Rejected': 0,
+      'On Hold': 0,
+      'Offered': 0,
+      'Offer Accepted': 0,
+      'Offer Declined': 0,
+      'Joined': 0,
+      'No Show': 0
+    };
+
+    validLinks.forEach(link => {
+      const key = `${link.candidateId._id.toString()}_${link.jobId._id.toString()}`;
+      const clientStatus = clientStatusMap.get(key);
+      if (clientStatus && clientStatusDistribution.hasOwnProperty(clientStatus.clientSideStatus)) {
+        clientStatusDistribution[clientStatus.clientSideStatus]++;
+      }
+    });
+
+    // Performance metrics
+    const performanceMetrics = {
+      averageLinkedPerJob: jobAnalytics.length > 0 
+        ? (overallStats.totalLinked / jobAnalytics.length).toFixed(1) 
+        : 0,
+      averageSubmittedPerJob: jobAnalytics.length > 0 
+        ? (overallStats.submittedToClient / jobAnalytics.length).toFixed(1) 
+        : 0,
+      successRate: overallStats.totalLinked > 0 
+        ? ((overallStats.selectedByClient / overallStats.totalLinked) * 100).toFixed(2) 
+        : 0,
+      activeJobs: jobAnalytics.filter(j => j.job.status !== 'Completed' && j.job.status !== 'Withdrawn').length,
+      completedJobs: jobAnalytics.filter(j => j.job.status === 'Completed').length,
+      totalJobs: jobAnalytics.length
+    };
+
+    // Weekly activity (last 12 weeks)
+    const weeklyActivity = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const weekStart = new Date(now);
+      weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay());
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      const weekLinks = validLinks.filter(l => {
+        const linkDate = new Date(l.createdAt);
+        return linkDate >= weekStart && linkDate <= weekEnd;
+      });
+      
+      weeklyActivity.push({
+        week: `W${12 - i}`,
+        weekStart: weekStart.toISOString().split('T')[0],
+        weekEnd: weekEnd.toISOString().split('T')[0],
+        linked: weekLinks.length,
+        submitted: weekLinks.filter(l => l.status === 'Submitted to Client' || l.status === 'Submitted').length
+      });
+    }
+
+    res.json({
+      success: true,
+      recruiter: {
+        _id: recruiter._id,
+        fullName: recruiter.fullName,
+        email: recruiter.email,
+        phone: recruiter.phone,
+        organization: recruiter.organization
+      },
+      dateRange: {
+        startDate: startDate || null,
+        endDate: endDate || null
+      },
+      overallStats,
+      candidatesBySource,
+      conversionRates,
+      performanceMetrics,
+      statusDistribution,
+      clientStatusDistribution,
+      activityTimeline,
+      weeklyActivity,
+      jobAnalytics,
+      totalJobs: jobAnalytics.length
+    });
+  } catch (error) {
+    console.error('Error fetching recruiter analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch recruiter analytics' });
+  }
+};
+
 // Get list of unique companies for filtering
 exports.getCompanies = async (req, res) => {
   try {

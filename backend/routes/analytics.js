@@ -15,5 +15,8 @@ router.get('/job/:jobId', authenticateToken, analyticsController.getJobAnalytics
 // Generate AI performance report for a job
 router.post('/job/:jobId/report', authenticateToken, analyticsController.generatePerformanceReport);
 
+// Get recruiter-specific analytics
+router.get('/recruiter/:recruiterId', authenticateToken, analyticsController.getRecruiterAnalytics);
+
 module.exports = router;
 
