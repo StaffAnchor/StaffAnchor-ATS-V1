@@ -31,11 +31,11 @@ import {
   Delete as DeleteIcon,
   Close as CloseIcon,
   Analytics as AnalyticsIcon,
-  Construction as ConstructionIcon,
   LinkOff as LinkOffIcon
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import ConfirmDialog from '../components/ConfirmDialog';
+import RecruiterAnalyticsModal from '../components/RecruiterAnalyticsModal';
 import API_URL from '../config/api';
 
 const Subordinates = ({ user }) => {
@@ -45,12 +45,13 @@ const Subordinates = ({ user }) => {
   const [expandedJobId, setExpandedJobId] = useState(null);
   const [jobs, setJobs] = useState({});
   const [showJobAuthDialog, setShowJobAuthDialog] = useState(false);
-  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [allJobs, setAllJobs] = useState([]);
   const [selectedSubordinateId, setSelectedSubordinateId] = useState(null);
   const [deletingSubordinate, setDeletingSubordinate] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [subordinateToDelete, setSubordinateToDelete] = useState(null);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [selectedRecruiterForAnalytics, setSelectedRecruiterForAnalytics] = useState(null);
 
   useEffect(() => {
     const fetchSubordinates = async () => {
@@ -375,7 +376,10 @@ const Subordinates = ({ user }) => {
                         </TableCell>
                         <TableCell sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.05)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
                           <IconButton
-                            onClick={() => setShowFeatureDialog(true)}
+                            onClick={() => {
+                              setSelectedRecruiterForAnalytics(sub);
+                              setShowAnalyticsModal(true);
+                            }}
                             sx={{
                               color: "#8b5cf6",
                               backgroundColor: "rgba(139, 92, 246, 0.08)",
@@ -713,45 +717,15 @@ const Subordinates = ({ user }) => {
           </DialogActions>
         </Dialog>
 
-        {/* Feature Under Development Dialog */}
-        <Dialog
-          open={showFeatureDialog}
-          onClose={() => setShowFeatureDialog(false)}
-          maxWidth="xs"
-          PaperProps={{
-            sx: {
-              background: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
-              borderRadius: 2,
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
-            }
+        {/* Recruiter Analytics Modal */}
+        <RecruiterAnalyticsModal
+          open={showAnalyticsModal}
+          onClose={() => {
+            setShowAnalyticsModal(false);
+            setSelectedRecruiterForAnalytics(null);
           }}
-        >
-          <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
-            <ConstructionIcon sx={{ fontSize: 64, color: '#f59e0b', mb: 2 }} />
-            <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
-              This feature is currently under development
-            </Typography>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-            <Button
-              onClick={() => setShowFeatureDialog(false)}
-              variant="contained"
-              sx={{
-                background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
-                color: '#fff',
-                fontWeight: 600,
-                textTransform: 'none',
-                px: 3,
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
-                }
-              }}
-            >
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
+          recruiter={selectedRecruiterForAnalytics}
+        />
 
         {/* Delete Confirmation Dialog */}
         <ConfirmDialog
