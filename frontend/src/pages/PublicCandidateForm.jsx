@@ -492,6 +492,22 @@ const PublicCandidateForm = () => {
                   </Paper>
                 </Box>
 
+                {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                  <PublicExpertiseSelector
+                    selectedDomain={selectedDomain}
+                    onDomainChange={setSelectedDomain}
+                    selectedTalentPools={selectedExpertiseTalentPools}
+                    onTalentPoolsChange={setSelectedExpertiseTalentPools}
+                    selectedSkills={selectedExpertiseSkills}
+                    onSkillsChange={setSelectedExpertiseSkills}
+                    singleDomain={true}
+                    multipleTalentPools={true}
+                    multipleSkills={true}
+                    required={false}
+                  />
+                </Box>
+
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
                 {/* ===== OPTIONAL FIELDS BELOW ===== */}
@@ -501,7 +517,7 @@ const PublicCandidateForm = () => {
                   fontSize: { xs: '0.875rem', sm: '1rem' },
                   fontStyle: 'italic'
                 }}>
-                  The following fields are optional
+                  These fields are totally optional—but the more you share, the faster we can spot the perfect opportunity for you!
                 </Typography>
 
                 {/* Total Experience */}
@@ -586,21 +602,6 @@ const PublicCandidateForm = () => {
 
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 
-                {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
-                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                  <PublicExpertiseSelector
-                    selectedDomain={selectedDomain}
-                    onDomainChange={setSelectedDomain}
-                    selectedTalentPools={selectedExpertiseTalentPools}
-                    onTalentPoolsChange={setSelectedExpertiseTalentPools}
-                    selectedSkills={selectedExpertiseSkills}
-                    onSkillsChange={setSelectedExpertiseSkills}
-                    singleDomain={true}
-                    multipleTalentPools={true}
-                    multipleSkills={true}
-                    required={false}
-                  />
-                </Box>
 
                 <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.05)' }} />
 

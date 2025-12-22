@@ -189,7 +189,7 @@ const PublicExpertiseSelector = ({
         mb: { xs: 0.5, sm: 1 },
         fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
       }}>
-        Expertise (Optional)
+        Expertise <span style={{ color: '#e74c3c' }}>*</span>
       </Typography>
       <Typography variant="body2" sx={{ 
         color: '#64748b', 
