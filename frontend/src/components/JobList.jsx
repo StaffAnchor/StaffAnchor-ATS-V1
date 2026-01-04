@@ -607,16 +607,6 @@ const JobList = ({ accessLevel, userId }) => {
                         fontSize: "0.95rem",
                       }}
                     >
-                      Internal Notes
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        color: "#8b5cf6",
-                        fontWeight: 700,
-                        fontSize: "0.95rem",
-                      }}
-                    >
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                         <span>Actions</span>
                         <Tooltip title={`Sort by Date Created (${sortOrder === 'desc' ? 'Newest First' : 'Oldest First'})`}>
@@ -649,7 +639,7 @@ const JobList = ({ accessLevel, userId }) => {
                   {sortedJobs.length === 0 ? (
                     <TableRow>
                       <TableCell 
-                        colSpan={7} 
+                        colSpan={6} 
                         sx={{ 
                           textAlign: 'center', 
                           py: 6,
@@ -803,23 +793,6 @@ const JobList = ({ accessLevel, userId }) => {
                           </FormControl>
                         </TableCell>
                         <TableCell align="center" onClick={(e) => e.stopPropagation()}>
-                          <Tooltip title="View Internal Notes">
-                            <IconButton
-                              onClick={() => setShowFeatureDialog(true)}
-                              sx={{
-                                color: "#8b5cf6",
-                                backgroundColor: "rgba(139, 92, 246, 0.1)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(139, 92, 246, 0.2)",
-                                  transform: "scale(1.1)",
-                                },
-                              }}
-                            >
-                              <DescriptionIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                           <Tooltip title={expandedJobId === job._id ? "Hide Details" : "View Details"}>
                             <IconButton
                               onClick={() => handleExpandClick(job._id)}
@@ -846,7 +819,7 @@ const JobList = ({ accessLevel, userId }) => {
                       {expandedJobId === job._id && (
                         <TableRow>
                           <TableCell
-                            colSpan={7}
+                            colSpan={6}
                             sx={{
                               py: 0,
                               px: 0,

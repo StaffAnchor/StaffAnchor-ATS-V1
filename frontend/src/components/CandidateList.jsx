@@ -47,7 +47,6 @@ import {
   Edit as EditIcon,
   Link as LinkIcon,
   Comment as CommentIcon,
-  Timeline as TimelineIcon,
   Construction as ConstructionIcon,
   Sort as SortIcon,
 } from "@mui/icons-material";
@@ -800,19 +799,6 @@ const CandidateList = ({
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
                         fontSize: "1rem",
                         padding: "18px 12px",
-                        minWidth: "120px",
-                        textAlign: "center",
-                      }}
-                    >
-                      Timeline
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#2563eb",
-                        fontWeight: 700,
-                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
                         minWidth: "160px",
                         textAlign: "center",
                       }}
@@ -981,30 +967,6 @@ const CandidateList = ({
                             </Typography>
                           )}
                         </Box>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
-                          textAlign: "center",
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Tooltip title="View Timeline">
-                          <IconButton
-                            onClick={() => setShowFeatureDialog(true)}
-                            sx={{
-                              color: "#8b5cf6",
-                              backgroundColor: "rgba(139, 92, 246, 0.1)",
-                              "&:hover": {
-                                backgroundColor: "rgba(139, 92, 246, 0.2)",
-                                transform: "scale(1.1)",
-                              },
-                            }}
-                          >
-                            <TimelineIcon />
-                          </IconButton>
-                        </Tooltip>
                       </TableCell>
                       <TableCell
                         sx={{

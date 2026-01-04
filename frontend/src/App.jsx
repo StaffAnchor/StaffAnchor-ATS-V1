@@ -11,6 +11,7 @@ import Subordinates from './pages/Subordinates.jsx';
 import Banners from './pages/Banners.jsx';
 import PublicJobApplication from './pages/PublicJobApplication.jsx';
 import PublicCandidateForm from './pages/PublicCandidateForm.jsx';
+import ClientCandidateTracking from './pages/ClientCandidateTracking.jsx';
 import Clients from './pages/Clients.jsx';
 import AddClient from './components/AddClient.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -93,6 +94,7 @@ function App() {
         {/* Public routes - no header, no authentication */}
         <Route path="/apply/:jobId" element={<PublicJobApplication />} />
         <Route path="/candidate-form" element={<PublicCandidateForm />} />
+        <Route path="/client-tracking/:trackingToken" element={<ClientCandidateTracking />} />
         
         {/* Authenticated routes */}
         <Route path="/*" element={

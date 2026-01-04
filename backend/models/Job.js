@@ -116,9 +116,26 @@ const JobSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  clientTrackingToken: {
+    type: String,
+    unique: true,
+    sparse: true // Allows null values, but unique for non-null
   }
 }, {
   timestamps: true
+});
+
+// Function to generate a random token
+function generateUniqueToken() {
+  return require('crypto').randomBytes(20).toString('hex');
+}
+
+JobSchema.pre('save', function(next) {
+  if (!this.clientTrackingToken) {
+    this.clientTrackingToken = generateUniqueToken();
+  }
+  next();
 });
 
 // Helper function to generate Job ID from date
