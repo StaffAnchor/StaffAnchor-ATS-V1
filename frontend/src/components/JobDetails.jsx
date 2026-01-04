@@ -12,7 +12,7 @@ import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
 import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon, TrackChanges as TrackChangesIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
 const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
@@ -608,7 +608,46 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                   }
                 }}
               >
-                Shareable Link
+                Apply Link
+              </Button>
+              <Button 
+                variant="outlined" 
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    let token = job.clientTrackingToken;
+                    // If token doesn't exist, generate it
+                    if (!token) {
+                      const tokenRes = await axios.post(`${API_URL}/api/client-tracking/generate-link/${job._id}`, {}, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }
+                      });
+                      token = tokenRes.data.clientTrackingToken;
+                      // Update the job in local state
+                      Object.assign(job, { clientTrackingToken: token });
+                      // Emit event to update job list
+                      window.dispatchEvent(new CustomEvent('jobUpdated', { 
+                        detail: { jobId: job._id, updatedJob: { ...job, clientTrackingToken: token } } 
+                      }));
+                    }
+                    const clientTrackingLink = `${window.location.origin}/client-tracking/${token}`;
+                    navigator.clipboard.writeText(clientTrackingLink);
+                    toast.success('Client tracking link copied!');
+                  } catch (error) {
+                    console.error('Error generating/copying link:', error);
+                    toast.error('Failed to copy client tracking link');
+                  }
+                }}
+                startIcon={<TrackChangesIcon />}
+                sx={{ 
+                  borderColor: 'rgba(139, 92, 246, 0.5)', 
+                  color: '#8b5cf6',
+                  '&:hover': { 
+                    borderColor: '#8b5cf6', 
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)' 
+                  }
+                }}
+              >
+                Client Tracking
               </Button>
             </Box>
 

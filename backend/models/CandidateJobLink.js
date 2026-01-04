@@ -94,7 +94,27 @@ const CandidateJobLinkSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
-  }
+  },
+  clientTrackingLink: {
+    type: String,
+    unique: true,
+    sparse: true // Allows null values to not violate unique constraint
+  },
+  clientRounds: [{
+    status: {
+      type: String,
+      enum: ['Ongoing', 'Accepted', 'Rejected'],
+      default: 'Ongoing'
+    },
+    feedback: {
+      type: String,
+      trim: true
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });
