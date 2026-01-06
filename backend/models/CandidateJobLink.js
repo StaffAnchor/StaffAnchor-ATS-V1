@@ -114,6 +114,20 @@ const CandidateJobLinkSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
+  }],
+  questionAnswers: [{
+    question: {
+      type: String,
+      required: true
+    },
+    answer: {
+      type: String,
+      required: true
+    },
+    answerType: {
+      type: String,
+      enum: ['text', 'number', 'true-false']
+    }
   }]
 }, {
   timestamps: true

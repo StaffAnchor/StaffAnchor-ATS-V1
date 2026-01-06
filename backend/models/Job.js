@@ -121,7 +121,19 @@ const JobSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true // Allows null values, but unique for non-null
-  }
+  },
+  personalizedQuestions: [{
+    question: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    answerType: {
+      type: String,
+      enum: ['text', 'number', 'true-false'],
+      default: 'text'
+    }
+  }]
 }, {
   timestamps: true
 });

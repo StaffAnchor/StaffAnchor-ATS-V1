@@ -18,8 +18,14 @@ import {
   Button,
   Chip,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
+  Tooltip,
 } from '@mui/material';
-import { Add as AddIcon, CloudDownload as CloudDownloadIcon, Check as CheckIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, CloudDownload as CloudDownloadIcon, Check as CheckIcon, Delete as DeleteIcon, QuestionAnswer as QuestionAnswerIcon, Close as CloseIcon } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -32,6 +38,9 @@ const ClientCandidateTracking = () => {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rounds, setRounds] = useState(1); // Default to 1 round
+  const [jobQuestions, setJobQuestions] = useState([]);
+  const [showRepliesModal, setShowRepliesModal] = useState(false);
+  const [selectedCandidateForReplies, setSelectedCandidateForReplies] = useState(null);
 
   useEffect(() => {
     const fetchJobAndCandidates = async () => {
@@ -39,6 +48,7 @@ const ClientCandidateTracking = () => {
         setLoading(true);
         const res = await axios.get(`${API_URL}/api/client-tracking/candidates/${trackingToken}`);
         setJobTitle(res.data.jobTitle);
+        setJobQuestions(res.data.personalizedQuestions || []);
 
         // Initialize clientRounds for each candidate if not present
         const initializedCandidates = res.data.candidates.map(candidate => ({
@@ -87,6 +97,7 @@ const ClientCandidateTracking = () => {
         try {
           const res = await axios.get(`${API_URL}/api/client-tracking/candidates/${trackingToken}`);
           setJobTitle(res.data.jobTitle);
+          setJobQuestions(res.data.personalizedQuestions || []);
           const initializedCandidates = res.data.candidates.map(candidate => ({
             ...candidate,
             clientRounds: candidate.clientRounds && candidate.clientRounds.length > 0
@@ -139,6 +150,7 @@ const ClientCandidateTracking = () => {
         try {
           const res = await axios.get(`${API_URL}/api/client-tracking/candidates/${trackingToken}`);
           setJobTitle(res.data.jobTitle);
+          setJobQuestions(res.data.personalizedQuestions || []);
           const initializedCandidates = res.data.candidates.map(candidate => ({
             ...candidate,
             clientRounds: candidate.clientRounds && candidate.clientRounds.length > 0
@@ -215,6 +227,7 @@ const ClientCandidateTracking = () => {
         try {
           const res = await axios.get(`${API_URL}/api/client-tracking/candidates/${trackingToken}`);
           setJobTitle(res.data.jobTitle);
+          setJobQuestions(res.data.personalizedQuestions || []);
           const initializedCandidates = res.data.candidates.map(candidate => ({
             ...candidate,
             clientRounds: candidate.clientRounds && candidate.clientRounds.length > 0
@@ -310,6 +323,11 @@ const ClientCandidateTracking = () => {
                     <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Resume</TableCell>
                     <TableCell sx={{ minWidth: 150, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Email</TableCell>
                     <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Phone</TableCell>
+                    <TableCell sx={{ minWidth: 150, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Current Location</TableCell>
+                    <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Current CTC</TableCell>
+                    {jobQuestions.length > 0 && (
+                      <TableCell sx={{ minWidth: 80, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1, textAlign: 'center' }}>Replies</TableCell>
+                    )}
                     {[...Array(rounds)].map((_, i) => (
                       <React.Fragment key={i}>
                         <TableCell sx={{ minWidth: 180, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>
@@ -341,7 +359,7 @@ const ClientCandidateTracking = () => {
                 <TableBody>
                   {candidates.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4 + rounds * 2} sx={{ textAlign: 'center', py: 4 }}>
+                      <TableCell colSpan={6 + (jobQuestions.length > 0 ? 1 : 0) + rounds * 2} sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
                           No candidates with "Submitted to client" status.
                         </Typography>
@@ -370,6 +388,48 @@ const ClientCandidateTracking = () => {
                         </TableCell>
                         <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.email}</TableCell>
                         <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.phone}</TableCell>
+                        <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.currentLocation || 'N/A'}</TableCell>
+                        <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.currentCTC || 'N/A'}</TableCell>
+                        {jobQuestions.length > 0 && (
+                          <TableCell sx={{ textAlign: 'center' }}>
+                            <Tooltip title="View Question Answers">
+                              <IconButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedCandidateForReplies(candidate);
+                                  setShowRepliesModal(true);
+                                }}
+                                size="small"
+                                disabled={!candidate.questionAnswers || candidate.questionAnswers.length === 0}
+                                sx={{
+                                  color: candidate.questionAnswers && candidate.questionAnswers.length > 0 
+                                    ? '#4caf50' 
+                                    : '#9e9e9e',
+                                  border: `1px solid ${
+                                    candidate.questionAnswers && candidate.questionAnswers.length > 0
+                                      ? 'rgba(76, 175, 80, 0.18)'
+                                      : 'rgba(158, 158, 158, 0.18)'
+                                  }`,
+                                  padding: '4px',
+                                  '&:hover': {
+                                    backgroundColor: candidate.questionAnswers && candidate.questionAnswers.length > 0
+                                      ? 'rgba(76, 175, 80, 0.1)'
+                                      : 'rgba(158, 158, 158, 0.1)',
+                                    borderColor: candidate.questionAnswers && candidate.questionAnswers.length > 0
+                                      ? '#4caf50'
+                                      : '#9e9e9e',
+                                  },
+                                  '&:disabled': {
+                                    color: '#9e9e9e',
+                                    borderColor: 'rgba(158, 158, 158, 0.18)',
+                                  }
+                                }}
+                              >
+                                <QuestionAnswerIcon sx={{ fontSize: '1rem' }} />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        )}
                         {[...Array(rounds)].map((_, i) => (
                           <React.Fragment key={`${candidate._id}-${i}`}>
                             <TableCell>
@@ -435,6 +495,127 @@ const ClientCandidateTracking = () => {
           </Box>
         </Paper>
       </Container>
+
+      {/* Replies Modal */}
+      <Dialog
+        open={showRepliesModal}
+        onClose={() => {
+          setShowRepliesModal(false);
+          setSelectedCandidateForReplies(null);
+        }}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            background: '#ffffff',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          pb: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          color: '#1e293b',
+          background: '#f8fafc',
+          borderBottom: '1px solid #e2e8f0'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <QuestionAnswerIcon sx={{ color: '#4caf50', fontSize: 28 }} />
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Question Answers
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => {
+              setShowRepliesModal(false);
+              setSelectedCandidateForReplies(null);
+            }}
+            sx={{
+              color: '#64748b',
+              '&:hover': {
+                backgroundColor: '#f1f5f9'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+        <DialogContent sx={{ pt: 3, pb: 2, background: '#ffffff' }}>
+          {selectedCandidateForReplies && (
+            <>
+              <Typography variant="body2" sx={{ color: '#64748b', mb: 2, fontSize: '0.95rem' }}>
+                Answers provided by <strong>{selectedCandidateForReplies.name}</strong>
+              </Typography>
+              {selectedCandidateForReplies.questionAnswers && selectedCandidateForReplies.questionAnswers.length > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {selectedCandidateForReplies.questionAnswers.map((qa, idx) => (
+                    <Paper
+                      key={idx}
+                      sx={{
+                        p: 2,
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 1.5,
+                        background: '#ffffff'
+                      }}
+                    >
+                      <Typography variant="subtitle2" sx={{ 
+                        color: '#1e293b', 
+                        fontWeight: 600,
+                        mb: 1,
+                        fontSize: '0.95rem'
+                      }}>
+                        {qa.question}
+                      </Typography>
+                      <Typography variant="body1" sx={{ 
+                        color: '#475569',
+                        fontSize: '0.9rem',
+                        pl: 1
+                      }}>
+                        {qa.answer || 'No answer provided'}
+                      </Typography>
+                    </Paper>
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <QuestionAnswerIcon sx={{ fontSize: 64, color: '#9e9e9e', opacity: 0.3, mb: 2 }} />
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
+                    No answers provided for this candidate
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+
+        <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+        <DialogActions sx={{ p: 2.5, background: '#f8fafc' }}>
+          <Button
+            onClick={() => {
+              setShowRepliesModal(false);
+              setSelectedCandidateForReplies(null);
+            }}
+            variant="outlined"
+            sx={{
+              borderColor: '#cbd5e1',
+              color: '#64748b',
+              '&:hover': {
+                borderColor: '#94a3b8',
+                backgroundColor: '#f1f5f9'
+              }
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -25,7 +25,12 @@ const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizat
   const [alternateName, setAlternateName] = useState('');
   const [error, setError] = useState('');
 
-  const handleConfirm = () => {
+  const handleProceed = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     // Validation
     if (showCompanyName === 'hide' && !alternateName.trim()) {
       setError('Please provide an alternate company name');
@@ -35,30 +40,11 @@ const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizat
     // Reset error
     setError('');
 
-    // Build the shareable URL with recruiter tracking
-    const baseUrl = `${window.location.origin}/apply/${jobId}`;
-    const params = new URLSearchParams();
-    
-    // Always add recruiter ID for tracking
-    if (recruiterId) {
-      params.append('ref', recruiterId);
-    }
-    
-    if (showCompanyName === 'hide') {
-      params.append('hideCompany', 'true');
-      params.append('altName', alternateName.trim());
-    }
-    
-    const queryString = params.toString();
-    const shareableUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-
-    // Copy to clipboard
-    navigator.clipboard.writeText(shareableUrl).then(() => {
-      onConfirm(shareableUrl);
-      handleClose();
-    }).catch((err) => {
-      console.error('Failed to copy link:', err);
-      setError('Failed to copy link to clipboard');
+    console.log('Proceed clicked, calling onConfirm');
+    // Call onConfirm with the company name settings, which will trigger the questions modal
+    onConfirm({
+      showCompanyName,
+      alternateName: alternateName.trim()
     });
   };
 
@@ -344,7 +330,8 @@ const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizat
           Cancel
         </Button>
         <Button
-          onClick={handleConfirm}
+          onClick={handleProceed}
+          type="button"
           variant="contained"
           sx={{
             backgroundColor: '#4caf50',
@@ -359,7 +346,7 @@ const CompanyNameVisibilityModal = ({ open, onClose, onConfirm, jobId, organizat
             }
           }}
         >
-          Copy Shareable Link
+          Proceed
         </Button>
       </DialogActions>
     </Dialog>
