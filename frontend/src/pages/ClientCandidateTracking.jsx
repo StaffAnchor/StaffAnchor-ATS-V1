@@ -310,6 +310,8 @@ const ClientCandidateTracking = () => {
                     <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Resume</TableCell>
                     <TableCell sx={{ minWidth: 150, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Email</TableCell>
                     <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Phone</TableCell>
+                    <TableCell sx={{ minWidth: 150, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Current Location</TableCell>
+                    <TableCell sx={{ minWidth: 120, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>Current CTC</TableCell>
                     {[...Array(rounds)].map((_, i) => (
                       <React.Fragment key={i}>
                         <TableCell sx={{ minWidth: 180, fontWeight: 'bold', backgroundColor: '#f0f0f0', zIndex: 1 }}>
@@ -341,7 +343,7 @@ const ClientCandidateTracking = () => {
                 <TableBody>
                   {candidates.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4 + rounds * 2} sx={{ textAlign: 'center', py: 4 }}>
+                      <TableCell colSpan={6 + rounds * 2} sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
                           No candidates with "Submitted to client" status.
                         </Typography>
@@ -370,6 +372,8 @@ const ClientCandidateTracking = () => {
                         </TableCell>
                         <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.email}</TableCell>
                         <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.phone}</TableCell>
+                        <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.currentLocation || 'N/A'}</TableCell>
+                        <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>{candidate.currentCTC || 'N/A'}</TableCell>
                         {[...Array(rounds)].map((_, i) => (
                           <React.Fragment key={`${candidate._id}-${i}`}>
                             <TableCell>

@@ -41,18 +41,43 @@ exports.getCandidatesForClientTracking = async (req, res) => {
       jobId: job._id,
       status: 'Submitted to Client'
     })
-    .populate('candidateId', 'name email phone resume') // Populate candidate details
+    .populate('candidateId', 'name email phone resume currentLocation experience') // Populate candidate details including location and experience
     .select('candidateId clientRounds'); // Select only necessary fields
 
-    const candidatesData = candidateJobLinks.map(link => ({
-      _id: link.candidateId._id,
-      name: link.candidateId.name,
-      email: link.candidateId.email,
-      phone: link.candidateId.phone,
-      resume: link.candidateId.resume,
-      clientRounds: link.clientRounds,
-      candidateJobLinkId: link._id, // Add the link ID for status updates
-    }));
+    const candidatesData = candidateJobLinks.map(link => {
+      // Get current CTC from the most recent experience entry
+      let currentCTC = 'N/A';
+      if (link.candidateId.experience && link.candidateId.experience.length > 0) {
+        // Get the most recent experience (assuming they're ordered by date or we take the first one)
+        const latestExperience = link.candidateId.experience[0];
+        if (latestExperience.ctc) {
+          currentCTC = latestExperience.ctc;
+        }
+      }
+
+      // Format current location
+      let currentLocation = 'N/A';
+      if (link.candidateId.currentLocation) {
+        const loc = link.candidateId.currentLocation;
+        const locationParts = [];
+        if (loc.city) locationParts.push(loc.city);
+        if (loc.state) locationParts.push(loc.state);
+        if (loc.country) locationParts.push(loc.country);
+        currentLocation = locationParts.length > 0 ? locationParts.join(', ') : 'N/A';
+      }
+
+      return {
+        _id: link.candidateId._id,
+        name: link.candidateId.name,
+        email: link.candidateId.email,
+        phone: link.candidateId.phone,
+        resume: link.candidateId.resume,
+        currentLocation: currentLocation,
+        currentCTC: currentCTC,
+        clientRounds: link.clientRounds,
+        candidateJobLinkId: link._id, // Add the link ID for status updates
+      };
+    });
 
     res.json({ jobTitle: job.title, candidates: candidatesData });
 
