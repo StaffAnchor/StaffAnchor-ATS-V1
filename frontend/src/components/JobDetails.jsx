@@ -9,6 +9,7 @@ import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import LinkedCandidates from './LinkedCandidates.jsx';
 import AIWarningDialog from './AIWarningDialog.jsx';
 import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
+import JobQuestionsModal from './JobQuestionsModal.jsx';
 import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
@@ -37,6 +38,18 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showAIWarning, setShowAIWarning] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(job.status || 'New');
   const [showCompanyNameModal, setShowCompanyNameModal] = useState(false);
+  const [showQuestionsModal, setShowQuestionsModal] = useState(false);
+  const [companyNameSettings, setCompanyNameSettings] = useState(null);
+  const [pendingQuestionsModal, setPendingQuestionsModal] = useState(false);
+
+  // Open questions modal when company name modal closes and we have pending settings
+  useEffect(() => {
+    if (!showCompanyNameModal && pendingQuestionsModal && companyNameSettings) {
+      console.log('Opening questions modal after company name modal closed');
+      setShowQuestionsModal(true);
+      setPendingQuestionsModal(false);
+    }
+  }, [showCompanyNameModal, pendingQuestionsModal, companyNameSettings]);
   const [existingWorkflow, setExistingWorkflow] = useState(null);
   const [checkingWorkflow, setCheckingWorkflow] = useState(false);
   const [statusChangeConfirm, setStatusChangeConfirm] = useState({
@@ -293,8 +306,46 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     setShowCompanyNameModal(true);
   };
 
-  const handleCompanyNameModalConfirm = (shareableUrl) => {
-    toast.success('Shareable link copied to clipboard!');
+  const handleCompanyNameModalConfirm = (settings) => {
+    console.log('Company name modal confirmed with settings:', settings);
+    // Store settings and mark that we need to open questions modal
+    setCompanyNameSettings(settings);
+    setPendingQuestionsModal(true);
+    // Close company name modal - useEffect will handle opening questions modal
+    setShowCompanyNameModal(false);
+  };
+
+  const handleQuestionsComplete = async (questions) => {
+    // Generate the shareable link after questions are saved
+    try {
+      const baseUrl = `${window.location.origin}/apply/${job._id}`;
+      const params = new URLSearchParams();
+      
+      // Always add recruiter ID for tracking
+      if (userId) {
+        params.append('ref', userId);
+      }
+      
+      // Add company name settings if hiding company name
+      if (companyNameSettings && companyNameSettings.showCompanyName === 'hide') {
+        params.append('hideCompany', 'true');
+        params.append('altName', companyNameSettings.alternateName);
+      }
+      
+      const queryString = params.toString();
+      const shareableUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareableUrl);
+      toast.success('Shareable link copied to clipboard!');
+      
+      // Close modal
+      setShowQuestionsModal(false);
+      setCompanyNameSettings(null);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      toast.error('Failed to copy link to clipboard');
+    }
   };
 
   const handleAddCandidateForJob = (e) => {
@@ -1489,11 +1540,27 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       {/* Company Name Visibility Modal */}
       <CompanyNameVisibilityModal
         open={showCompanyNameModal}
-        onClose={() => setShowCompanyNameModal(false)}
+        onClose={() => {
+          setShowCompanyNameModal(false);
+          setCompanyNameSettings(null);
+          setPendingQuestionsModal(false);
+        }}
         onConfirm={handleCompanyNameModalConfirm}
         jobId={job._id}
         organizationName={job.organization}
         recruiterId={userId}
+      />
+
+      {/* Job Questions Modal */}
+      <JobQuestionsModal
+        open={showQuestionsModal}
+        onClose={() => {
+          setShowQuestionsModal(false);
+          setCompanyNameSettings(null);
+          setPendingQuestionsModal(false);
+        }}
+        jobId={job._id}
+        onComplete={handleQuestionsComplete}
       />
 
       {/* Status Change Confirmation Dialog */}

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import CommentsModal from './CommentsModal.jsx';
 import CandidateDetailsModal from './CandidateDetailsModal.jsx';
 import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
+import DeleteConfirmationPopup from './DeleteConfirmationPopup.jsx';
 import {
   Dialog,
   DialogTitle,
@@ -28,6 +29,7 @@ import {
   Link,
   Tooltip,
   Checkbox,
+  Divider,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -41,6 +43,8 @@ import {
   AccountTree as WorkflowIcon,
   FilterList as FilterListIcon,
   Comment as CommentIcon,
+  QuestionAnswer as QuestionAnswerIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import API_URL from '../config/api';
 
@@ -50,13 +54,21 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const [unlinking, setUnlinking] = useState({});
   const [updatingStatus, setUpdatingStatus] = useState({});
   const [statusFilter, setStatusFilter] = useState('All');
+  const [deleting, setDeleting] = useState({});
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [candidateToDelete, setCandidateToDelete] = useState(null);
   const [existingWorkflow, setExistingWorkflow] = useState(null);
   const [checkingWorkflow, setCheckingWorkflow] = useState(false);
+  const [jobQuestions, setJobQuestions] = useState([]);
 
   // Comments state
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedCandidateForComments, setSelectedCandidateForComments] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Replies modal state
+  const [showRepliesModal, setShowRepliesModal] = useState(false);
+  const [selectedCandidateForReplies, setSelectedCandidateForReplies] = useState(null);
 
   // Candidate details modal state
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -96,9 +108,23 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     if (open && jobId) {
       fetchLinkedCandidates();
       checkExistingWorkflow();
+      fetchJobQuestions();
       setStatusFilter('All');
     }
   }, [open, jobId]);
+
+  const fetchJobQuestions = async () => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const response = await axios.get(`${API_URL}/api/jobs/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setJobQuestions(response.data.personalizedQuestions || []);
+    } catch (error) {
+      console.error('Error fetching job questions:', error);
+      setJobQuestions([]);
+    }
+  };
 
   const fetchLinkedCandidates = async () => {
     try {
@@ -153,6 +179,39 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     } finally {
       setUnlinking(prev => ({ ...prev, [linkId]: false }));
     }
+  };
+
+  const handleDeleteCandidateRequest = (candidate) => {
+    setCandidateToDelete(candidate);
+    setShowDeletePopup(true);
+  };
+
+  const handleDeleteCandidate = async () => {
+    if (!candidateToDelete) return;
+
+    try {
+      setDeleting(prev => ({ ...prev, [candidateToDelete._id]: true }));
+      const token = localStorage.getItem('jwt');
+      await axios.delete(`${API_URL}/api/candidates/${candidateToDelete._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success(`Deleted ${candidateToDelete.name}`);
+      // Refresh the list
+      fetchLinkedCandidates();
+      setShowDeletePopup(false);
+      setCandidateToDelete(null);
+    } catch (error) {
+      console.error('Error deleting candidate:', error);
+      toast.error('Failed to delete candidate');
+    } finally {
+      setDeleting(prev => ({ ...prev, [candidateToDelete._id]: false }));
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeletePopup(false);
+    setCandidateToDelete(null);
   };
 
   const handleStatusChangeRequest = (linkId, newStatus, candidateName, currentStatus) => {
@@ -587,17 +646,19 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                   }}>
                     Status
                   </TableCell>
-                  <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                    color: '#2563eb',
-                    fontWeight: 700,
-                    fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
-                    width: 80,
-                    textAlign: 'center'
-                  }}>
-                    Comments
-                  </TableCell>
+                  {jobQuestions.length > 0 && (
+                    <TableCell sx={{ 
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                      color: '#2563eb',
+                      fontWeight: 700,
+                      fontSize: '0.95rem',
+                      borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
+                      width: 80,
+                      textAlign: 'center'
+                    }}>
+                      Replies
+                    </TableCell>
+                  )}
                   {accessLevel === 2 && (
                     <TableCell sx={{ 
                       background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -745,40 +806,67 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       py: 2
                     }}>
-                      {candidate.resume && candidate.resume.url ? (
-                        <Tooltip title="Download Resume">
-                          <IconButton
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {candidate.resume && candidate.resume.url ? (
+                          <Tooltip title="Download Resume">
+                            <IconButton
+                              size="small"
+                              component="a"
+                              href={candidate.resume.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              sx={{
+                                color: '#2563eb',
+                                border: '1px solid rgba(37, 99, 235, 0.18)',
+                                padding: '4px',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(79, 140, 255, 0.1)',
+                                  borderColor: '#2563eb',
+                                }
+                              }}
+                            >
+                              <DownloadIcon sx={{ fontSize: '1rem' }} />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Chip
+                            icon={<DescriptionIcon sx={{ fontSize: '0.9rem' }} />}
+                            label="No Resume"
                             size="small"
-                            component="a"
-                            href={candidate.resume.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                            sx={{
+                              backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                              color: '#ff9800',
+                              fontSize: '0.7rem',
+                              height: '24px',
+                            }}
+                          />
+                        )}
+                        <Tooltip title="View Comments">
+                          <IconButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCandidateForComments({
+                                _id: candidate._id,
+                                name: candidate.name
+                              });
+                              setShowCommentsModal(true);
+                            }}
+                            size="small"
                             sx={{
                               color: '#2563eb',
                               border: '1px solid rgba(37, 99, 235, 0.18)',
+                              padding: '4px',
                               '&:hover': {
                                 backgroundColor: 'rgba(79, 140, 255, 0.1)',
                                 borderColor: '#2563eb',
                               }
                             }}
                           >
-                            <DownloadIcon fontSize="small" />
+                            <CommentIcon sx={{ fontSize: '1rem' }} />
                           </IconButton>
                         </Tooltip>
-                      ) : (
-                        <Chip
-                          icon={<DescriptionIcon sx={{ fontSize: '0.9rem' }} />}
-                          label="No Resume"
-                          size="small"
-                          sx={{
-                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                            color: '#ff9800',
-                            fontSize: '0.7rem',
-                            height: '24px',
-                          }}
-                        />
-                      )}
+                      </Box>
                     </TableCell>
 
                     {/* Status */}
@@ -858,36 +946,51 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       </FormControl>
                     </TableCell>
 
-                    {/* Comments */}
-                    <TableCell sx={{ 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                      py: 2,
-                      textAlign: 'center'
-                    }}>
-                      <Tooltip title="View Comments">
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedCandidateForComments({
-                              _id: candidate._id,
-                              name: candidate.name
-                            });
-                            setShowCommentsModal(true);
-                          }}
-                          size="small"
-                          sx={{
-                            color: '#2563eb',
-                            border: '1px solid rgba(37, 99, 235, 0.18)',
-                            '&:hover': {
-                              backgroundColor: 'rgba(79, 140, 255, 0.1)',
-                              borderColor: '#2563eb',
-                            }
-                          }}
-                        >
-                          <CommentIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
+                    {/* Replies */}
+                    {jobQuestions.length > 0 && (
+                      <TableCell sx={{ 
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        py: 2,
+                        textAlign: 'center'
+                      }}>
+                        <Tooltip title="View Question Answers">
+                          <IconButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCandidateForReplies(candidate);
+                              setShowRepliesModal(true);
+                            }}
+                            size="small"
+                            disabled={!candidate.linkInfo?.questionAnswers || candidate.linkInfo.questionAnswers.length === 0}
+                            sx={{
+                              color: candidate.linkInfo?.questionAnswers && candidate.linkInfo.questionAnswers.length > 0 
+                                ? '#4caf50' 
+                                : '#9e9e9e',
+                              border: `1px solid ${
+                                candidate.linkInfo?.questionAnswers && candidate.linkInfo.questionAnswers.length > 0
+                                  ? 'rgba(76, 175, 80, 0.18)'
+                                  : 'rgba(158, 158, 158, 0.18)'
+                              }`,
+                              padding: '4px',
+                              '&:hover': {
+                                backgroundColor: candidate.linkInfo?.questionAnswers && candidate.linkInfo.questionAnswers.length > 0
+                                  ? 'rgba(76, 175, 80, 0.1)'
+                                  : 'rgba(158, 158, 158, 0.1)',
+                                borderColor: candidate.linkInfo?.questionAnswers && candidate.linkInfo.questionAnswers.length > 0
+                                  ? '#4caf50'
+                                  : '#9e9e9e',
+                              },
+                              '&:disabled': {
+                                color: '#9e9e9e',
+                                borderColor: 'rgba(158, 158, 158, 0.18)',
+                              }
+                            }}
+                          >
+                            <QuestionAnswerIcon sx={{ fontSize: '1rem' }} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    )}
 
                     {/* Actions (Admin only) */}
                     {accessLevel === 2 && (
@@ -896,34 +999,66 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                         py: 2,
                         textAlign: 'center'
                       }}>
-                        <Tooltip title="Unlink Candidate">
-                          <IconButton
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUnlinkCandidate(candidate.linkInfo.linkId, candidate.name);
-                            }}
-                            disabled={unlinking[candidate.linkInfo.linkId]}
-                            size="small"
-                            sx={{
-                              color: '#f44336',
-                              border: '1px solid rgba(244, 67, 54, 0.3)',
-                              '&:hover': {
-                                backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                                borderColor: '#f44336',
-                              },
-                              '&:disabled': {
-                                color: 'rgba(244, 67, 54, 0.3)',
-                                borderColor: 'rgba(244, 67, 54, 0.1)',
-                              }
-                            }}
-                          >
-                            {unlinking[candidate.linkInfo.linkId] ? (
-                              <CircularProgress size={18} sx={{ color: '#f44336' }} />
-                            ) : (
-                              <LinkOffIcon fontSize="small" />
-                            )}
-                          </IconButton>
-                        </Tooltip>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                          <Tooltip title="Unlink Candidate">
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUnlinkCandidate(candidate.linkInfo.linkId, candidate.name);
+                              }}
+                              disabled={unlinking[candidate.linkInfo.linkId]}
+                              size="small"
+                              sx={{
+                                color: '#f44336',
+                                border: '1px solid rgba(244, 67, 54, 0.3)',
+                                padding: '4px',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                                  borderColor: '#f44336',
+                                },
+                                '&:disabled': {
+                                  color: 'rgba(244, 67, 54, 0.3)',
+                                  borderColor: 'rgba(244, 67, 54, 0.1)',
+                                }
+                              }}
+                            >
+                              {unlinking[candidate.linkInfo.linkId] ? (
+                                <CircularProgress size={16} sx={{ color: '#f44336' }} />
+                              ) : (
+                                <LinkOffIcon sx={{ fontSize: '1rem' }} />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Candidate">
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteCandidateRequest(candidate);
+                              }}
+                              disabled={deleting[candidate._id]}
+                              size="small"
+                              sx={{
+                                color: '#d32f2f',
+                                border: '1px solid rgba(211, 47, 47, 0.3)',
+                                padding: '4px',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                                  borderColor: '#d32f2f',
+                                },
+                                '&:disabled': {
+                                  color: 'rgba(211, 47, 47, 0.3)',
+                                  borderColor: 'rgba(211, 47, 47, 0.1)',
+                                }
+                              }}
+                            >
+                              {deleting[candidate._id] ? (
+                                <CircularProgress size={16} sx={{ color: '#d32f2f' }} />
+                              ) : (
+                                <DeleteIcon sx={{ fontSize: '1rem' }} />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
                     )}
                   </TableRow>
@@ -1029,6 +1164,127 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       />
     )}
 
+    {/* Replies Modal */}
+    <Dialog
+      open={showRepliesModal}
+      onClose={() => {
+        setShowRepliesModal(false);
+        setSelectedCandidateForReplies(null);
+      }}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          background: '#ffffff',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+        }
+      }}
+    >
+      <DialogTitle sx={{
+        pb: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        color: '#1e293b',
+        background: '#f8fafc',
+        borderBottom: '1px solid #e2e8f0'
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <QuestionAnswerIcon sx={{ color: '#4caf50', fontSize: 28 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Question Answers
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={() => {
+            setShowRepliesModal(false);
+            setSelectedCandidateForReplies(null);
+          }}
+          sx={{
+            color: '#64748b',
+            '&:hover': {
+              backgroundColor: '#f1f5f9'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+      <DialogContent sx={{ pt: 3, pb: 2, background: '#ffffff' }}>
+        {selectedCandidateForReplies && (
+          <>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2, fontSize: '0.95rem' }}>
+              Answers provided by <strong>{selectedCandidateForReplies.name}</strong>
+            </Typography>
+            {selectedCandidateForReplies.linkInfo?.questionAnswers && selectedCandidateForReplies.linkInfo.questionAnswers.length > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {selectedCandidateForReplies.linkInfo.questionAnswers.map((qa, idx) => (
+                  <Paper
+                    key={idx}
+                    sx={{
+                      p: 2,
+                      border: '1px solid #e2e8f0',
+                      borderRadius: 1.5,
+                      background: '#ffffff'
+                    }}
+                  >
+                    <Typography variant="subtitle2" sx={{ 
+                      color: '#1e293b', 
+                      fontWeight: 600,
+                      mb: 1,
+                      fontSize: '0.95rem'
+                    }}>
+                      {qa.question}
+                    </Typography>
+                    <Typography variant="body1" sx={{ 
+                      color: '#475569',
+                      fontSize: '0.9rem',
+                      pl: 1
+                    }}>
+                      {qa.answer || 'No answer provided'}
+                    </Typography>
+                  </Paper>
+                ))}
+              </Box>
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <QuestionAnswerIcon sx={{ fontSize: 64, color: '#9e9e9e', opacity: 0.3, mb: 2 }} />
+                <Typography variant="body2" sx={{ color: '#64748b' }}>
+                  No answers provided for this candidate
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
+      </DialogContent>
+
+      <Divider sx={{ borderColor: '#e2e8f0' }} />
+
+      <DialogActions sx={{ p: 2.5, background: '#f8fafc' }}>
+        <Button
+          onClick={() => {
+            setShowRepliesModal(false);
+            setSelectedCandidateForReplies(null);
+          }}
+          variant="outlined"
+          sx={{
+            borderColor: '#cbd5e1',
+            color: '#64748b',
+            '&:hover': {
+              borderColor: '#94a3b8',
+              backgroundColor: '#f1f5f9'
+            }
+          }}
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+
     {/* Candidate Details Modal */}
     {selectedCandidateForDetails && (
       <CandidateDetailsModal
@@ -1054,6 +1310,17 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       newStatus={statusChangeConfirm.newStatus}
       itemName={statusChangeConfirm.candidateName}
       itemType="candidate"
+    />
+
+    {/* Delete Confirmation Popup */}
+    <DeleteConfirmationPopup
+      open={showDeletePopup}
+      onClose={cancelDelete}
+      onConfirm={handleDeleteCandidate}
+      title="Delete Candidate"
+      message="Are you sure you want to delete this candidate? This action cannot be undone and will also remove all associated data including resume and job links."
+      itemName={candidateToDelete?.name}
+      isDeleting={candidateToDelete ? deleting[candidateToDelete._id] : false}
     />
     </>
   );

@@ -49,6 +49,7 @@ import {
   Comment as CommentIcon,
   Construction as ConstructionIcon,
   Sort as SortIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
 import axios from "axios";
 import API_URL from '../config/api';
@@ -1115,6 +1116,38 @@ const CandidateList = ({
                               >
                                 Pool
                               </Button>
+                            </Tooltip>
+                          )}
+                          {accessLevel === 2 && (
+                            <Tooltip title="Delete Candidate">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteCandidate(candidate);
+                                }}
+                                disabled={isDeleting[candidate._id]}
+                                sx={{
+                                  color: "#d32f2f",
+                                  border: "1px solid rgba(211, 47, 47, 0.3)",
+                                  padding: "4px",
+                                  borderRadius: 1,
+                                  "&:hover": {
+                                    backgroundColor: "rgba(211, 47, 47, 0.1)",
+                                    borderColor: "#d32f2f",
+                                  },
+                                  "&:disabled": {
+                                    color: "rgba(211, 47, 47, 0.3)",
+                                    borderColor: "rgba(211, 47, 47, 0.1)",
+                                  }
+                                }}
+                              >
+                                {isDeleting[candidate._id] ? (
+                                  <CircularProgress size={16} sx={{ color: "#d32f2f" }} />
+                                ) : (
+                                  <DeleteIcon sx={{ fontSize: "1rem" }} />
+                                )}
+                              </IconButton>
                             </Tooltip>
                           )}
                         </Box>

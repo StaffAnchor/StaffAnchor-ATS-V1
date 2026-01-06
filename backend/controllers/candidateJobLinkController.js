@@ -110,7 +110,8 @@ exports.getLinkedCandidates = async (req, res) => {
               linkedAt: link.createdAt,
               status: link.status,
               notes: link.notes,
-              linkId: link._id
+              linkId: link._id,
+              questionAnswers: link.questionAnswers || []
             }
           };
         } catch (err) {

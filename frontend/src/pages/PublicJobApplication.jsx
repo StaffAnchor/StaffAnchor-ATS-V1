@@ -76,6 +76,9 @@ const PublicJobApplication = () => {
     education: [{ clg: '', course: '', start: '', end: '' }]
   });
 
+  // Personalized questions answers state
+  const [questionAnswers, setQuestionAnswers] = useState({});
+
   useEffect(() => {
     fetchJobDetails();
   }, [jobId]);
@@ -215,6 +218,20 @@ const PublicJobApplication = () => {
       return;
     }
 
+    // Validate personalized questions if they exist
+    if (job && job.personalizedQuestions && job.personalizedQuestions.length > 0) {
+      const missingAnswers = [];
+      job.personalizedQuestions.forEach((q, index) => {
+        if (!questionAnswers[`question_${index}`] || questionAnswers[`question_${index}`].trim() === '') {
+          missingAnswers.push(q.question);
+        }
+      });
+      if (missingAnswers.length > 0) {
+        toast.error('Please answer all required questions');
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
       
@@ -229,6 +246,18 @@ const PublicJobApplication = () => {
         };
       });
 
+      // Build question answers array
+      const answersArray = [];
+      if (job && job.personalizedQuestions && job.personalizedQuestions.length > 0) {
+        job.personalizedQuestions.forEach((q, index) => {
+          answersArray.push({
+            question: q.question,
+            answer: questionAnswers[`question_${index}`] || '',
+            answerType: q.answerType
+          });
+        });
+      }
+
       const candidateData = {
         ...form,
         preferredLocations,
@@ -238,7 +267,9 @@ const PublicJobApplication = () => {
         experience: form.experience.filter(exp => exp.company || exp.position),
         education: form.education.filter(edu => edu.clg || edu.course),
         // Include the recruiter ID who shared this link for tracking
-        sharedByRecruiterId: sharedByRecruiterId
+        sharedByRecruiterId: sharedByRecruiterId,
+        // Include question answers
+        questionAnswers: answersArray
       };
 
       const response = await axios.post(`${API_URL}/api/candidates/public/apply/${jobId}`, candidateData);
@@ -726,6 +757,64 @@ const PublicJobApplication = () => {
                     )}
                   </Paper>
                 </Box>
+
+                {/* Personalized Questions - Required */}
+                {job && job.personalizedQuestions && job.personalizedQuestions.length > 0 && (
+                  <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <Typography variant="h6" sx={{ 
+                      color: '#475569', 
+                      mb: { xs: 1.5, sm: 2 },
+                      fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                    }}>
+                      Additional Questions <span style={{ color: '#e74c3c' }}>*</span>
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {job.personalizedQuestions.map((q, index) => (
+                        <Box key={index}>
+                          <Typography variant="body2" sx={{ 
+                            color: '#1e293b', 
+                            mb: 1,
+                            fontWeight: 500,
+                            fontSize: { xs: '0.875rem', sm: '1rem' }
+                          }}>
+                            {q.question} <span style={{ color: '#e74c3c' }}>*</span>
+                          </Typography>
+                          {q.answerType === 'true-false' ? (
+                            <FormControl fullWidth>
+                              <Select
+                                value={questionAnswers[`question_${index}`] || ''}
+                                onChange={(e) => setQuestionAnswers({
+                                  ...questionAnswers,
+                                  [`question_${index}`]: e.target.value
+                                })}
+                                displayEmpty
+                                required
+                                sx={inputStyles}
+                              >
+                                <MenuItem value="">Select an option</MenuItem>
+                                <MenuItem value="true">True</MenuItem>
+                                <MenuItem value="false">False</MenuItem>
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <TextField
+                              fullWidth
+                              required
+                              type={q.answerType === 'number' ? 'number' : 'text'}
+                              value={questionAnswers[`question_${index}`] || ''}
+                              onChange={(e) => setQuestionAnswers({
+                                ...questionAnswers,
+                                [`question_${index}`]: e.target.value
+                              })}
+                              placeholder={`Enter your answer${q.answerType === 'number' ? ' (number)' : ''}`}
+                              sx={inputStyles}
+                            />
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
 
                 {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>

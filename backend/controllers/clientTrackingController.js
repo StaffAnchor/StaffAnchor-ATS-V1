@@ -42,12 +42,21 @@ exports.getCandidatesForClientTracking = async (req, res) => {
       status: 'Submitted to Client'
     })
     .populate('candidateId', 'name email phone resume currentLocation experience') // Populate candidate details including location and experience
-    .select('candidateId clientRounds'); // Select only necessary fields
+    .select('candidateId clientRounds questionAnswers'); // Select only necessary fields including questionAnswers
 
-    const candidatesData = candidateJobLinks.map(link => {
+    // Filter out links where candidateId is null (deleted candidates)
+    const validLinks = candidateJobLinks.filter(link => {
+      if (!link.candidateId) {
+        console.log('Skipping link with null candidateId (deleted candidate):', link._id);
+        return false;
+      }
+      return true;
+    });
+
+    const candidatesData = validLinks.map(link => {
       // Get current CTC from the most recent experience entry
       let currentCTC = 'N/A';
-      if (link.candidateId.experience && link.candidateId.experience.length > 0) {
+      if (link.candidateId && link.candidateId.experience && link.candidateId.experience.length > 0) {
         // Get the most recent experience (assuming they're ordered by date or we take the first one)
         const latestExperience = link.candidateId.experience[0];
         if (latestExperience.ctc) {
@@ -57,7 +66,7 @@ exports.getCandidatesForClientTracking = async (req, res) => {
 
       // Format current location
       let currentLocation = 'N/A';
-      if (link.candidateId.currentLocation) {
+      if (link.candidateId && link.candidateId.currentLocation) {
         const loc = link.candidateId.currentLocation;
         const locationParts = [];
         if (loc.city) locationParts.push(loc.city);
@@ -76,10 +85,15 @@ exports.getCandidatesForClientTracking = async (req, res) => {
         currentCTC: currentCTC,
         clientRounds: link.clientRounds,
         candidateJobLinkId: link._id, // Add the link ID for status updates
+        questionAnswers: link.questionAnswers || [], // Include question answers
       };
     });
 
-    res.json({ jobTitle: job.title, candidates: candidatesData });
+    res.json({ 
+      jobTitle: job.title, 
+      candidates: candidatesData,
+      personalizedQuestions: job.personalizedQuestions || [] // Include job questions
+    });
 
   } catch (error) {
     console.error('Error fetching candidates for client tracking:', error);

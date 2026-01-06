@@ -969,6 +969,11 @@ exports.submitPublicJobApplication = async (req, res) => {
         linkData.linkedBy = req.body.sharedByRecruiterId;
       }
       
+      // Add question answers if provided
+      if (req.body.questionAnswers && Array.isArray(req.body.questionAnswers)) {
+        linkData.questionAnswers = req.body.questionAnswers;
+      }
+      
       await CandidateJobLink.findOneAndUpdate(
         { candidateId: candidate._id, jobId },
         linkData,
