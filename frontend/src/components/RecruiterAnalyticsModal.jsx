@@ -1105,16 +1105,6 @@ const RecruiterAnalyticsModal = ({ open, onClose, recruiter }) => {
                                                   </Box>
                                                 );
                                               })()
-                                            ) : candidate.clientSideStatus ? (
-                                              <Chip
-                                                label={candidate.clientSideStatus}
-                                                size="small"
-                                                sx={{
-                                                  fontSize: '0.7rem',
-                                                  background: `${getStatusColor(candidate.clientSideStatus)}15`,
-                                                  color: getStatusColor(candidate.clientSideStatus)
-                                                }}
-                                              />
                                             ) : (
                                               <Typography sx={{ color: '#94a3b8', fontSize: '0.8rem', fontStyle: 'italic' }}>
                                                 Not submitted to client

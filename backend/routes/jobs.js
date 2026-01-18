@@ -16,6 +16,8 @@ router.get('/:id', jobController.jobDetails);
 router.put('/:id', jobController.updateJob);
 router.get('/:jobId/suitable-candidates', jobController.findSuitableCandidates);
 router.post('/:jobId/suitable-candidates', jobController.findSuitableCandidates);
+router.post('/:jobId/rank-linked-candidates', jobController.rankLinkedCandidates);
+router.get('/:jobId/justify-candidate/:candidateId', jobController.getCandidateJustification);
 router.delete('/:jobId', requireDeletionPermission, jobController.deleteJob);
 
 module.exports = router;

@@ -11,6 +11,8 @@ import AIWarningDialog from './AIWarningDialog.jsx';
 import CompanyNameVisibilityModal from './CompanyNameVisibilityModal.jsx';
 import JobQuestionsModal from './JobQuestionsModal.jsx';
 import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
+import CandidateSearchOptionsModal from './CandidateSearchOptionsModal.jsx';
+import RankedCandidatesDisplay from './RankedCandidatesDisplay.jsx';
 import { toast } from 'react-toastify';
 import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon, TrackChanges as TrackChangesIcon } from '@mui/icons-material';
@@ -36,6 +38,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [linkingCandidates, setLinkingCandidates] = useState(false);
   const [showLinkedCandidatesModal, setShowLinkedCandidatesModal] = useState(false);
   const [showAIWarning, setShowAIWarning] = useState(false);
+  const [showCandidateSearchOptions, setShowCandidateSearchOptions] = useState(false);
+  const [showRankedCandidates, setShowRankedCandidates] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(job.status || 'New');
   const [showCompanyNameModal, setShowCompanyNameModal] = useState(false);
   const [showQuestionsModal, setShowQuestionsModal] = useState(false);
@@ -156,7 +160,12 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   };
 
   const findSuitableCandidates = () => {
-    setShowAIWarning(true);
+    setShowCandidateSearchOptions(true);
+  };
+
+  const handleSelectLinkedCandidates = () => {
+    setShowCandidateSearchOptions(false);
+    setShowRankedCandidates(true);
   };
 
   const handleAIWarningProceed = () => {
@@ -558,22 +567,46 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                   Edit
                 </Button>
               )}
-              <Button 
-                variant="contained" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  findSuitableCandidates();
-                }}
-                disabled={isLoading}
-                sx={{ 
-                  backgroundColor: '#2563eb', 
-                  color: '#ffffff',
-                  '&:hover': { backgroundColor: '#3d7be8' },
-                  '&:disabled': { backgroundColor: '#475569' }
-                }}
-              >
-                {isLoading ? 'Finding...' : 'Find Suitable Candidates'}
-              </Button>
+              <Box sx={{ position: 'relative' }}>
+                <Chip
+                  label="AI"
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: -8,
+                    left: -8,
+                    zIndex: 1,
+                    height: 20,
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    backgroundColor: '#8b5cf6',
+                    color: '#ffffff',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                  }}
+                />
+                <Button 
+                  variant="contained" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    findSuitableCandidates();
+                  }}
+                  disabled={isLoading}
+                  sx={{ 
+                    backgroundColor: '#2563eb', 
+                    color: '#ffffff',
+                    '&:hover': { 
+                      backgroundColor: '#1d4ed8',
+                      color: '#ffffff'
+                    },
+                    '&:disabled': { 
+                      backgroundColor: '#475569',
+                      color: '#ffffff'
+                    }
+                  }}
+                >
+                  {isLoading ? 'Finding...' : 'Find Suitable Candidates'}
+                </Button>
+              </Box>
               <Button 
                 variant="outlined" 
                 onClick={(e) => {
@@ -1445,6 +1478,22 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         )}
       </Stack>
       
+      {/* Candidate Search Options Modal */}
+      <CandidateSearchOptionsModal
+        open={showCandidateSearchOptions}
+        onClose={() => setShowCandidateSearchOptions(false)}
+        onSelectLinkedCandidates={handleSelectLinkedCandidates}
+      />
+
+      {/* Ranked Candidates Display (for linked candidates) */}
+      <RankedCandidatesDisplay
+        open={showRankedCandidates}
+        onClose={() => setShowRankedCandidates(false)}
+        jobId={job._id}
+        jobTitle={job.title}
+        accessLevel={accessLevel}
+      />
+
       {/* Preference Selection Modal */}
       <AIWarningDialog
         open={showAIWarning}

@@ -1064,34 +1064,6 @@ const CandidateList = ({
                               </IconButton>
                             </Tooltip>
                           )}
-                          <Tooltip title="Find Suitable Jobs">
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFindSuitableJobs(candidate);
-                              }}
-                              disabled={loadingJobs[candidate._id]}
-                              sx={{
-                                backgroundColor: "#2563eb",
-                                color: "#ffffff",
-                                fontSize: "0.75rem",
-                                padding: "4px 8px",
-                                minWidth: "auto",
-                                borderRadius: 1,
-                                "&:hover": {
-                                  backgroundColor: "#3d7be8",
-                                },
-                                "&:disabled": {
-                                  backgroundColor: "#475569",
-                                  color: "#ccc"
-                                }
-                              }}
-                            >
-                              {loadingJobs[candidate._id] ? 'Finding...' : 'Jobs'}
-                            </Button>
-                          </Tooltip>
                           {(accessLevel === 1 || accessLevel === 2) && (
                             <Tooltip title="Add to Talent Pool">
                               <Button

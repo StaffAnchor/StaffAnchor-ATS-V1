@@ -635,14 +635,6 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
           {!editMode && (accessLevel === 1 || accessLevel === 2) ? (
             <Button variant="contained" onClick={() => setEditMode(true)}>Edit</Button>
           ) : null}
-          <Button 
-            variant="contained" 
-            sx={{ml:2}} 
-            onClick={findSuitableJobs}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Finding Jobs...' : 'Find Suitable Jobs'}
-          </Button>
           {accessLevel === 2 && (
             <Button 
               variant="outlined" 
