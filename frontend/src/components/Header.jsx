@@ -202,25 +202,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
               Jobs
             </Button>
 
-            {/* 2. Client side status */}
-            <Button 
-              sx={{
-                ...getTabStyle(location.pathname === '/dashboard' && view === 'workflows'),
-                textTransform: 'none',
-                px: 2,
-                py: 1,
-                borderRadius: '8px',
-                minWidth: 'auto'
-              }} 
-              onClick={() => {
-                setView('workflows');
-                navigate('/dashboard');
-              }}
-            >
-              Client side status
-            </Button>
-
-            {/* 3. Candidates */}
+            {/* 2. Candidates */}
             <Button 
               sx={{
                 ...getTabStyle(location.pathname === '/dashboard' && view === 'candidates'),

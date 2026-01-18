@@ -40,11 +40,11 @@ import {
   Web as WebIcon,
   Download as DownloadIcon,
   Description as DescriptionIcon,
-  AccountTree as WorkflowIcon,
   FilterList as FilterListIcon,
   Comment as CommentIcon,
   QuestionAnswer as QuestionAnswerIcon,
   Delete as DeleteIcon,
+  OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import API_URL from '../config/api';
 
@@ -57,9 +57,8 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   const [deleting, setDeleting] = useState({});
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [candidateToDelete, setCandidateToDelete] = useState(null);
-  const [existingWorkflow, setExistingWorkflow] = useState(null);
-  const [checkingWorkflow, setCheckingWorkflow] = useState(false);
   const [jobQuestions, setJobQuestions] = useState([]);
+  const [clientTrackingToken, setClientTrackingToken] = useState(null);
 
   // Comments state
   const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -107,7 +106,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   useEffect(() => {
     if (open && jobId) {
       fetchLinkedCandidates();
-      checkExistingWorkflow();
       fetchJobQuestions();
       setStatusFilter('All');
     }
@@ -120,9 +118,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setJobQuestions(response.data.personalizedQuestions || []);
+      setClientTrackingToken(response.data.clientTrackingToken || null);
     } catch (error) {
       console.error('Error fetching job questions:', error);
       setJobQuestions([]);
+      setClientTrackingToken(null);
     }
   };
 
@@ -134,7 +134,14 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setLinkedCandidates(response.data.candidates || []);
+      const candidates = response.data.candidates || [];
+      // Ensure clientRounds is always an array
+      candidates.forEach(candidate => {
+        if (candidate.linkInfo && !candidate.linkInfo.clientRounds) {
+          candidate.linkInfo.clientRounds = [];
+        }
+      });
+      setLinkedCandidates(candidates);
     } catch (error) {
       console.error('Error fetching linked candidates:', error);
       toast.error('Failed to fetch linked candidates');
@@ -143,24 +150,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     }
   };
 
-  const checkExistingWorkflow = async () => {
-    try {
-      setCheckingWorkflow(true);
-      const token = localStorage.getItem('jwt');
-      const response = await axios.get(`${API_URL}/api/workflows/job/${jobId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      // Check if there's an active workflow
-      const activeWorkflow = response.data.find(w => w.status === 'Active');
-      setExistingWorkflow(activeWorkflow || null);
-    } catch (error) {
-      console.error('Error checking workflow:', error);
-      setExistingWorkflow(null);
-    } finally {
-      setCheckingWorkflow(false);
-    }
-  };
 
   const handleUnlinkCandidate = async (linkId, candidateName) => {
     try {
@@ -261,50 +250,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
   };
 
 
-  const handleCreateWorkflow = () => {
-    // Only include candidates with status "Submitted to Client"
-    const submittedCandidates = linkedCandidates.filter(
-      c => c.linkInfo?.status === 'Submitted to Client'
-    );
-
-    if (submittedCandidates.length === 0) {
-      toast.info('No candidates submitted to client');
-      return;
-    }
-
-    // If workflow exists, check for new candidates
-    if (existingWorkflow) {
-      // Get all candidate IDs already in the workflow using candidateStatuses
-      const existingCandidateIds = new Set();
-      existingWorkflow.candidateStatuses?.forEach(cs => {
-        existingCandidateIds.add(cs.candidateId?.toString() || cs.candidateId);
-      });
-
-      // Filter for new candidates not in workflow
-      const newCandidates = submittedCandidates.filter(
-        c => !existingCandidateIds.has(c._id.toString())
-      );
-
-      if (newCandidates.length === 0) {
-        toast.info('No new candidates submitted to client');
-        return;
-      }
-    }
-
-    // Store job ID to open creation modal with pre-selected job
-    sessionStorage.setItem('workflowData', JSON.stringify({
-      jobId,
-      jobTitle
-    }));
-
-    // Close modal and navigate to workflows page
-    onClose();
-    
-    // Trigger navigation to workflows page
-    window.dispatchEvent(new CustomEvent('createWorkflowFromLinked', {
-      detail: { jobId, jobTitle }
-    }));
-  };
 
   const getSourceIcon = (source) => {
     switch (source) {
@@ -584,17 +529,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 200
                   }}>
-                    Email
-                  </TableCell>
-                  <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                    color: '#2563eb',
-                    fontWeight: 700,
-                    fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
-                    minWidth: 140
-                  }}>
-                    Phone
+                    Contact
                   </TableCell>
                   <TableCell sx={{ 
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -605,16 +540,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     minWidth: 120
                   }}>
                     Current CTC
-                  </TableCell>
-                  <TableCell sx={{ 
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                    color: '#2563eb',
-                    fontWeight: 700,
-                    fontSize: '0.95rem',
-                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
-                    minWidth: 120
-                  }}>
-                    Expected CTC
                   </TableCell>
                   <TableCell sx={{ 
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -634,7 +559,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 120
                   }}>
-                    Resume
+                    Resume & Reviews
                   </TableCell>
                   <TableCell sx={{ 
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -644,7 +569,39 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                     borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
                     minWidth: 200
                   }}>
-                    Status
+                    Internal Status
+                  </TableCell>
+                  <TableCell sx={{ 
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    color: '#2563eb',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    borderBottom: '2px solid rgba(37, 99, 235, 0.18)',
+                    minWidth: 180
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      Client Status
+                      {clientTrackingToken && (
+                        <Tooltip title="Open Client Tracking Page">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(`/client-tracking/${clientTrackingToken}`, '_blank');
+                            }}
+                            sx={{
+                              padding: '2px',
+                              color: '#2563eb',
+                              '&:hover': {
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                              }
+                            }}
+                          >
+                            <OpenInNewIcon sx={{ fontSize: '0.9rem' }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
                   </TableCell>
                   {jobQuestions.length > 0 && (
                     <TableCell sx={{ 
@@ -704,52 +661,48 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       </Typography>
                     </TableCell>
 
-                    {/* Email */}
+                    {/* Contact (Email & Phone) */}
                     <TableCell sx={{ 
                       color: '#64748b',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       py: 2
                     }}>
-                      <Link
-                        href={`mailto:${candidate.email}`}
-                        onClick={(e) => e.stopPropagation()}
-                        sx={{
-                          color: '#2563eb',
-                          textDecoration: 'none',
-                          '&:hover': {
-                            textDecoration: 'underline',
-                          }
-                        }}
-                      >
-                        {candidate.email}
-                      </Link>
-                    </TableCell>
-
-                    {/* Phone */}
-                    <TableCell sx={{ 
-                      color: '#64748b',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                      py: 2
-                    }}>
-                      {candidate.phone ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                         <Link
-                          href={`tel:${candidate.phone}`}
+                          href={`mailto:${candidate.email}`}
                           onClick={(e) => e.stopPropagation()}
                           sx={{
-                            color: '#64748b',
+                            color: '#2563eb',
                             textDecoration: 'none',
+                            fontSize: '0.875rem',
                             '&:hover': {
-                              color: '#2563eb',
+                              textDecoration: 'underline',
                             }
                           }}
                         >
-                          {candidate.phone}
+                          {candidate.email}
                         </Link>
-                      ) : (
-                        <Typography variant="body2" sx={{ color: '#7a8a9e', fontStyle: 'italic' }}>
-                          Not provided
-                        </Typography>
-                      )}
+                        {candidate.phone ? (
+                          <Link
+                            href={`tel:${candidate.phone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            sx={{
+                              color: '#64748b',
+                              textDecoration: 'none',
+                              fontSize: '0.875rem',
+                              '&:hover': {
+                                color: '#2563eb',
+                              }
+                            }}
+                          >
+                            {candidate.phone}
+                          </Link>
+                        ) : (
+                          <Typography variant="body2" sx={{ color: '#7a8a9e', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                            Not provided
+                          </Typography>
+                        )}
+                      </Box>
                     </TableCell>
 
                     {/* Current CTC */}
@@ -764,17 +717,6 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                           : (candidate.experience && candidate.experience.length > 0 && candidate.experience[0].ctc)
                             ? `₹ ${candidate.experience[0].ctc} LPA`
                             : 'Not Mentioned'}
-                      </Typography>
-                    </TableCell>
-
-                    {/* Expected CTC */}
-                    <TableCell sx={{ 
-                      color: '#64748b',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                      py: 2
-                    }}>
-                      <Typography variant="body2" sx={{ color: '#1e293b' }}>
-                        {candidate.expectedCTC ? `₹ ${candidate.expectedCTC} LPA` : 'Not Mentioned'}
                       </Typography>
                     </TableCell>
 
@@ -946,6 +888,55 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
                       </FormControl>
                     </TableCell>
 
+                    {/* Client Status */}
+                    <TableCell sx={{ 
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                      py: 2
+                    }}>
+                      {candidate.linkInfo.status === 'Submitted to Client' ? (
+                        (() => {
+                          const rounds = candidate.linkInfo.clientRounds || [];
+                          // If no rounds exist, show Round 1: Ongoing as default
+                          const displayRounds = rounds.length > 0 ? rounds : [{ status: 'Ongoing' }];
+                          
+                          return (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                              {displayRounds.map((round, idx) => (
+                                <Chip
+                                  key={idx}
+                                  label={`Round ${idx + 1}: ${round.status}`}
+                                  size="small"
+                                  sx={{
+                                    fontSize: '0.75rem',
+                                    height: '24px',
+                                    backgroundColor: round.status === 'Accepted' 
+                                      ? 'rgba(76, 175, 80, 0.15)' 
+                                      : round.status === 'Rejected'
+                                      ? 'rgba(244, 67, 54, 0.15)'
+                                      : 'rgba(255, 152, 0, 0.15)',
+                                    color: round.status === 'Accepted'
+                                      ? '#4caf50'
+                                      : round.status === 'Rejected'
+                                      ? '#f44336'
+                                      : '#ff9800',
+                                    fontWeight: 600
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          );
+                        })()
+                      ) : (
+                        <Typography variant="body2" sx={{ 
+                          color: '#94a3b8', 
+                          fontSize: '0.8rem',
+                          fontStyle: 'italic'
+                        }}>
+                          Not submitted to client
+                        </Typography>
+                      )}
+                    </TableCell>
+
                     {/* Replies */}
                     {jobQuestions.length > 0 && (
                       <TableCell sx={{ 
@@ -1075,62 +1066,8 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
         borderTop: '1px solid rgba(0, 0, 0, 0.05)',
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
       }}>
-        <Box>
-          {linkedCandidates.length > 0 && (() => {
-            const submittedCandidates = linkedCandidates.filter(
-              c => c.linkInfo?.status === 'Submitted to Client'
-            );
-            
-            let buttonText = 'Start tracking submitted candidates to client';
-            let isDisabled = submittedCandidates.length === 0;
-            
-            if (existingWorkflow) {
-              // Check for new candidates not in workflow
-              const existingCandidateIds = new Set();
-              existingWorkflow.phases?.forEach(phase => {
-                phase.candidates?.forEach(candidateId => {
-                  existingCandidateIds.add(candidateId.toString());
-                });
-              });
-              
-              const newSubmittedCandidates = submittedCandidates.filter(
-                c => !existingCandidateIds.has(c._id.toString())
-              );
-              
-              buttonText = 'Start tracking newly submitted candidates to client';
-              isDisabled = newSubmittedCandidates.length === 0;
-            }
-            
-            return (
-              <Button
-                onClick={handleCreateWorkflow}
-                variant={existingWorkflow ? "outlined" : "contained"}
-                startIcon={<WorkflowIcon />}
-                disabled={isDisabled || checkingWorkflow}
-                sx={{
-                  backgroundColor: existingWorkflow ? 'transparent' : '#2563eb',
-                  borderColor: existingWorkflow ? 'rgba(79, 140, 255, 0.5)' : 'transparent',
-                  color: existingWorkflow ? '#2563eb' : '#ffffff',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  '&:hover': {
-                    backgroundColor: existingWorkflow ? 'rgba(79, 140, 255, 0.1)' : '#3d7be8',
-                    borderColor: existingWorkflow ? '#2563eb' : 'transparent',
-                  },
-                  '&:disabled': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                    color: 'rgba(0, 0, 0, 0.26)',
-                    borderColor: 'rgba(0, 0, 0, 0.12)',
-                  }
-                }}
-              >
-                {buttonText}
-              </Button>
-            );
-          })()}
-        </Box>
         <Button
           onClick={onClose}
           variant="outlined"

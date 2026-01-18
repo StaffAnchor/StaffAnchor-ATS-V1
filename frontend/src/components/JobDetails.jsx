@@ -50,8 +50,6 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
       setPendingQuestionsModal(false);
     }
   }, [showCompanyNameModal, pendingQuestionsModal, companyNameSettings]);
-  const [existingWorkflow, setExistingWorkflow] = useState(null);
-  const [checkingWorkflow, setCheckingWorkflow] = useState(false);
   const [statusChangeConfirm, setStatusChangeConfirm] = useState({
     open: false,
     newStatus: ''
@@ -62,39 +60,9 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     setCurrentStatus(job.status || 'New');
   }, [job.status]);
 
-  // Check for existing workflow
-  useEffect(() => {
-    const checkWorkflow = async () => {
-      try {
-        setCheckingWorkflow(true);
-        const token = localStorage.getItem('jwt');
-        const response = await axios.get(`${API_URL}/api/workflows/job/${job._id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const activeWorkflow = response.data.find(w => w.status === 'Active');
-        setExistingWorkflow(activeWorkflow || null);
-      } catch (error) {
-        console.error('Error checking workflow:', error);
-        setExistingWorkflow(null);
-      } finally {
-        setCheckingWorkflow(false);
-      }
-    };
-    
-    if (job._id) {
-      checkWorkflow();
-    }
-  }, [job._id]);
 
   const handleQuickStatusChangeRequest = (newStatus) => {
-    // Check if workflow exists - only allow "Ongoing client process" or "Completed"
-    if (existingWorkflow && existingWorkflow.status === 'Active') {
-      const allowedStatuses = ['Ongoing client process', 'Completed'];
-      if (!allowedStatuses.includes(newStatus)) {
-        toast.error('Client side process already started');
-        return;
-      }
-    }
+    // Workflow feature removed - no restrictions
     
     setStatusChangeConfirm({
       open: true,
@@ -173,11 +141,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
 
   // When entering edit mode, ensure recruiters array exists
   const handleEditClick = () => {
-    // Check if workflow exists - prevent editing
-    if (existingWorkflow && existingWorkflow.status === 'Active') {
-      toast.error('Client side process is already started for this job');
-      return;
-    }
+    // Workflow feature removed - no restrictions
     
     const recruitersList = job.recruiters && job.recruiters.length > 0 
       ? job.recruiters 
@@ -847,10 +811,10 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                             }
                           }}
                         >
-                          <MenuItem value="New" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>New</MenuItem>
-                          <MenuItem value="In Progress" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>In Progress</MenuItem>
-                          <MenuItem value="Halted" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>Halted</MenuItem>
-                          <MenuItem value="Withdrawn" disabled={existingWorkflow && existingWorkflow.status === 'Active'}>Withdrawn</MenuItem>
+                          <MenuItem value="New">New</MenuItem>
+                          <MenuItem value="In Progress">In Progress</MenuItem>
+                          <MenuItem value="Halted">Halted</MenuItem>
+                          <MenuItem value="Withdrawn">Withdrawn</MenuItem>
                           <MenuItem value="Ongoing client process">Ongoing client process</MenuItem>
                           <MenuItem value="Completed">Completed</MenuItem>
                         </Select>

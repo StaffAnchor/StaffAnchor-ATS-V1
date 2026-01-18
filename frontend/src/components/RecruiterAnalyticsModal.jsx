@@ -1072,7 +1072,40 @@ const RecruiterAnalyticsModal = ({ open, onClose, recruiter }) => {
                                             />
                                           </TableCell>
                                           <TableCell>
-                                            {candidate.clientSideStatus ? (
+                                            {candidate.status === 'Submitted to Client' ? (
+                                              (() => {
+                                                const rounds = candidate.clientRounds || [];
+                                                // If no rounds exist, show Round 1: Ongoing as default
+                                                const displayRounds = rounds.length > 0 ? rounds : [{ status: 'Ongoing' }];
+                                                
+                                                return (
+                                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                    {displayRounds.map((round, idx) => (
+                                                      <Chip
+                                                        key={idx}
+                                                        label={`Round ${idx + 1}: ${round.status}`}
+                                                        size="small"
+                                                        sx={{
+                                                          fontSize: '0.7rem',
+                                                          height: '22px',
+                                                          backgroundColor: round.status === 'Accepted' 
+                                                            ? 'rgba(76, 175, 80, 0.15)' 
+                                                            : round.status === 'Rejected'
+                                                            ? 'rgba(244, 67, 54, 0.15)'
+                                                            : 'rgba(255, 152, 0, 0.15)',
+                                                          color: round.status === 'Accepted'
+                                                            ? '#4caf50'
+                                                            : round.status === 'Rejected'
+                                                            ? '#f44336'
+                                                            : '#ff9800',
+                                                          fontWeight: 600
+                                                        }}
+                                                      />
+                                                    ))}
+                                                  </Box>
+                                                );
+                                              })()
+                                            ) : candidate.clientSideStatus ? (
                                               <Chip
                                                 label={candidate.clientSideStatus}
                                                 size="small"
@@ -1083,7 +1116,9 @@ const RecruiterAnalyticsModal = ({ open, onClose, recruiter }) => {
                                                 }}
                                               />
                                             ) : (
-                                              <Typography sx={{ color: '#94a3b8', fontSize: '0.8rem' }}>—</Typography>
+                                              <Typography sx={{ color: '#94a3b8', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                                Not submitted to client
+                                              </Typography>
                                             )}
                                           </TableCell>
                                           <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>
