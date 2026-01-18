@@ -1,7 +1,6 @@
 const { sendEmail, prepareEmailPreview } = require('../services/emailService');
 const Job = require('../models/Job');
 const Candidate = require('../models/Candidate');
-const Workflow = require('../models/Workflow');
 const User = require('../models/User');
 
   // Preview email before sending
@@ -36,13 +35,7 @@ exports.previewEmail = async (req, res) => {
       enrichedData.candidates = candidates;
     }
 
-    // Enrich workflow data
-    if (data.workflowId) {
-      const workflow = await Workflow.findById(data.workflowId);
-      if (workflow) {
-        enrichedData.workflow = workflow;
-      }
-    }
+    // Workflow feature removed
 
     // Enrich creator data
     if (data.creatorId) {

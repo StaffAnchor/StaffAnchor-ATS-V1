@@ -783,6 +783,7 @@ const Analytics = () => {
                   <TableCell sx={{ fontWeight: 600 }}>Phone</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Linked On</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Resume</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Client Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -830,6 +831,50 @@ const Analytics = () => {
                       ) : (
                         <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.8rem' }}>
                           No resume
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {candidate.status === 'Submitted to Client' ? (
+                        (() => {
+                          const rounds = candidate.clientRounds || [];
+                          // If no rounds exist, show Round 1: Ongoing as default
+                          const displayRounds = rounds.length > 0 ? rounds : [{ status: 'Ongoing' }];
+                          
+                          return (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                              {displayRounds.map((round, idx) => (
+                                <Chip
+                                  key={idx}
+                                  label={`Round ${idx + 1}: ${round.status}`}
+                                  size="small"
+                                  sx={{
+                                    fontSize: '0.7rem',
+                                    height: '22px',
+                                    backgroundColor: round.status === 'Accepted' 
+                                      ? 'rgba(76, 175, 80, 0.15)' 
+                                      : round.status === 'Rejected'
+                                      ? 'rgba(244, 67, 54, 0.15)'
+                                      : 'rgba(255, 152, 0, 0.15)',
+                                    color: round.status === 'Accepted'
+                                      ? '#4caf50'
+                                      : round.status === 'Rejected'
+                                      ? '#f44336'
+                                      : '#ff9800',
+                                    fontWeight: 600
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          );
+                        })()
+                      ) : (
+                        <Typography variant="body2" sx={{ 
+                          color: '#94a3b8', 
+                          fontSize: '0.8rem',
+                          fontStyle: 'italic'
+                        }}>
+                          Not submitted to client
                         </Typography>
                       )}
                     </TableCell>

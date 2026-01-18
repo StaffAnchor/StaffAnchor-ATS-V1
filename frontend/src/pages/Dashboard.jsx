@@ -4,7 +4,6 @@ import JobList from '../components/JobList.jsx';
 import CandidateList from '../components/CandidateList.jsx';
 import AddJob from '../components/AddJob.jsx';
 import AddCandidate from '../components/AddCandidate.jsx';
-import Workflows from './WorkflowsSimple.jsx';
 import TalentPools from './TalentPools.jsx';
 import axios from 'axios';
 import API_URL from '../config/api';
@@ -108,16 +107,6 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
     }
   }, [view, currentPage, sortOrder, serverFilters]);
 
-  // Listen for workflow creation event
-  useEffect(() => {
-    const handleCreateWorkflowEvent = () => {
-      if (setView) {
-        setView('workflows');
-      }
-    };
-    window.addEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
-    return () => window.removeEventListener('createWorkflowFromLinked', handleCreateWorkflowEvent);
-  }, [setView]);
 
   // Listen for candidate deletion event
   useEffect(() => {
@@ -184,7 +173,6 @@ const Dashboard = ({ user, setUser, onLogout, view, setView }) => {
         )}
         {view === 'addJob' && <AddJob user={user} />}
         {view === 'addCandidate' && <AddCandidate key={location.state?.preSelectedJob?._id || 'default'} />}
-        {view === 'workflows' && <Workflows user={user} />}
         {view === 'talentPools' && <TalentPools user={user} />}
         {user.accessLevel === 2 && view === 'subordinates' && <div>Subordinates View</div>}
       </div>

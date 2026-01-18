@@ -1,7 +1,6 @@
 const CandidateJobLink = require('../models/CandidateJobLink');
 const Candidate = require('../models/Candidate');
 const Job = require('../models/Job');
-const Workflow = require('../models/Workflow');
 const User = require('../models/User');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
@@ -53,30 +52,10 @@ exports.getJobsWithAnalytics = async (req, res) => {
           l.status === 'Submitted to Client' || l.status === 'Submitted'
         ).length;
 
-        // Get workflow data for client-side statuses
-        const workflow = await Workflow.findOne({ jobId: job._id });
-        
+        // Workflow feature removed - client-side status tracking removed
         let selectedCount = 0;
         let rejectedCount = 0;
         let ongoingCount = 0;
-
-        if (workflow && workflow.candidateStatuses) {
-          const linkedCandidateIds = links.map(l => l.candidateId.toString());
-
-          workflow.candidateStatuses.forEach(cs => {
-            if (linkedCandidateIds.includes(cs.candidateId.toString())) {
-              const status = cs.clientSideStatus;
-              if (['Offer Accepted', 'Joined'].includes(status)) {
-                selectedCount++;
-              } else if (status === 'Rejected') {
-                rejectedCount++;
-              } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
-                         'Feedback Received', 'Shortlisted', 'On Hold', 'Offered'].includes(status)) {
-                ongoingCount++;
-              }
-            }
-          });
-        }
 
         // Count unique recruiters (include both linkedBy and sharedByRecruiterId)
         const recruiterIds = new Set();
@@ -144,22 +123,8 @@ exports.getJobAnalytics = async (req, res) => {
     // Filter out links with null candidates (deleted candidates)
     const validLinks = links.filter(l => l.candidateId);
 
-    // Get workflow data for client-side statuses
-    const workflow = await Workflow.findOne({ jobId })
-      .populate('candidateStatuses.updatedBy', 'fullName email');
-
-    // Build a map of candidateId to client-side status info
+    // Workflow feature removed - clientStatusMap is now empty
     const clientStatusMap = new Map();
-    if (workflow && workflow.candidateStatuses) {
-      workflow.candidateStatuses.forEach(cs => {
-        clientStatusMap.set(cs.candidateId.toString(), {
-          clientSideStatus: cs.clientSideStatus,
-          updatedBy: cs.updatedBy,
-          updatedAt: cs.updatedAt,
-          statusHistory: cs.statusHistory || []
-        });
-      });
-    }
 
     // Group candidates by recruiter (use linkedBy or sharedByRecruiterId for applied-through-link candidates)
     const recruiterMap = new Map();
@@ -211,14 +176,7 @@ exports.getJobAnalytics = async (req, res) => {
         statusHistory: link.statusHistory || []
       };
       
-      // Add client-side status if available
-      const clientStatus = clientStatusMap.get(link.candidateId._id.toString());
-      if (clientStatus) {
-        candidateInfo.clientSideStatus = clientStatus.clientSideStatus;
-        candidateInfo.clientStatusUpdatedBy = clientStatus.updatedBy;
-        candidateInfo.clientStatusUpdatedAt = clientStatus.updatedAt;
-        candidateInfo.clientStatusHistory = clientStatus.statusHistory;
-      }
+      // Workflow feature removed - no client-side status
       
       // Categorize candidate
       recruiterData.candidates.linked.push(candidateInfo);
@@ -245,34 +203,7 @@ exports.getJobAnalytics = async (req, res) => {
         }
       }
       
-      // Check client-side status for selected/rejected/ongoing
-      if (clientStatus) {
-        const status = clientStatus.clientSideStatus;
-        if (['Offer Accepted', 'Joined'].includes(status)) {
-          recruiterData.candidates.selected.push(candidateInfo);
-          recruiterData.stats.totalSelected++;
-          
-          recruiterData.timeline.push({
-            action: 'selected',
-            candidateName: link.candidateId.name,
-            date: clientStatus.updatedAt,
-            status: status
-          });
-        } else if (status === 'Rejected') {
-          recruiterData.candidates.rejected.push(candidateInfo);
-          recruiterData.stats.totalRejected++;
-          
-          recruiterData.timeline.push({
-            action: 'rejected',
-            candidateName: link.candidateId.name,
-            date: clientStatus.updatedAt
-          });
-        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
-                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered', 'Offer Declined', 'No Show'].includes(status)) {
-          recruiterData.candidates.ongoing.push(candidateInfo);
-          recruiterData.stats.totalOngoing++;
-        }
-      }
+      // Workflow feature removed - no client-side status tracking
     });
     
     // Sort timelines by date
@@ -367,16 +298,8 @@ exports.generatePerformanceReport = async (req, res) => {
 
     const validLinks = links.filter(l => l.candidateId);
 
-    // Get workflow data
-    const workflow = await Workflow.findOne({ jobId });
-
-    // Build a map of candidateId to client-side status
+    // Workflow feature removed - clientStatusMap is now empty
     const clientStatusMap = new Map();
-    if (workflow && workflow.candidateStatuses) {
-      workflow.candidateStatuses.forEach(cs => {
-        clientStatusMap.set(cs.candidateId.toString(), cs.clientSideStatus);
-      });
-    }
 
     // Group by recruiter and calculate stats (use linkedBy or sharedByRecruiterId)
     const recruiterStats = new Map();
@@ -415,17 +338,7 @@ exports.generatePerformanceReport = async (req, res) => {
         stats.submitted++;
       }
       
-      const clientStatus = clientStatusMap.get(link.candidateId._id.toString());
-      if (clientStatus) {
-        if (['Offer Accepted', 'Joined'].includes(clientStatus)) {
-          stats.selected++;
-        } else if (clientStatus === 'Rejected') {
-          stats.rejected++;
-        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
-                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered'].includes(clientStatus)) {
-          stats.ongoing++;
-        }
-      }
+      // Workflow feature removed - no client-side status tracking
     });
 
     // Build report data for each recruiter
@@ -599,22 +512,8 @@ exports.getRecruiterAnalytics = async (req, res) => {
     // Get unique jobs this recruiter has worked on
     const jobIds = [...new Set(validLinks.map(l => l.jobId._id.toString()))];
     
-    // Get workflow data for client-side statuses
-    const workflows = await Workflow.find({ jobId: { $in: jobIds } });
-    
-    // Build a map of candidateId+jobId to client-side status
+    // Workflow feature removed - clientStatusMap is now empty
     const clientStatusMap = new Map();
-    workflows.forEach(workflow => {
-      if (workflow.candidateStatuses) {
-        workflow.candidateStatuses.forEach(cs => {
-          const key = `${cs.candidateId.toString()}_${workflow.jobId.toString()}`;
-          clientStatusMap.set(key, {
-            clientSideStatus: cs.clientSideStatus,
-            updatedAt: cs.updatedAt
-          });
-        });
-      }
-    });
 
     // Calculate overall stats
     let overallStats = {
@@ -696,39 +595,7 @@ exports.getRecruiterAnalytics = async (req, res) => {
       }
 
       // Check client-side status
-      const key = `${link.candidateId._id.toString()}_${jobIdStr}`;
-      const clientStatus = clientStatusMap.get(key);
-      
-      if (clientStatus) {
-        const status = clientStatus.clientSideStatus;
-        
-        if (['Offer Accepted', 'Joined'].includes(status)) {
-          overallStats.selectedByClient++;
-          jobAnalytics.stats.selectedByClient++;
-          if (status === 'Joined') overallStats.joined++;
-          if (status === 'Offer Accepted') overallStats.offerAccepted++;
-        } else if (status === 'Rejected') {
-          overallStats.rejectedByClient++;
-          jobAnalytics.stats.rejectedByClient++;
-        } else if (['Interview Scheduled', 'Interview Completed', 'Awaiting Feedback', 
-                   'Feedback Received', 'Shortlisted', 'On Hold', 'Offered', 'Offer Declined', 'No Show'].includes(status)) {
-          overallStats.ongoingProcess++;
-          jobAnalytics.stats.ongoingProcess++;
-          
-          if (status === 'Interview Scheduled') {
-            overallStats.interviewScheduled++;
-            jobAnalytics.stats.interviewScheduled++;
-          }
-          if (status === 'Interview Completed') {
-            overallStats.interviewCompleted++;
-            jobAnalytics.stats.interviewCompleted++;
-          }
-          if (status === 'Offered') {
-            overallStats.offered++;
-            jobAnalytics.stats.offered++;
-          }
-        }
-      }
+      // Workflow feature removed - no client-side status tracking
 
       // Add candidate info to job analytics
       jobAnalytics.candidates.push({
@@ -738,7 +605,8 @@ exports.getRecruiterAnalytics = async (req, res) => {
         status: link.status,
         source: link.source,
         linkedAt: link.createdAt,
-        clientSideStatus: clientStatus?.clientSideStatus || null
+        clientSideStatus: null, // Workflow feature removed
+        clientRounds: link.clientRounds || []
       });
 
       // Add to timeline
@@ -867,11 +735,7 @@ exports.getRecruiterAnalytics = async (req, res) => {
     };
 
     validLinks.forEach(link => {
-      const key = `${link.candidateId._id.toString()}_${link.jobId._id.toString()}`;
-      const clientStatus = clientStatusMap.get(key);
-      if (clientStatus && clientStatusDistribution.hasOwnProperty(clientStatus.clientSideStatus)) {
-        clientStatusDistribution[clientStatus.clientSideStatus]++;
-      }
+      // Workflow feature removed - no client-side status distribution
     });
 
     // Performance metrics

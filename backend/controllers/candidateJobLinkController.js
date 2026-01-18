@@ -86,6 +86,7 @@ exports.getLinkedCandidates = async (req, res) => {
         select: 'fullName email',
         strictPopulate: false
       })
+      .select('candidateId source linkedBy createdAt status notes questionAnswers clientRounds')
       .sort({ createdAt: -1 });
 
     console.log(`Found ${links.length} links for job ${jobId}`);
@@ -111,7 +112,8 @@ exports.getLinkedCandidates = async (req, res) => {
               status: link.status,
               notes: link.notes,
               linkId: link._id,
-              questionAnswers: link.questionAnswers || []
+              questionAnswers: link.questionAnswers || [],
+              clientRounds: link.clientRounds || []
             }
           };
         } catch (err) {
