@@ -116,8 +116,21 @@ button, .button {
 }
 button:hover, .button:hover {
   background: var(--color-primary-hover);
+  color: #ffffff;
   box-shadow: var(--shadow-lg);
   transform: translateY(-1px);
+}
+
+/* Global button hover styles for better text visibility */
+.MuiButton-contained:hover {
+  color: #ffffff !important;
+}
+
+/* Ensure text is visible on hover for buttons with gradient or dark backgrounds */
+.MuiButton-contained[style*="gradient"]:hover,
+.MuiButton-contained[style*="linear-gradient"]:hover,
+.MuiButton-contained[style*="background"]:hover {
+  color: #ffffff !important;
 }
 
 input, select, textarea {

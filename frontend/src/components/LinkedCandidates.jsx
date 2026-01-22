@@ -111,6 +111,22 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
     }
   }, [open, jobId]);
 
+  // Listen for status changes from RankedCandidatesDisplay
+  useEffect(() => {
+    if (!open || !jobId) return;
+    
+    const handleStatusUpdate = (event) => {
+      const { linkId, newStatus } = event.detail;
+      // Refresh the linked candidates to get the latest status
+      fetchLinkedCandidates();
+    };
+
+    window.addEventListener('candidateStatusUpdated', handleStatusUpdate);
+    return () => {
+      window.removeEventListener('candidateStatusUpdated', handleStatusUpdate);
+    };
+  }, [open, jobId]);
+
   const fetchJobQuestions = async () => {
     try {
       const token = localStorage.getItem('jwt');
@@ -241,6 +257,11 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       }));
 
       toast.success('Status updated successfully');
+      
+      // Dispatch event to notify RankedCandidatesDisplay
+      window.dispatchEvent(new CustomEvent('candidateStatusUpdated', {
+        detail: { linkId, newStatus }
+      }));
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');

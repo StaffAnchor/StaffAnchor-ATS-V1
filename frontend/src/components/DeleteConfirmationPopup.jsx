@@ -120,6 +120,7 @@ const DeleteConfirmationPopup = ({
             color: '#ffffff',
             '&:hover': {
               backgroundColor: '#d32f2f',
+              color: '#ffffff',
             },
             '&:disabled': {
               backgroundColor: 'rgba(244, 67, 54, 0.5)',

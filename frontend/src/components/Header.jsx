@@ -133,8 +133,32 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
 
   const getTabStyle = (active) =>
     active
-      ? { background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)', color: '#ffffff', fontWeight: 700, border: '2px solid transparent', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }
-      : { background: '#ffffff', color: '#475569', border: '2px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)' };
+      ? { 
+          background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)', 
+          color: '#ffffff', 
+          fontWeight: 700, 
+          border: '2px solid transparent', 
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
+          '&:hover': {
+            background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
+            color: '#ffffff',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 6px 16px rgba(37, 99, 235, 0.4)'
+          }
+        }
+      : { 
+          background: '#ffffff', 
+          color: '#475569', 
+          border: '2px solid #e2e8f0', 
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+          '&:hover': {
+            background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+            color: '#ffffff',
+            border: '2px solid transparent',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+          }
+        };
 
   return (
     <AppBar position="fixed" sx={{ 
@@ -350,7 +374,11 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   color: '#1e293b',
                   py: 1.5,
                   '&:hover': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                    color: '#8b5cf6',
+                    '& .MuiListItemIcon-root': {
+                      color: '#8b5cf6'
+                    }
                   }
                 }}
               >
@@ -365,7 +393,11 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   color: '#1e293b',
                   py: 1.5,
                   '&:hover': {
-                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                    color: '#2563eb',
+                    '& .MuiListItemIcon-root': {
+                      color: '#2563eb'
+                    }
                   }
                 }}
               >
@@ -383,7 +415,11 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   color: '#1e293b',
                   py: 1.5,
                   '&:hover': {
-                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10b981',
+                    '& .MuiListItemIcon-root': {
+                      color: '#10b981'
+                    }
                   }
                 }}
               >
@@ -398,7 +434,11 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   color: '#1e293b',
                   py: 1.5,
                   '&:hover': {
-                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10b981',
+                    '& .MuiListItemIcon-root': {
+                      color: '#10b981'
+                    }
                   }
                 }}
               >

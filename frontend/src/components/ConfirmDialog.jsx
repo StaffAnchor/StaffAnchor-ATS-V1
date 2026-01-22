@@ -73,6 +73,7 @@ const ConfirmDialog = ({
             px: 3,
             '&:hover': {
               backgroundColor: confirmColor === "#ef4444" ? '#dc2626' : confirmColor,
+              color: '#ffffff',
             },
           }}
         >

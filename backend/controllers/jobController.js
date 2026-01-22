@@ -1,6 +1,8 @@
 const Job = require('../models/Job');
 const Candidate = require('../models/Candidate');
 const Client = require('../models/Client');
+const CandidateJobLink = require('../models/CandidateJobLink');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 exports.addJob = async (req, res) => {
   try {
@@ -581,6 +583,319 @@ exports.findSuitableCandidates = async (req, res) => {
   } catch (err) {
     console.error('Error finding suitable candidates:', err);
     res.status(500).json({ error: 'Failed to find suitable candidates' });
+  }
+};
+
+// Rank linked candidates using Gemini AI
+exports.rankLinkedCandidates = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    // Get job details
+    const job = await Job.findById(jobId).populate('skills', 'name').lean();
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Get all linked candidates for this job
+    const links = await CandidateJobLink.find({ jobId })
+      .populate({
+        path: 'candidateId',
+        populate: {
+          path: 'skills',
+          select: 'name'
+        }
+      })
+      .select('candidateId status')
+      .lean();
+    
+    // Ensure all links have a status (default to 'New' if missing)
+    links.forEach(link => {
+      if (!link.status) {
+        link.status = 'New';
+      }
+    });
+
+    // Filter out deleted candidates
+    const validLinks = links.filter(link => link.candidateId);
+    
+    if (validLinks.length === 0) {
+      return res.status(404).json({ error: 'No linked candidates found for this job' });
+    }
+
+    // Prepare candidate data for AI
+    const candidatesData = validLinks.map((link, index) => {
+      const candidate = link.candidateId;
+      const skills = candidate.skills ? candidate.skills.map(s => s.name || s).join(', ') : 'Not specified';
+      const experience = candidate.experience && candidate.experience.length > 0
+        ? candidate.experience.map(exp => `${exp.position} at ${exp.company} (${exp.start} - ${exp.end || 'Present'})`).join('; ')
+        : 'Not specified';
+      const education = candidate.education && candidate.education.length > 0
+        ? candidate.education.map(edu => `${edu.course} from ${edu.clg}`).join('; ')
+        : 'Not specified';
+      
+      return {
+        index: index + 1,
+        name: candidate.name || 'Unknown',
+        email: candidate.email || 'Not provided',
+        phone: candidate.phone || 'Not provided',
+        skills,
+        experience,
+        education,
+        currentLocation: candidate.currentLocation ? 
+          `${candidate.currentLocation.city || ''}, ${candidate.currentLocation.state || ''}, ${candidate.currentLocation.country || ''}`.trim() : 
+          'Not specified',
+        totalExperience: candidate.totalExperience || 'Not specified',
+        resume: candidate.resume ? 'Resume available' : 'No resume',
+        status: link.status || 'New'
+      };
+    });
+
+    // Prepare job description
+    const jobDescription = `
+Job Title: ${job.title || 'Not specified'}
+Organization: ${job.organization || 'Not specified'}
+Location: ${job.location || 'Not specified'}
+Required Skills: ${job.skills ? job.skills.map(s => s.name || s).join(', ') : 'Not specified'}
+Experience Required: ${job.experience || 'Not specified'}
+Description: ${job.description || 'No description provided'}
+`;
+
+    // Initialize Gemini AI
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // Create prompt for ranking
+    const prompt = `You are an expert recruitment AI assistant. Analyze the following job description and candidate profiles, then rank the candidates from most suitable to least suitable.
+
+JOB DESCRIPTION:
+${jobDescription}
+
+CANDIDATES:
+${candidatesData.map(c => `
+Candidate ${c.index}:
+- Name: ${c.name}
+- Email: ${c.email}
+- Phone: ${c.phone}
+- Skills: ${c.skills}
+- Experience: ${c.experience}
+- Education: ${c.education}
+- Location: ${c.currentLocation}
+- Total Experience: ${c.totalExperience}
+- Resume: ${c.resume}
+- Current Status: ${c.status}
+`).join('\n')}
+
+Please provide a ranked list of candidates in JSON format. For each candidate, provide:
+1. The candidate index (from the list above)
+2. A relevance score (0-100)
+3. A brief justification (2-3 sentences explaining why this candidate is ranked at this position)
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks, just raw JSON):
+{
+  "ranking": [
+    {
+      "candidateIndex": 1,
+      "relevanceScore": 95,
+      "justification": "Brief explanation of why this candidate is ranked here"
+    },
+    {
+      "candidateIndex": 2,
+      "relevanceScore": 85,
+      "justification": "Brief explanation"
+    }
+  ],
+  "summary": "A brief overall summary of the ranking (2-3 sentences)"
+}`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+
+    // Parse the JSON response
+    let parsedData;
+    try {
+      // Remove markdown code blocks if present
+      const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsedData = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      throw new Error('Failed to parse AI ranking response');
+    }
+
+    // Map ranking back to candidates
+    const rankedCandidates = parsedData.ranking.map(rank => {
+      const candidateIndex = rank.candidateIndex - 1; // Convert to 0-based
+      if (candidateIndex >= 0 && candidateIndex < validLinks.length) {
+        const link = validLinks[candidateIndex];
+        // Ensure status is always set (use 'New' as default if missing or empty)
+        const linkStatus = link.status && link.status.trim() !== '' ? link.status : 'New';
+        return {
+          candidate: link.candidateId,
+          linkId: link._id,
+          relevanceScore: rank.relevanceScore,
+          justification: rank.justification,
+          rank: parsedData.ranking.indexOf(rank) + 1,
+          currentStatus: linkStatus
+        };
+      }
+      return null;
+    }).filter(item => item !== null);
+
+    res.json({
+      success: true,
+      summary: parsedData.summary,
+      rankedCandidates,
+      totalCandidates: rankedCandidates.length
+    });
+
+  } catch (err) {
+    console.error('Error ranking linked candidates:', err);
+    
+    // Check if it's a rate limit error
+    if (err.status === 429 || err.message?.includes('quota') || err.message?.includes('rate limit')) {
+      return res.status(429).json({ 
+        error: 'AI_RATE_LIMIT',
+        message: 'The AI service is currently busy. Please try again in a minute.'
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to rank linked candidates',
+      details: err.message 
+    });
+  }
+};
+
+// Get AI justification for a specific candidate ranking
+exports.getCandidateJustification = async (req, res) => {
+  try {
+    const { jobId, candidateId } = req.params;
+
+    // Get job details
+    const job = await Job.findById(jobId).populate('skills', 'name').lean();
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Get candidate details
+    const candidate = await Candidate.findById(candidateId)
+      .populate('skills', 'name')
+      .lean();
+    
+    if (!candidate) {
+      return res.status(404).json({ error: 'Candidate not found' });
+    }
+
+    // Prepare candidate data
+    const skills = candidate.skills ? candidate.skills.map(s => s.name || s).join(', ') : 'Not specified';
+    const experience = candidate.experience && candidate.experience.length > 0
+      ? candidate.experience.map(exp => `${exp.position} at ${exp.company} (${exp.start} - ${exp.end || 'Present'})`).join('; ')
+      : 'Not specified';
+    const education = candidate.education && candidate.education.length > 0
+      ? candidate.education.map(edu => `${edu.course} from ${edu.clg}`).join('; ')
+      : 'Not specified';
+
+    const candidateProfile = `
+Name: ${candidate.name || 'Unknown'}
+Email: ${candidate.email || 'Not provided'}
+Phone: ${candidate.phone || 'Not provided'}
+Skills: ${skills}
+Experience: ${experience}
+Education: ${education}
+Current Location: ${candidate.currentLocation ? 
+  `${candidate.currentLocation.city || ''}, ${candidate.currentLocation.state || ''}, ${candidate.currentLocation.country || ''}`.trim() : 
+  'Not specified'}
+Total Experience: ${candidate.totalExperience || 'Not specified'}
+Resume: ${candidate.resume ? 'Available' : 'Not available'}
+`;
+
+    // Prepare job description
+    const jobDescription = `
+Job Title: ${job.title || 'Not specified'}
+Organization: ${job.organization || 'Not specified'}
+Location: ${job.location || 'Not specified'}
+Required Skills: ${job.skills ? job.skills.map(s => s.name || s).join(', ') : 'Not specified'}
+Experience Required: ${job.experience || 'Not specified'}
+Description: ${job.description || 'No description provided'}
+`;
+
+    // Initialize Gemini AI
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // Create prompt for justification
+    const prompt = `You are an expert recruitment AI assistant. Analyze the following job description and candidate profile, then provide a comprehensive analysis with merits, demerits, and a final verdict.
+
+JOB DESCRIPTION:
+${jobDescription}
+
+CANDIDATE PROFILE:
+${candidateProfile}
+
+Provide a detailed analysis with:
+1. MERITS: Exactly 3 bullet points highlighting the candidate's strengths, relevant skills, experience, or qualifications that make them suitable for this job.
+2. DEMERITS: Exactly 3 bullet points highlighting the candidate's weaknesses, missing skills, experience gaps, or qualifications that may not align with the job requirements.
+3. FINAL VERDICT: Exactly 3 bullet points providing an overall assessment and recommendation.
+
+Each bullet point should be concise (1-2 sentences) and focus on specific, actionable insights.
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks, just raw JSON):
+{
+  "merits": [
+    "First merit point",
+    "Second merit point",
+    "Third merit point"
+  ],
+  "demerits": [
+    "First demerit point",
+    "Second demerit point",
+    "Third demerit point"
+  ],
+  "finalVerdict": [
+    "First verdict point",
+    "Second verdict point",
+    "Third verdict point"
+  ]
+}`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+
+    // Parse the JSON response
+    let parsedData;
+    try {
+      // Remove markdown code blocks if present
+      const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsedData = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      throw new Error('Failed to parse AI justification response');
+    }
+
+    res.json({
+      success: true,
+      merits: parsedData.merits || [],
+      demerits: parsedData.demerits || [],
+      finalVerdict: parsedData.finalVerdict || []
+    });
+
+  } catch (err) {
+    console.error('Error getting candidate justification:', err);
+    
+    // Check if it's a rate limit error
+    if (err.status === 429 || err.message?.includes('quota') || err.message?.includes('rate limit')) {
+      return res.status(429).json({ 
+        error: 'AI_RATE_LIMIT',
+        message: 'The AI service is currently busy. Please try again in a minute.'
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to get candidate justification',
+      details: err.message 
+    });
   }
 };
 

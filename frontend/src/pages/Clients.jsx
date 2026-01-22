@@ -27,11 +27,9 @@ import {
 import {
   Visibility as VisibilityIcon,
   Delete as DeleteIcon,
-  Payment as PaymentIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
   Work as WorkIcon,
-  Construction as ConstructionIcon,
   Edit as EditIcon
 } from '@mui/icons-material';
 import API_URL from '../config/api';
@@ -44,7 +42,6 @@ const Clients = () => {
   const [selectedClient, setSelectedClient] = useState(null);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, clientId: null, clientName: '' });
 
   useEffect(() => {
@@ -72,10 +69,6 @@ const Clients = () => {
     setOpenDetailsDialog(true);
   };
 
-  const handleBilling = (e) => {
-    e.stopPropagation(); // Prevent row click
-    setShowFeatureDialog(true);
-  };
 
   const handleEdit = () => {
     setOpenDetailsDialog(false);
@@ -165,9 +158,6 @@ const Clients = () => {
                 Details
               </TableCell>
               <TableCell sx={{ color: '#1e293b', fontWeight: 700, fontSize: '0.95rem' }}>
-                Billing
-              </TableCell>
-              <TableCell sx={{ color: '#1e293b', fontWeight: 700, fontSize: '0.95rem' }}>
                 Contact
               </TableCell>
               <TableCell sx={{ color: '#1e293b', fontWeight: 700, fontSize: '0.95rem' }}>
@@ -178,7 +168,7 @@ const Clients = () => {
           <TableBody>
             {clients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" sx={{ color: '#64748b' }}>
                     No clients found. Add a new client to get started.
                   </Typography>
@@ -216,15 +206,6 @@ const Clients = () => {
                       sx={{ color: '#8b5cf6' }}
                     >
                       <VisibilityIcon />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={handleBilling}
-                      sx={{ color: '#10b981' }}
-                    >
-                      <PaymentIcon />
                     </IconButton>
                   </TableCell>
                   <TableCell>
@@ -374,46 +355,6 @@ const Clients = () => {
         client={selectedClient}
         onClientUpdated={handleClientUpdated}
       />
-
-      {/* Feature Under Development Dialog */}
-      <Dialog
-        open={showFeatureDialog}
-        onClose={() => setShowFeatureDialog(false)}
-        maxWidth="xs"
-        PaperProps={{
-          sx: {
-            background: '#ffffff',
-            border: '1px solid rgba(0, 0, 0, 0.1)',
-            borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
-          }
-        }}
-      >
-        <DialogContent sx={{ textAlign: 'center', py: 4, px: 3 }}>
-          <ConstructionIcon sx={{ fontSize: 64, color: '#f59e0b', mb: 2 }} />
-          <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
-            This feature is currently under development
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-          <Button
-            onClick={() => setShowFeatureDialog(false)}
-            variant="contained"
-            sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
-              color: '#fff',
-              fontWeight: 600,
-              textTransform: 'none',
-              px: 3,
-              '&:hover': {
-                background: 'linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)',
-              }
-            }}
-          >
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Delete Confirmation */}
       <ConfirmDialog
