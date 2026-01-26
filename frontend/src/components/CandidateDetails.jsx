@@ -730,7 +730,15 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
                     Location: {job.location} {job.remote && '(Remote)'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
-                    Experience: {job.experience} years
+                    Experience: {job.experienceMin !== undefined || job.experienceMax !== undefined
+                      ? (job.experienceMin !== undefined && job.experienceMax !== undefined
+                          ? `${job.experienceMin} - ${job.experienceMax}`
+                          : job.experienceMin !== undefined
+                            ? `${job.experienceMin}+`
+                            : `Up to ${job.experienceMax}`)
+                      : job.experience !== undefined
+                        ? `${job.experience}+`
+                        : 'Not specified'} years
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.9rem', mb: 0.5 }}>
                     Industry: {job.industry}

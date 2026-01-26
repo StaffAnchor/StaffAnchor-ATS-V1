@@ -1178,8 +1178,18 @@ const CandidateList = ({
                                     )}
                                     
                                     {/* Experience */}
-                                    {job.experience && (
-                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}><strong>Years of Experience:</strong> {job.experience}</Typography>
+                                    {(job.experienceMin !== undefined || job.experienceMax !== undefined || job.experience !== undefined) && (
+                                      <Typography variant="body2" sx={{color: '#1e293b', mb: 1}}>
+                                        <strong>Years of Experience:</strong> {
+                                          job.experienceMin !== undefined || job.experienceMax !== undefined
+                                            ? (job.experienceMin !== undefined && job.experienceMax !== undefined
+                                                ? `${job.experienceMin} - ${job.experienceMax}`
+                                                : job.experienceMin !== undefined
+                                                  ? `${job.experienceMin}+`
+                                                  : `Up to ${job.experienceMax}`)
+                                            : `${job.experience}+`
+                                        } years
+                                      </Typography>
                                     )}
                                     
                                     {/* Remote Work */}

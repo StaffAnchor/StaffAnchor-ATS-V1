@@ -52,7 +52,8 @@ const AddJob = ({ user }) => {
     clientContact: '',
     location: '', 
     remote: false, 
-    experience: '', 
+    experienceMin: '', 
+    experienceMax: '', 
     ctcMin: '', 
     ctcMax: '', 
     description: '',
@@ -198,9 +199,25 @@ const AddJob = ({ user }) => {
     setLoading(true);
     
     // Validate required fields
-    if (!form.title || !form.organization || !form.clientContact || !form.experience || !form.ctcMin || !form.ctcMax || !form.description) {
+    if (!form.title || !form.organization || !form.clientContact || !form.experienceMin || !form.experienceMax || !form.ctcMin || !form.ctcMax || !form.description) {
       setMsg('Please fill in all required fields');
       toast.error('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+    
+    // Validate Experience range
+    const expMinVal = parseInt(form.experienceMin);
+    const expMaxVal = parseInt(form.experienceMax);
+    if (isNaN(expMinVal) || isNaN(expMaxVal) || expMinVal < 0 || expMaxVal < 0) {
+      setMsg('Experience values must be valid positive numbers');
+      toast.error('Experience values must be valid positive numbers');
+      setLoading(false);
+      return;
+    }
+    if (expMinVal > expMaxVal) {
+      setMsg('Minimum Experience cannot be greater than Maximum Experience');
+      toast.error('Minimum Experience cannot be greater than Maximum Experience');
       setLoading(false);
       return;
     }
@@ -252,7 +269,8 @@ const AddJob = ({ user }) => {
         location: validLocations.length > 0 ? `${validLocations[0].city}, ${validLocations[0].state}, ${validLocations[0].country}` : '', // Keep for backward compatibility
         locations: validLocations,
         remote: form.remote,
-        experience: parseInt(form.experience),
+        experienceMin: parseInt(form.experienceMin),
+        experienceMax: parseInt(form.experienceMax),
         ctcMin: parseFloat(form.ctcMin),
         ctcMax: parseFloat(form.ctcMax),
         description: form.description,
@@ -293,7 +311,8 @@ const AddJob = ({ user }) => {
         clientContact: '',
         location: '', 
         remote: false, 
-        experience: '', 
+        experienceMin: '', 
+        experienceMax: '', 
         ctcMin: '', 
         ctcMax: '', 
         description: ''
@@ -587,29 +606,60 @@ const AddJob = ({ user }) => {
             ))}
           </Box>
 
-          {/* Years of Experience */}
+          {/* Years of Experience Range */}
           <Box sx={{ mb: 3 }}>
-            <TextField
-              name="experience"
-              label="Years of Experience"
-              value={form.experience}
-              onChange={handleChange}
-              required
-              fullWidth
-              type="number"
-              InputProps={{
-                startAdornment: <WorkIcon sx={{ color: '#64748b', mr: 1 }} />,
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
-                  '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
-                  '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
-                },
-                '& .MuiInputLabel-root': { color: '#64748b' },
-                '& .MuiInputBase-input': { color: '#1e293b' },
-              }}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <WorkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="subtitle1" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                Years of Experience *
+              </Typography>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="experienceMin"
+                  label="Minimum Experience"
+                  value={form.experienceMin}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  type="number"
+                  inputProps={{ step: "1", min: "0" }}
+                  placeholder="e.g., 2"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                      '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="experienceMax"
+                  label="Maximum Experience"
+                  value={form.experienceMax}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  type="number"
+                  inputProps={{ step: "1", min: "0" }}
+                  placeholder="e.g., 5"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.23)' },
+                      '&:hover fieldset': { borderColor: 'rgba(0, 0, 0, 0.4)' },
+                      '&.Mui-focused fieldset': { borderColor: '#8b5cf6', borderWidth: '2px' },
+                    },
+                    '& .MuiInputLabel-root': { color: '#64748b' },
+                    '& .MuiInputBase-input': { color: '#1e293b' },
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Box>
 
           {/* CTC Range */}

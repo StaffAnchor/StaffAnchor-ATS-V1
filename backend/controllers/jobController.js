@@ -357,7 +357,11 @@ exports.findSuitableCandidates = async (req, res) => {
       }
 
       // 3. REQUIRED WORK EXPERIENCE IN YEARS
-      if (job.experience !== undefined && candidate.experience && candidate.experience.length > 0) {
+      // Use experienceMin if available, otherwise fall back to experience (treating it as minimum)
+      const minExperience = job.experienceMin !== undefined ? job.experienceMin : (job.experience !== undefined ? job.experience : undefined);
+      const maxExperience = job.experienceMax !== undefined ? job.experienceMax : undefined;
+      
+      if (minExperience !== undefined && candidate.experience && candidate.experience.length > 0) {
         let totalYears = 0;
         let validExperiences = 0;
         
@@ -390,22 +394,44 @@ exports.findSuitableCandidates = async (req, res) => {
 
         if (validExperiences > 0) {
           let experienceScore = 0;
+          const experienceRange = maxExperience !== undefined ? `${minExperience}-${maxExperience}` : `${minExperience}+`;
           
-          if (totalYears >= job.experience) {
-            experienceScore = 100; // Perfect match
-            matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (meets requirement: ${job.experience}) = 100%`);
-          } else if (totalYears >= job.experience * 0.8) {
-            experienceScore = 85; // Close match
-            matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (close to requirement: ${job.experience}) = 85%`);
-          } else if (totalYears >= job.experience * 0.6) {
-            experienceScore = 70; // Partial match
-            matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (partial match: ${job.experience}) = 70%`);
-          } else if (totalYears >= job.experience * 0.4) {
-            experienceScore = 55; // Basic match
-            matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (basic match: ${job.experience}) = 55%`);
+          // Check if within range (if max is specified) or meets minimum
+          if (maxExperience !== undefined) {
+            if (totalYears >= minExperience && totalYears <= maxExperience) {
+              experienceScore = 100; // Perfect match within range
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (within range: ${experienceRange}) = 100%`);
+            } else if (totalYears >= minExperience * 0.8 && totalYears <= maxExperience * 1.2) {
+              experienceScore = 85; // Close match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (close to range: ${experienceRange}) = 85%`);
+            } else if (totalYears >= minExperience * 0.6) {
+              experienceScore = 70; // Partial match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (partial match: ${experienceRange}) = 70%`);
+            } else if (totalYears >= minExperience * 0.4) {
+              experienceScore = 55; // Basic match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (basic match: ${experienceRange}) = 55%`);
+            } else {
+              experienceScore = 40; // Below requirement but some experience
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (below requirement: ${experienceRange}) = 40%`);
+            }
           } else {
-            experienceScore = 40; // Below requirement but some experience
-            matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (below requirement: ${job.experience}) = 40%`);
+            // Only minimum specified (or old format with single experience value)
+            if (totalYears >= minExperience) {
+              experienceScore = 100; // Perfect match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (meets requirement: ${minExperience}+) = 100%`);
+            } else if (totalYears >= minExperience * 0.8) {
+              experienceScore = 85; // Close match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (close to requirement: ${minExperience}+) = 85%`);
+            } else if (totalYears >= minExperience * 0.6) {
+              experienceScore = 70; // Partial match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (partial match: ${minExperience}+) = 70%`);
+            } else if (totalYears >= minExperience * 0.4) {
+              experienceScore = 55; // Basic match
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (basic match: ${minExperience}+) = 55%`);
+            } else {
+              experienceScore = 40; // Below requirement but some experience
+              matchDetails.push(`Years Experience: ${totalYears.toFixed(1)} years (below requirement: ${minExperience}+) = 40%`);
+            }
           }
           
           individualScores.yearsOfExp = experienceScore;
@@ -566,13 +592,32 @@ exports.findSuitableCandidates = async (req, res) => {
         return candidateData;
       });
 
+    // Format experience for response
+    const formatExperience = (job) => {
+      if (job.experienceMin !== undefined || job.experienceMax !== undefined) {
+        if (job.experienceMin !== undefined && job.experienceMax !== undefined) {
+          return `${job.experienceMin} - ${job.experienceMax}`;
+        } else if (job.experienceMin !== undefined) {
+          return `${job.experienceMin}+`;
+        } else {
+          return `Up to ${job.experienceMax}`;
+        }
+      } else if (job.experience !== undefined) {
+        return `${job.experience}+`;
+      }
+      return 'Not specified';
+    };
+    
     res.json({
       job: {
         _id: job._id,
         title: job.title,
         organization: job.organization,
         location: job.location,
-        experience: job.experience,
+        experience: job.experience, // Keep for backward compatibility
+        experienceMin: job.experienceMin !== undefined ? job.experienceMin : (job.experience !== undefined ? job.experience : undefined),
+        experienceMax: job.experienceMax,
+        experienceFormatted: formatExperience(job),
         industry: job.industry,
         description: job.description
       },
@@ -657,7 +702,15 @@ Job Title: ${job.title || 'Not specified'}
 Organization: ${job.organization || 'Not specified'}
 Location: ${job.location || 'Not specified'}
 Required Skills: ${job.skills ? job.skills.map(s => s.name || s).join(', ') : 'Not specified'}
-Experience Required: ${job.experience || 'Not specified'}
+Experience Required: ${job.experienceMin !== undefined || job.experienceMax !== undefined
+      ? (job.experienceMin !== undefined && job.experienceMax !== undefined
+          ? `${job.experienceMin} - ${job.experienceMax} years`
+          : job.experienceMin !== undefined
+            ? `${job.experienceMin}+ years`
+            : `Up to ${job.experienceMax} years`)
+      : job.experience !== undefined
+        ? `${job.experience}+ years`
+        : 'Not specified'}
 Description: ${job.description || 'No description provided'}
 `;
 
@@ -816,7 +869,15 @@ Job Title: ${job.title || 'Not specified'}
 Organization: ${job.organization || 'Not specified'}
 Location: ${job.location || 'Not specified'}
 Required Skills: ${job.skills ? job.skills.map(s => s.name || s).join(', ') : 'Not specified'}
-Experience Required: ${job.experience || 'Not specified'}
+Experience Required: ${job.experienceMin !== undefined || job.experienceMax !== undefined
+      ? (job.experienceMin !== undefined && job.experienceMax !== undefined
+          ? `${job.experienceMin} - ${job.experienceMax} years`
+          : job.experienceMin !== undefined
+            ? `${job.experienceMin}+ years`
+            : `Up to ${job.experienceMax} years`)
+      : job.experience !== undefined
+        ? `${job.experience}+ years`
+        : 'Not specified'}
 Description: ${job.description || 'No description provided'}
 `;
 

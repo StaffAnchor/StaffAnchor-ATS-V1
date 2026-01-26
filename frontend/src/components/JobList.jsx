@@ -231,12 +231,32 @@ const JobList = ({ accessLevel, userId }) => {
       return false;
     }
     
-    if (
-      activeFilters.experience &&
-      (job.experience < activeFilters.experience[0] ||
-        job.experience > activeFilters.experience[1])
-    ) {
-      return false;
+    if (activeFilters.experience) {
+      // Get experience value: use min if available, otherwise fall back to old experience field
+      const jobExpMin = job.experienceMin !== undefined ? job.experienceMin : (job.experience !== undefined ? job.experience : null);
+      const jobExpMax = job.experienceMax !== undefined ? job.experienceMax : null;
+      
+      if (jobExpMin === null) {
+        // No experience specified, filter it out if filter requires experience
+        return false;
+      }
+      
+      // Check if job's experience range overlaps with filter range
+      const filterMin = activeFilters.experience[0];
+      const filterMax = activeFilters.experience[1];
+      
+      // Job has max: check if ranges overlap
+      if (jobExpMax !== null) {
+        // Ranges overlap if: jobMin <= filterMax AND jobMax >= filterMin
+        if (jobExpMin > filterMax || jobExpMax < filterMin) {
+          return false;
+        }
+      } else {
+        // Job only has min (or old format): check if min is within filter range
+        if (jobExpMin < filterMin || jobExpMin > filterMax) {
+          return false;
+        }
+      }
     }
     if (activeFilters.ctcLow && (job.ctcMin !== undefined || job.ctcMax !== undefined)) {
       const jobCtcMax = job.ctcMax ?? job.ctcMin;
