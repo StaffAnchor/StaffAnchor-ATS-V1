@@ -232,3 +232,4 @@ const ResumePreviewModal = ({ open, onClose, resumeUrl, candidateName, fileName 
 export default ResumePreviewModal;
 
 
+

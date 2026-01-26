@@ -18,12 +18,42 @@ import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, 
 import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon, TrackChanges as TrackChangesIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
+// Helper function to format experience display (handles both old single value and new range)
+const formatExperience = (job) => {
+  if (job.experienceMin !== undefined || job.experienceMax !== undefined) {
+    // New format with range
+    const min = job.experienceMin !== undefined ? job.experienceMin : '';
+    const max = job.experienceMax !== undefined ? job.experienceMax : '';
+    if (min !== '' && max !== '') {
+      return `${min} - ${max} years`;
+    } else if (min !== '') {
+      return `${min}+ years`;
+    } else if (max !== '') {
+      return `Up to ${max} years`;
+    }
+  } else if (job.experience !== undefined) {
+    // Old format - treat as minimum
+    return `${job.experience}+ years`;
+  }
+  return 'Not specified';
+};
+
 const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const navigate = useNavigate();
   const [showCandidates, setShowCandidates] = useState(false);
   const [candidates, setCandidates] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [editJob, setEditJob] = useState({ ...job, recruiters: job.recruiters || [] });
+  // Initialize editJob with experience range, converting old format if needed
+  const initializeEditJob = () => {
+    const baseJob = { ...job, recruiters: job.recruiters || [] };
+    // If job has old experience format but no new format, initialize new format from old
+    if ((baseJob.experienceMin === undefined && baseJob.experienceMax === undefined) && baseJob.experience !== undefined) {
+      baseJob.experienceMin = baseJob.experience;
+      baseJob.experienceMax = '';
+    }
+    return baseJob;
+  };
+  const [editJob, setEditJob] = useState(initializeEditJob());
   const [subordinates, setSubordinates] = useState([]);
   const [matchingResults, setMatchingResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -368,8 +398,27 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         return;
       }
 
-      // Ensure experience is a valid number
-      if (editJob.experience && (isNaN(editJob.experience) || editJob.experience < 0)) {
+      // Ensure experience range is valid
+      const expMin = editJob.experienceMin !== undefined && editJob.experienceMin !== '' ? parseInt(editJob.experienceMin) : undefined;
+      const expMax = editJob.experienceMax !== undefined && editJob.experienceMax !== '' ? parseInt(editJob.experienceMax) : undefined;
+      const oldExp = editJob.experience !== undefined && editJob.experience !== '' ? parseInt(editJob.experience) : undefined;
+      
+      // If using new format, validate range
+      if (expMin !== undefined || expMax !== undefined) {
+        if (expMin !== undefined && (isNaN(expMin) || expMin < 0)) {
+          toast.error('Minimum experience must be a valid positive number');
+          return;
+        }
+        if (expMax !== undefined && (isNaN(expMax) || expMax < 0)) {
+          toast.error('Maximum experience must be a valid positive number');
+          return;
+        }
+        if (expMin !== undefined && expMax !== undefined && expMin > expMax) {
+          toast.error('Minimum experience cannot be greater than maximum experience');
+          return;
+        }
+      } else if (oldExp !== undefined && (isNaN(oldExp) || oldExp < 0)) {
+        // Old format validation
         toast.error('Experience must be a valid positive number');
         return;
       }
@@ -388,7 +437,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
         title: editJob.title.trim(),
         organization: editJob.organization.trim(),
         location: editJob.location.trim(),
-        experience: editJob.experience && editJob.experience !== '' ? parseInt(editJob.experience) : undefined,
+        // Handle experience: use new format if available, otherwise convert old format to min
+        experienceMin: expMin !== undefined ? expMin : (oldExp !== undefined ? oldExp : undefined),
+        experienceMax: expMax !== undefined ? expMax : undefined,
+        // Keep old experience field for backward compatibility if no new format
+        experience: (expMin === undefined && expMax === undefined && oldExp !== undefined) ? oldExp : undefined,
         ctcMin: ctcMinVal,
         ctcMax: ctcMaxVal,
         industry: editJob.industry && editJob.industry.trim() !== '' ? editJob.industry.trim() : undefined,
@@ -528,7 +581,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
               <strong>Location:</strong> {job.location}
             </Typography>
             <Typography variant="body1" sx={{color: '#1e293b'}}>
-              <strong>Experience:</strong> {job.experience} years
+              <strong>Experience:</strong> {formatExperience(job)}
             </Typography>
             {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
               <Typography variant="body1" sx={{color: '#1e293b'}}>
@@ -742,7 +795,7 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                       py: 2
                     }}>
-                      {job.experience} years
+                      {formatExperience(job)}
                     </TableCell>
                   </TableRow>
                   
@@ -1086,24 +1139,54 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                 }}
               />
               
-              {/* Experience */}
-              <TextField
-                label="Experience (years)"
-                name="experience"
-                type="number"
-                value={editJob.experience}
-                onChange={handleEditChange}
-                fullWidth
-                sx={{ 
-                  '& .MuiInputBase-input': { color: '#1e293b' }, 
-                  '& .MuiInputLabel-root': { color: '#64748b' },
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
-                    '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
-                    '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
-                  }
-                }}
-              />
+              {/* Experience Range */}
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: '#64748b', mb: 1 }}>
+                  Experience (years) *
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Minimum Experience"
+                      name="experienceMin"
+                      type="number"
+                      value={editJob.experienceMin !== undefined ? editJob.experienceMin : ''}
+                      onChange={handleEditChange}
+                      fullWidth
+                      inputProps={{ step: "1", min: "0" }}
+                      sx={{ 
+                        '& .MuiInputBase-input': { color: '#1e293b' }, 
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Maximum Experience"
+                      name="experienceMax"
+                      type="number"
+                      value={editJob.experienceMax !== undefined ? editJob.experienceMax : ''}
+                      onChange={handleEditChange}
+                      fullWidth
+                      inputProps={{ step: "1", min: "0" }}
+                      sx={{ 
+                        '& .MuiInputBase-input': { color: '#1e293b' }, 
+                        '& .MuiInputLabel-root': { color: '#64748b' },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': { borderColor: 'rgba(0, 0, 0, 0.08)' },
+                          '&:hover fieldset': { borderColor: 'rgba(238, 187, 195, 0.4)' },
+                          '&.Mui-focused fieldset': { borderColor: '#8b5cf6' },
+                        }
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
               
               {/* CTC Range */}
               <Box>

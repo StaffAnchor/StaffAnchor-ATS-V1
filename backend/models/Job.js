@@ -74,6 +74,22 @@ const JobSchema = new mongoose.Schema({
       message: 'Experience must be a whole number'
     }
   },
+  experienceMin: {
+    type: Number,
+    min: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Minimum experience must be a whole number'
+    }
+  },
+  experienceMax: {
+    type: Number,
+    min: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Maximum experience must be a whole number'
+    }
+  },
   ctcMin: {
     type: Number,
     min: 0

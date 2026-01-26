@@ -482,7 +482,15 @@ const PublicJobApplication = () => {
                     color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}>
-                    {job.experience} years experience
+                    {job.experienceMin !== undefined || job.experienceMax !== undefined
+                      ? (job.experienceMin !== undefined && job.experienceMax !== undefined
+                          ? `${job.experienceMin} - ${job.experienceMax}`
+                          : job.experienceMin !== undefined
+                            ? `${job.experienceMin}+`
+                            : `Up to ${job.experienceMax}`)
+                      : job.experience !== undefined
+                        ? `${job.experience}+`
+                        : 'Not specified'} years experience
                   </Typography>
                 </Box>
               </Grid>
