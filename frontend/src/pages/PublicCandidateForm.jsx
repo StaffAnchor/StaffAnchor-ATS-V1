@@ -32,6 +32,7 @@ import PublicLocationSelector from '../components/PublicLocationSelector';
 
 const PublicCandidateForm = () => {
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   
   // Location state
   const [selectedPreferredLocations, setSelectedPreferredLocations] = useState([]);
@@ -183,12 +184,8 @@ const PublicCandidateForm = () => {
         }
       }
       
-      toast.success('Profile submitted successfully! We will get back to you soon.');
-      
-      // Reset form after successful submission
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      // Show confirmation page instead of reloading
+      setSubmitted(true);
       
     } catch (error) {
       console.error('Error submitting candidate:', error);
@@ -197,6 +194,154 @@ const PublicCandidateForm = () => {
       setSubmitting(false);
     }
   };
+
+  // Show confirmation page after successful submission
+  if (submitted) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: '#f8fafc',
+        py: { xs: 1, sm: 2, md: 4 },
+        px: { xs: 1, sm: 2 },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <ToastContainer position="top-center" autoClose={3000} theme="light" />
+        
+        <Container maxWidth="sm" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+          {/* Header with StaffAnchor Branding */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            mb: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 1, sm: 2 }
+          }}>
+            <img 
+              src={staffAnchorLogo} 
+              alt="StaffAnchor Logo" 
+              style={{ 
+                height: '100px',
+                width: 'auto',
+                maxWidth: '100%'
+              }}
+            />
+          </Box>
+
+          {/* Success Confirmation Card */}
+          <Card sx={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            textAlign: 'center',
+            p: { xs: 3, sm: 4, md: 5 }
+          }}>
+            <CardContent>
+              <CheckCircleIcon sx={{ 
+                fontSize: { xs: 64, sm: 80, md: 96 }, 
+                color: '#4caf50',
+                mb: { xs: 2, sm: 3 }
+              }} />
+              
+              <Typography variant="h4" sx={{ 
+                fontWeight: 700, 
+                color: '#1e293b',
+                mb: { xs: 1.5, sm: 2 },
+                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }
+              }}>
+                Profile Submitted Successfully!
+              </Typography>
+              
+              <Typography variant="h6" sx={{ 
+                color: '#475569',
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                fontWeight: 500
+              }}>
+                Welcome to Our Talent Network
+              </Typography>
+              
+              <Divider sx={{ my: { xs: 2, sm: 3 }, borderColor: '#e2e8f0' }} />
+              
+              <Typography variant="body1" sx={{ 
+                color: '#475569',
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: 1.6
+              }}>
+                Thank you for joining our talent network! We have received your profile and will review it carefully.
+              </Typography>
+              
+              <Typography variant="body1" sx={{ 
+                color: '#475569',
+                mb: { xs: 3, sm: 4 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: 1.6
+              }}>
+                Our team will match you with the best opportunities and get back to you soon if we find a suitable match.
+              </Typography>
+              
+              <Box sx={{ 
+                mt: { xs: 3, sm: 4 },
+                p: { xs: 2, sm: 3 },
+                background: '#f0f9ff',
+                borderRadius: '8px',
+                border: '1px solid #bae6fd'
+              }}>
+                <Typography variant="body2" sx={{ 
+                  color: '#1e293b',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontWeight: 500
+                }}>
+                  What's Next?
+                </Typography>
+                <Typography variant="body2" sx={{ 
+                  color: '#475569',
+                  mt: 1,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  lineHeight: 1.6
+                }}>
+                  Keep an eye on your email ({form.email}) for updates about matching opportunities.
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {/* Footer */}
+          <Paper sx={{
+            mt: { xs: 2, sm: 3, md: 4 },
+            p: { xs: 2, sm: 3 },
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#475569',
+                mb: { xs: 0.5, sm: 1 },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
+              © {new Date().getFullYear()} StaffAnchor. All rights reserved.
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: '#475569',
+                fontSize: { xs: '0.6875rem', sm: '0.75rem' }
+              }}
+            >
+              Connecting Talent with Opportunity
+            </Typography>
+          </Paper>
+        </Container>
+      </Box>
+    );
+  }
 
   const inputStyles = {
     '& .MuiOutlinedInput-root': {
