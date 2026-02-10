@@ -63,6 +63,10 @@ const CandidateSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
+  },
+  source: {
+    type: String,
+    enum: ['uploaded-by-recruiter', 'applied-on-job-link', 'applied-using-candidate-form']
   }
 }, {
   timestamps: true // Adds createdAt and updatedAt fields

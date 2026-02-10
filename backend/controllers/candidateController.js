@@ -66,7 +66,13 @@ exports.addCandidate = async (req, res) => {
       });
     }
     
-    const candidate = new Candidate(req.body);
+    // Set source to 'uploaded-by-recruiter' if not provided
+    const candidateData = {
+      ...req.body,
+      source: req.body.source || 'uploaded-by-recruiter'
+    };
+    
+    const candidate = new Candidate(candidateData);
     await candidate.save();
     
     // Save skills to database if user is authenticated
@@ -293,7 +299,7 @@ exports.listCandidates = async (req, res) => {
     // Fetch candidates with pagination and sorting
     // Only return basic fields, not full nested arrays
     const candidates = await Candidate.find(query)
-      .select('name email phone currentLocation domain talentPools expertiseSkills skills resume createdAt updatedAt')
+      .select('name email phone currentLocation domain talentPools expertiseSkills skills resume createdAt updatedAt source')
       .populate('domain', 'name')
       .populate('talentPools', 'name')
       .populate('expertiseSkills', 'name')
@@ -957,11 +963,17 @@ exports.submitPublicJobApplication = async (req, res) => {
         candidate.appliedJobs.push(jobId);
         await candidate.save();
       }
+      // Update source if not already set
+      if (!candidate.source) {
+        candidate.source = 'applied-on-job-link';
+        await candidate.save();
+      }
     } else {
       // Create new candidate with applied job
       candidate = new Candidate({
         ...cleanedData,
-        appliedJobs: [jobId]
+        appliedJobs: [jobId],
+        source: 'applied-on-job-link'
       });
       await candidate.save();
 
@@ -1059,10 +1071,17 @@ exports.submitPublicCandidate = async (req, res) => {
     if (candidate) {
       // Candidate exists - update their data
       Object.assign(candidate, cleanedData);
+      // Update source if not already set
+      if (!candidate.source) {
+        candidate.source = 'applied-using-candidate-form';
+      }
       await candidate.save();
     } else {
       // Create new candidate without applied jobs
-      candidate = new Candidate(cleanedData);
+      candidate = new Candidate({
+        ...cleanedData,
+        source: 'applied-using-candidate-form'
+      });
       await candidate.save();
 
       // Add candidate to talent pools if provided

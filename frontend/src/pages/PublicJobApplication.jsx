@@ -47,6 +47,7 @@ const PublicJobApplication = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [displayCompanyName, setDisplayCompanyName] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   
   // Location state
   const [selectedPreferredLocations, setSelectedPreferredLocations] = useState([]);
@@ -75,9 +76,6 @@ const PublicJobApplication = () => {
     experience: [{ company: '', position: '', role: '', ctc: '', start: '', end: '' }],
     education: [{ clg: '', course: '', start: '', end: '' }]
   });
-
-  // Personalized questions answers state
-  const [questionAnswers, setQuestionAnswers] = useState({});
 
   useEffect(() => {
     fetchJobDetails();
@@ -218,20 +216,6 @@ const PublicJobApplication = () => {
       return;
     }
 
-    // Validate personalized questions if they exist
-    if (job && job.personalizedQuestions && job.personalizedQuestions.length > 0) {
-      const missingAnswers = [];
-      job.personalizedQuestions.forEach((q, index) => {
-        if (!questionAnswers[`question_${index}`] || questionAnswers[`question_${index}`].trim() === '') {
-          missingAnswers.push(q.question);
-        }
-      });
-      if (missingAnswers.length > 0) {
-        toast.error('Please answer all required questions');
-        return;
-      }
-    }
-
     try {
       setSubmitting(true);
       
@@ -246,18 +230,6 @@ const PublicJobApplication = () => {
         };
       });
 
-      // Build question answers array
-      const answersArray = [];
-      if (job && job.personalizedQuestions && job.personalizedQuestions.length > 0) {
-        job.personalizedQuestions.forEach((q, index) => {
-          answersArray.push({
-            question: q.question,
-            answer: questionAnswers[`question_${index}`] || '',
-            answerType: q.answerType
-          });
-        });
-      }
-
       const candidateData = {
         ...form,
         preferredLocations,
@@ -267,9 +239,7 @@ const PublicJobApplication = () => {
         experience: form.experience.filter(exp => exp.company || exp.position),
         education: form.education.filter(edu => edu.clg || edu.course),
         // Include the recruiter ID who shared this link for tracking
-        sharedByRecruiterId: sharedByRecruiterId,
-        // Include question answers
-        questionAnswers: answersArray
+        sharedByRecruiterId: sharedByRecruiterId
       };
 
       const response = await axios.post(`${API_URL}/api/candidates/public/apply/${jobId}`, candidateData);
@@ -295,12 +265,8 @@ const PublicJobApplication = () => {
         }
       }
       
-      toast.success('Application submitted successfully! We will get back to you soon.');
-      
-      // Reset form after successful submission
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      // Show confirmation page instead of reloading
+      setSubmitted(true);
       
     } catch (error) {
       console.error('Error submitting application:', error);
@@ -340,6 +306,154 @@ const PublicJobApplication = () => {
         <Typography variant="body2" sx={{ color: '#475569' }}>
           This job posting may have been removed or does not exist.
         </Typography>
+      </Box>
+    );
+  }
+
+  // Show confirmation page after successful submission
+  if (submitted) {
+    return (
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: '#f8fafc',
+        py: { xs: 1, sm: 2, md: 4 },
+        px: { xs: 1, sm: 2 },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <ToastContainer position="top-center" autoClose={3000} theme="light" />
+        
+        <Container maxWidth="sm" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+          {/* Header with StaffAnchor Branding */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            mb: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 1, sm: 2 }
+          }}>
+            <img 
+              src={staffAnchorLogo} 
+              alt="StaffAnchor Logo" 
+              style={{ 
+                height: '100px',
+                width: 'auto',
+                maxWidth: '100%'
+              }}
+            />
+          </Box>
+
+          {/* Success Confirmation Card */}
+          <Card sx={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            textAlign: 'center',
+            p: { xs: 3, sm: 4, md: 5 }
+          }}>
+            <CardContent>
+              <CheckCircleIcon sx={{ 
+                fontSize: { xs: 64, sm: 80, md: 96 }, 
+                color: '#4caf50',
+                mb: { xs: 2, sm: 3 }
+              }} />
+              
+              <Typography variant="h4" sx={{ 
+                fontWeight: 700, 
+                color: '#1e293b',
+                mb: { xs: 1.5, sm: 2 },
+                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }
+              }}>
+                Application Submitted Successfully!
+              </Typography>
+              
+              <Typography variant="h6" sx={{ 
+                color: '#475569',
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                fontWeight: 500
+              }}>
+                {job.title}
+              </Typography>
+              
+              <Divider sx={{ my: { xs: 2, sm: 3 }, borderColor: '#e2e8f0' }} />
+              
+              <Typography variant="body1" sx={{ 
+                color: '#475569',
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: 1.6
+              }}>
+                Thank you for your interest in this position. We have received your application and will review it carefully.
+              </Typography>
+              
+              <Typography variant="body1" sx={{ 
+                color: '#475569',
+                mb: { xs: 3, sm: 4 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: 1.6
+              }}>
+                Our team will get back to you soon if your profile matches our requirements.
+              </Typography>
+              
+              <Box sx={{ 
+                mt: { xs: 3, sm: 4 },
+                p: { xs: 2, sm: 3 },
+                background: '#f0f9ff',
+                borderRadius: '8px',
+                border: '1px solid #bae6fd'
+              }}>
+                <Typography variant="body2" sx={{ 
+                  color: '#1e293b',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontWeight: 500
+                }}>
+                  What's Next?
+                </Typography>
+                <Typography variant="body2" sx={{ 
+                  color: '#475569',
+                  mt: 1,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  lineHeight: 1.6
+                }}>
+                  Keep an eye on your email ({form.email}) for updates about your application status.
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {/* Footer */}
+          <Paper sx={{
+            mt: { xs: 2, sm: 3, md: 4 },
+            p: { xs: 2, sm: 3 },
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#475569',
+                mb: { xs: 0.5, sm: 1 },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
+              © {new Date().getFullYear()} StaffAnchor. All rights reserved.
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: '#475569',
+                fontSize: { xs: '0.6875rem', sm: '0.75rem' }
+              }}
+            >
+              Connecting Talent with Opportunity
+            </Typography>
+          </Paper>
+        </Container>
       </Box>
     );
   }
@@ -482,15 +596,7 @@ const PublicJobApplication = () => {
                     color: '#1e293b',
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}>
-                    {job.experienceMin !== undefined || job.experienceMax !== undefined
-                      ? (job.experienceMin !== undefined && job.experienceMax !== undefined
-                          ? `${job.experienceMin} - ${job.experienceMax}`
-                          : job.experienceMin !== undefined
-                            ? `${job.experienceMin}+`
-                            : `Up to ${job.experienceMax}`)
-                      : job.experience !== undefined
-                        ? `${job.experience}+`
-                        : 'Not specified'} years experience
+                    {job.experience} years experience
                   </Typography>
                 </Box>
               </Grid>
@@ -765,64 +871,6 @@ const PublicJobApplication = () => {
                     )}
                   </Paper>
                 </Box>
-
-                {/* Personalized Questions - Required */}
-                {job && job.personalizedQuestions && job.personalizedQuestions.length > 0 && (
-                  <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                    <Typography variant="h6" sx={{ 
-                      color: '#475569', 
-                      mb: { xs: 1.5, sm: 2 },
-                      fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-                    }}>
-                      Additional Questions <span style={{ color: '#e74c3c' }}>*</span>
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {job.personalizedQuestions.map((q, index) => (
-                        <Box key={index}>
-                          <Typography variant="body2" sx={{ 
-                            color: '#1e293b', 
-                            mb: 1,
-                            fontWeight: 500,
-                            fontSize: { xs: '0.875rem', sm: '1rem' }
-                          }}>
-                            {q.question} <span style={{ color: '#e74c3c' }}>*</span>
-                          </Typography>
-                          {q.answerType === 'true-false' ? (
-                            <FormControl fullWidth>
-                              <Select
-                                value={questionAnswers[`question_${index}`] || ''}
-                                onChange={(e) => setQuestionAnswers({
-                                  ...questionAnswers,
-                                  [`question_${index}`]: e.target.value
-                                })}
-                                displayEmpty
-                                required
-                                sx={inputStyles}
-                              >
-                                <MenuItem value="">Select an option</MenuItem>
-                                <MenuItem value="true">True</MenuItem>
-                                <MenuItem value="false">False</MenuItem>
-                              </Select>
-                            </FormControl>
-                          ) : (
-                            <TextField
-                              fullWidth
-                              required
-                              type={q.answerType === 'number' ? 'number' : 'text'}
-                              value={questionAnswers[`question_${index}`] || ''}
-                              onChange={(e) => setQuestionAnswers({
-                                ...questionAnswers,
-                                [`question_${index}`]: e.target.value
-                              })}
-                              placeholder={`Enter your answer${q.answerType === 'number' ? ' (number)' : ''}`}
-                              sx={inputStyles}
-                            />
-                          )}
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                )}
 
                 {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
                 <Box sx={{ mb: { xs: 2, sm: 3 } }}>
