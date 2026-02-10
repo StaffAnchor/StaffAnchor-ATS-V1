@@ -739,15 +739,16 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        width: "60px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        width: "50px",
                       }}
                     >
                       <Checkbox
                         checked={selectedCandidates.length === filteredCandidates.length && filteredCandidates.length > 0}
                         indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < filteredCandidates.length}
                         onChange={handleSelectAllCandidates}
+                        size="small"
                         sx={{
                           color: "#2563eb",
                           '&.Mui-checked': {
@@ -764,9 +765,9 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        width: "40px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        width: "35px",
                       }}
                     />
                     <TableCell
@@ -774,9 +775,9 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "180px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "140px",
                       }}
                     >
                       Name
@@ -786,9 +787,9 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "160px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "140px",
                       }}
                     >
                       Contact
@@ -798,9 +799,9 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "160px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "100px",
                         textAlign: "center",
                       }}
                     >
@@ -811,9 +812,57 @@ const CandidateList = ({
                         color: "#2563eb",
                         fontWeight: 700,
                         borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
-                        fontSize: "1rem",
-                        padding: "18px 12px",
-                        minWidth: "300px",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "100px",
+                      }}
+                    >
+                      Date Created
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "120px",
+                      }}
+                    >
+                      Source
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "100px",
+                      }}
+                    >
+                      Domain
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "120px",
+                      }}
+                    >
+                      Talent Pool
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        borderBottom: "2px solid rgba(139, 92, 246, 0.2)",
+                        fontSize: "0.75rem",
+                        padding: "12px 8px",
+                        minWidth: "250px",
                         position: "sticky",
                         right: 0,
                         background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
@@ -833,7 +882,7 @@ const CandidateList = ({
                             sx={{
                               background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
                               color: '#ffffff',
-                              padding: '8px',
+                              padding: '6px',
                               '&:hover': {
                                 background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
                                 transform: 'scale(1.05)',
@@ -872,7 +921,7 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
                           textAlign: "center",
                         }}
                         onClick={(e) => e.stopPropagation()}
@@ -880,6 +929,7 @@ const CandidateList = ({
                         <Checkbox
                           checked={selectedCandidates.includes(candidate._id)}
                           onChange={() => handleSelectCandidate(candidate._id)}
+                          size="small"
                           sx={{
                             color: "#2563eb",
                             '&.Mui-checked': {
@@ -891,14 +941,14 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
                           textAlign: "center",
                         }}
                       >
                         <Box
                           sx={{
-                            width: 32,
-                            height: 32,
+                            width: 24,
+                            height: 24,
                             borderRadius: 1,
                             background: "linear-gradient(135deg, #2563eb 0%, #3d7be8 100%)",
                             display: "flex",
@@ -906,7 +956,7 @@ const CandidateList = ({
                             justifyContent: "center",
                             color: "#ffffff",
                             fontWeight: 700,
-                            fontSize: "0.875rem",
+                            fontSize: "0.7rem",
                           }}
                         >
                           {index + 1}
@@ -915,7 +965,7 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
                         }}
                       >
                         <Box>
@@ -925,6 +975,7 @@ const CandidateList = ({
                               fontWeight: 600,
                               color: "#1e293b",
                               mb: 0.5,
+                              fontSize: "0.75rem",
                             }}
                           >
                             {candidate.name}
@@ -933,7 +984,7 @@ const CandidateList = ({
                             variant="body2"
                             sx={{
                               color: "#64748b",
-                              fontSize: "0.875rem",
+                              fontSize: "0.7rem",
                             }}
                           >
                             {candidate.organization || "Not specified"}
@@ -943,7 +994,7 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
                         }}
                       >
                         <Box>
@@ -952,6 +1003,7 @@ const CandidateList = ({
                             sx={{
                               color: "#1e293b",
                               mb: 0.5,
+                              fontSize: "0.7rem",
                             }}
                           >
                             {candidate.email}
@@ -961,7 +1013,7 @@ const CandidateList = ({
                               variant="body2"
                               sx={{
                                 color: "#64748b",
-                                fontSize: "0.875rem",
+                                fontSize: "0.7rem",
                               }}
                             >
                               {candidate.phone}
@@ -972,7 +1024,7 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
                           textAlign: "center",
                         }}
                         onClick={(e) => e.stopPropagation()}
@@ -980,7 +1032,7 @@ const CandidateList = ({
                         <Button
                           variant="contained"
                           size="small"
-                          startIcon={<CommentIcon />}
+                          startIcon={<CommentIcon sx={{ fontSize: "0.875rem" }} />}
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedCandidateForComments(candidate);
@@ -990,8 +1042,8 @@ const CandidateList = ({
                             background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
                             color: '#fff',
                             fontWeight: 600,
-                            fontSize: "0.75rem",
-                            padding: "6px 12px",
+                            fontSize: "0.65rem",
+                            padding: "4px 8px",
                             textTransform: "none",
                             borderRadius: 1,
                             "&:hover": {
@@ -1008,7 +1060,117 @@ const CandidateList = ({
                       <TableCell
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
-                          padding: "16px 12px",
+                          padding: "12px 8px",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#1e293b",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {candidate.createdAt
+                            ? new Date(candidate.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })
+                            : 'N/A'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "12px 8px",
+                        }}
+                      >
+                        {(() => {
+                          const sourceConfig = {
+                            'uploaded-by-recruiter': {
+                              label: 'Uploaded by Recruiter',
+                              color: '#8b5cf6',
+                              bgColor: 'rgba(139, 92, 246, 0.12)',
+                              borderColor: 'rgba(139, 92, 246, 0.3)'
+                            },
+                            'applied-on-job-link': {
+                              label: 'Applied on Job Link',
+                              color: '#10b981',
+                              bgColor: 'rgba(16, 185, 129, 0.12)',
+                              borderColor: 'rgba(16, 185, 129, 0.3)'
+                            },
+                            'applied-using-candidate-form': {
+                              label: 'Applied using Candidate Form',
+                              color: '#f59e0b',
+                              bgColor: 'rgba(245, 158, 11, 0.12)',
+                              borderColor: 'rgba(245, 158, 11, 0.3)'
+                            }
+                          };
+                          
+                          const config = sourceConfig[candidate.source] || {
+                            label: candidate.source || 'N/A',
+                            color: '#64748b',
+                            bgColor: 'rgba(100, 116, 139, 0.12)',
+                            borderColor: 'rgba(100, 116, 139, 0.3)'
+                          };
+                          
+                          return (
+                            <Chip
+                              label={config.label}
+                              size="small"
+                              sx={{
+                                backgroundColor: config.bgColor,
+                                color: config.color,
+                                border: `1px solid ${config.borderColor}`,
+                                fontSize: '0.65rem',
+                                height: '20px',
+                                fontWeight: 600,
+                                '& .MuiChip-label': {
+                                  padding: '0 6px',
+                                }
+                              }}
+                            />
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "12px 8px",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#1e293b",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {candidate.domain?.name || 'N/A'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "12px 8px",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#1e293b",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {candidate.talentPools && candidate.talentPools.length > 0
+                            ? candidate.talentPools.map(tp => tp.name || 'N/A').join(', ')
+                            : 'N/A'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
+                          padding: "12px 8px",
                           position: "sticky",
                           right: 0,
                           background: index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.03)",
@@ -1017,7 +1179,7 @@ const CandidateList = ({
                         }}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "nowrap", alignItems: "center" }}>
+                        <Box sx={{ display: "flex", gap: 0.5, flexWrap: "nowrap", alignItems: "center" }}>
                           <Tooltip title="View Details">
                             <Button
                               variant="outlined"
@@ -1029,8 +1191,8 @@ const CandidateList = ({
                               sx={{
                                 borderColor: "rgba(255, 255, 255, 0.3)",
                                 color: "#64748b",
-                                fontSize: "0.75rem",
-                                padding: "4px 8px",
+                                fontSize: "0.65rem",
+                                padding: "3px 6px",
                                 minWidth: "auto",
                                 borderRadius: 1,
                                 "&:hover": {
@@ -1053,14 +1215,14 @@ const CandidateList = ({
                                 sx={{
                                   color: "#8b5cf6",
                                   border: "1px solid #8b5cf6",
-                                  padding: "4px",
+                                  padding: "3px",
                                   borderRadius: 1,
                                   "&:hover": {
                                     backgroundColor: "rgba(139, 92, 246, 0.08)",
                                   },
                                 }}
                               >
-                                <EditIcon sx={{ fontSize: "1rem" }} />
+                                <EditIcon sx={{ fontSize: "0.875rem" }} />
                               </IconButton>
                             </Tooltip>
                           )}
@@ -1076,8 +1238,8 @@ const CandidateList = ({
                                 sx={{
                                   borderColor: "rgba(238, 187, 195, 0.5)",
                                   color: "#8b5cf6",
-                                  fontSize: "0.75rem",
-                                  padding: "4px 8px",
+                                  fontSize: "0.65rem",
+                                  padding: "3px 6px",
                                   minWidth: "auto",
                                   borderRadius: 1,
                                   "&:hover": {
@@ -1102,7 +1264,7 @@ const CandidateList = ({
                                 sx={{
                                   color: "#d32f2f",
                                   border: "1px solid rgba(211, 47, 47, 0.3)",
-                                  padding: "4px",
+                                  padding: "3px",
                                   borderRadius: 1,
                                   "&:hover": {
                                     backgroundColor: "rgba(211, 47, 47, 0.1)",
@@ -1115,9 +1277,9 @@ const CandidateList = ({
                                 }}
                               >
                                 {isDeleting[candidate._id] ? (
-                                  <CircularProgress size={16} sx={{ color: "#d32f2f" }} />
+                                  <CircularProgress size={14} sx={{ color: "#d32f2f" }} />
                                 ) : (
-                                  <DeleteIcon sx={{ fontSize: "1rem" }} />
+                                  <DeleteIcon sx={{ fontSize: "0.875rem" }} />
                                 )}
                               </IconButton>
                             </Tooltip>
@@ -1129,7 +1291,7 @@ const CandidateList = ({
                     // Expanded Candidate Details
                     expandedCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-expanded`}>
-                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={10} sx={{ padding: 0, border: 'none' }}>
                           <CandidateDetails 
                             candidate={candidate} 
                             accessLevel={accessLevel}
@@ -1142,7 +1304,7 @@ const CandidateList = ({
                     // Suitable Jobs Section
                     expandedJobsCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-jobs`}>
-                        <TableCell colSpan={5} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={10} sx={{ padding: 0, border: 'none' }}>
                           <Box sx={{ 
                             p: 2, 
                             background: 'rgba(255, 255, 255, 0.02)', 
