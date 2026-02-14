@@ -450,7 +450,7 @@ const JobList = ({ accessLevel, userId }) => {
             sx={{
               fontWeight: 700,
               color: "#1e293b",
-              fontSize: { xs: "0.95rem", md: "1.25rem" },
+              fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
               lineHeight: 1.3,
             }}
           >
@@ -473,7 +473,7 @@ const JobList = ({ accessLevel, userId }) => {
                   },
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.7rem", md: "0.8rem" },
+                  fontSize: "0.7rem",
                   px: { xs: 1, md: 1.5 },
                   py: { xs: 0.35, md: 0.5 },
                   minHeight: 0,
@@ -489,7 +489,7 @@ const JobList = ({ accessLevel, userId }) => {
                   backgroundColor: "rgba(37, 99, 235, 0.12)",
                   color: "#2563eb",
                   fontWeight: 600,
-                  fontSize: { xs: "0.65rem", md: "0.75rem" },
+                  fontSize: "0.7rem",
                   height: { xs: 20, md: 26 },
                 }}
               />
@@ -613,7 +613,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                         py: { xs: 1, md: 2 },
                       }}
                     >
@@ -623,7 +623,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                         py: { xs: 1, md: 2 },
                       }}
                     >
@@ -633,7 +633,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                       }}
                     >
                       Company
@@ -642,7 +642,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                       }}
                     >
                       Assignee
@@ -652,7 +652,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                         cursor: "pointer",
                         userSelect: "none",
                         '&:hover': {
@@ -684,7 +684,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: { xs: "0.7rem", md: "0.95rem" },
+                        fontSize: "0.75rem",
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
@@ -755,7 +755,7 @@ const JobList = ({ accessLevel, userId }) => {
                             sx={{
                               color: "#8b5cf6",
                               fontWeight: 600,
-                              fontSize: { xs: "0.7rem", md: "0.85rem" },
+                              fontSize: "0.7rem",
                               fontFamily: "monospace",
                             }}
                           >
@@ -768,7 +768,7 @@ const JobList = ({ accessLevel, userId }) => {
                             sx={{
                               color: "#1e293b",
                               fontWeight: 600,
-                              fontSize: { xs: "0.8rem", md: "1rem" },
+                              fontSize: "0.75rem",
                             }}
                           >
                             {job.title}
@@ -779,7 +779,7 @@ const JobList = ({ accessLevel, userId }) => {
                             variant="body2"
                             sx={{
                               color: "#64748b",
-                              fontSize: { xs: "0.7rem", md: "0.875rem" },
+                              fontSize: "0.7rem",
                             }}
                           >
                             {job.organization}
@@ -795,7 +795,7 @@ const JobList = ({ accessLevel, userId }) => {
                                   sx={{
                                     color: "#94a3b8",
                                     fontStyle: "italic",
-                                    fontSize: { xs: "0.7rem", md: "0.875rem" },
+                                    fontSize: "0.7rem",
                                   }}
                                 >
                                   No assignee
@@ -831,7 +831,7 @@ const JobList = ({ accessLevel, userId }) => {
                                         color: '#8b5cf6',
                                         fontWeight: 500,
                                         cursor: 'pointer',
-                                        fontSize: { xs: '0.65rem', md: '0.8125rem' },
+                                        fontSize: '0.7rem',
                                         height: { xs: 20, md: 24 },
                                         '&:hover': {
                                           backgroundColor: 'rgba(139, 92, 246, 0.2)',
@@ -844,7 +844,7 @@ const JobList = ({ accessLevel, userId }) => {
                             );
                           })()}
                         </TableCell>
-                        <TableCell align="center" onClick={(e) => e.stopPropagation()} sx={{ fontSize: { xs: '0.7rem', md: 'inherit' } }}>
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()} sx={{ fontSize: '0.7rem' }}>
                           <FormControl size="small" sx={{ minWidth: { xs: 100, md: 140 } }}>
                             <Select
                               value={job.status || 'New'}
@@ -863,7 +863,7 @@ const JobList = ({ accessLevel, userId }) => {
                                 },
                                 '& .MuiSelect-select': {
                                   padding: { xs: '2px 6px', md: '4px 8px' },
-                                  fontSize: { xs: '0.7rem', md: '0.875rem' },
+                                  fontSize: '0.7rem',
                                 }
                               }}
                             >

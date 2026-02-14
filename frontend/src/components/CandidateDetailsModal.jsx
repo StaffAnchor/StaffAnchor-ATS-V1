@@ -21,8 +21,11 @@ import {
   CircularProgress,
   TextField,
   Stack,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
-import { InsertDriveFile as FileIcon, Close as CloseIcon, Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material';
+import { InsertDriveFile as FileIcon, Close as CloseIcon, Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import CandidateScoreDisplay from './CandidateScoreDisplay';
 import ExpertiseSelector from './ExpertiseSelector';
 import API_URL from '../config/api';
@@ -30,7 +33,8 @@ import API_URL from '../config/api';
 const CandidateDetailsModal = ({ open, onClose, candidate, preferences, accessLevel = 0 }) => {
   const [fullCandidateData, setFullCandidateData] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+  const [expandedDetail, setExpandedDetail] = useState(null);
+
   // Edit mode state
   const [editMode, setEditMode] = useState(false);
   const [editCandidate, setEditCandidate] = useState({});
@@ -86,6 +90,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences, accessLe
       setLoading(false);
       setEditMode(false);
       setEditCandidate({});
+      setExpandedDetail(null);
     }
   }, [open]);
 
@@ -173,7 +178,7 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences, accessLe
   return (
     <Dialog
       open={open}
-      onClose={(event, reason) => {
+      onClose={(event) => {
         event?.stopPropagation();
         onClose();
       }}
@@ -322,463 +327,271 @@ const CandidateDetailsModal = ({ open, onClose, candidate, preferences, accessLe
           </Box>
         ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {/* Score Display */}
           {preferences && (
             <CandidateScoreDisplay candidate={displayCandidate} preferences={preferences} />
           )}
 
-          {/* Basic Information */}
-          <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
-            <Table size="small">
-              <TableBody>
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Name</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.name}</TableCell>
-                </TableRow>
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Email</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.email}</TableCell>
-                </TableRow>
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Phone</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>{displayCandidate.phone || 'Not provided'}</TableCell>
-                </TableRow>
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Current CTC</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    {displayCandidate.currentCTC 
-                      ? `₹ ${displayCandidate.currentCTC} LPA`
-                      : (displayCandidate.experience && displayCandidate.experience.length > 0 && displayCandidate.experience[0].ctc)
-                        ? `₹ ${displayCandidate.experience[0].ctc} LPA (from last job)`
-                        : 'Not Mentioned'}
-                  </TableCell>
-                </TableRow>
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Expected CTC</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    {displayCandidate.expectedCTC ? `₹ ${displayCandidate.expectedCTC} LPA` : 'Not Mentioned'}
-                  </TableCell>
-                </TableRow>
-                {displayCandidate.currentLocation && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Current Location</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      {displayCandidate.currentLocation.city}, {displayCandidate.currentLocation.state}, {displayCandidate.currentLocation.country}
-                    </TableCell>
-                  </TableRow>
-                )}
-                {displayCandidate.linkedin && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>LinkedIn</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      <Link href={`https://linkedin.com/in/${displayCandidate.linkedin}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
-                        {displayCandidate.linkedin}
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                )}
-                {displayCandidate.x && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>X (Twitter)</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      <Link href={`https://twitter.com/${displayCandidate.x}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>
-                        @{displayCandidate.x}
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                )}
-                <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Resume</TableCell>
-                  <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                    {displayCandidate.resume && displayCandidate.resume.url ? (
-                      <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-                          <Link 
-                            href={displayCandidate.resume.url} 
-                            target="_blank" 
-                            rel="noopener" 
-                            sx={{ color: '#4fc3f7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' }}}
-                          >
-                            View resume
-                          </Link>
-                          {displayCandidate.resume.fileSize && (
-                            <Typography variant="caption" sx={{ color: '#64748b' }}>
-                              ({(displayCandidate.resume.fileSize / 1024).toFixed(2)} KB)
-                            </Typography>
-                          )}
-                        </Box>
-                        {displayCandidate.resume.uploadedAt && (
-                          <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.5 }}>
-                            Uploaded: {new Date(displayCandidate.resume.uploadedAt).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}
-                          </Typography>
-                        )}
-                      </Box>
-                    ) : (
-                      <Typography variant="body2" sx={{ color: '#64748b' }}>
-                        No resume uploaded
+          {/* Accordion layout - one section open at a time, like job list expanded */}
+          <Box sx={{ '& .MuiAccordion-root': { boxShadow: 'none', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px !important', mb: 1 }, '& .MuiAccordion-root:before': { display: 'none' } }}>
+            <Accordion expanded={expandedDetail === 'name'} onChange={() => setExpandedDetail(expandedDetail === 'name' ? null : 'name')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Name</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{displayCandidate.name}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'email'} onChange={() => setExpandedDetail(expandedDetail === 'email' ? null : 'email')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Email</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{displayCandidate.email}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'phone'} onChange={() => setExpandedDetail(expandedDetail === 'phone' ? null : 'phone')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Phone</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{displayCandidate.phone || 'Not provided'}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'currentCTC'} onChange={() => setExpandedDetail(expandedDetail === 'currentCTC' ? null : 'currentCTC')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Current CTC</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {displayCandidate.currentCTC ? `₹ ${displayCandidate.currentCTC} LPA` : (displayCandidate.experience && displayCandidate.experience.length > 0 && displayCandidate.experience[0].ctc) ? `₹ ${displayCandidate.experience[0].ctc} LPA (from last job)` : 'Not Mentioned'}
+              </AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'expectedCTC'} onChange={() => setExpandedDetail(expandedDetail === 'expectedCTC' ? null : 'expectedCTC')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Expected CTC</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{displayCandidate.expectedCTC ? `₹ ${displayCandidate.expectedCTC} LPA` : 'Not Mentioned'}</AccordionDetails>
+            </Accordion>
+            {displayCandidate.currentLocation && (
+              <Accordion expanded={expandedDetail === 'currentLocation'} onChange={() => setExpandedDetail(expandedDetail === 'currentLocation' ? null : 'currentLocation')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Current Location</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{displayCandidate.currentLocation.city}, {displayCandidate.currentLocation.state}, {displayCandidate.currentLocation.country}</AccordionDetails>
+              </Accordion>
+            )}
+            {(displayCandidate.linkedin != null && displayCandidate.linkedin !== '') && (
+              <Accordion expanded={expandedDetail === 'linkedin'} onChange={() => setExpandedDetail(expandedDetail === 'linkedin' ? null : 'linkedin')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>LinkedIn</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Link href={`https://linkedin.com/in/${displayCandidate.linkedin}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>{displayCandidate.linkedin}</Link>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {(displayCandidate.x != null && displayCandidate.x !== '') && (
+              <Accordion expanded={expandedDetail === 'x'} onChange={() => setExpandedDetail(expandedDetail === 'x' ? null : 'x')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>X (Twitter)</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Link href={`https://twitter.com/${displayCandidate.x}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>@{displayCandidate.x}</Link>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            <Accordion expanded={expandedDetail === 'resume'} onChange={() => setExpandedDetail(expandedDetail === 'resume' ? null : 'resume')}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Resume</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {displayCandidate.resume && displayCandidate.resume.url ? (
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
+                      <Link href={displayCandidate.resume.url} target="_blank" rel="noopener" sx={{ color: '#4fc3f7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>View resume</Link>
+                      {displayCandidate.resume.fileSize && <Typography variant="caption" sx={{ color: '#64748b' }}>({(displayCandidate.resume.fileSize / 1024).toFixed(2)} KB)</Typography>}
+                    </Box>
+                    {displayCandidate.resume.uploadedAt && (
+                      <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.5 }}>
+                        Uploaded: {new Date(displayCandidate.resume.uploadedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </Typography>
                     )}
-                  </TableCell>
-                </TableRow>
-                {displayCandidate.preferredLocations && displayCandidate.preferredLocations.length > 0 && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Preferred Locations</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      {displayCandidate.preferredLocations.map((loc, idx) => (
-                        <Box key={idx} component="span">
-                          {loc.city && loc.state && loc.country 
-                            ? `${loc.city}, ${loc.state}, ${loc.country}` 
-                            : loc.city || loc.state || loc.country}
-                          {idx < displayCandidate.preferredLocations.length - 1 && '; '}
-                        </Box>
-                      ))}
-                    </TableCell>
-                  </TableRow>
-                )}
-                {displayCandidate.domain && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Domain</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      {typeof displayCandidate.domain === 'object' ? displayCandidate.domain.name : displayCandidate.domain}
-                    </TableCell>
-                  </TableRow>
-                )}
-                {displayCandidate.talentPools && displayCandidate.talentPools.length > 0 && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>Talent Pools</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {displayCandidate.talentPools.map((pool, idx) => (
-                          <Chip 
-                            key={idx} 
-                            label={typeof pool === 'object' ? pool.name : pool}
-                            size="small"
-                            sx={{ 
-                              backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                              color: '#2563eb',
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )}
-                {displayCandidate.expertiseSkills && displayCandidate.expertiseSkills.length > 0 && (
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, borderBottom: 'none' }}>Expertise Skills</TableCell>
-                    <TableCell sx={{ color: '#1e293b', borderBottom: 'none' }}>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {displayCandidate.expertiseSkills.map((skill, idx) => (
-                          <Chip 
-                            key={idx} 
-                            label={typeof skill === 'object' ? skill.name : skill}
-                            size="small"
-                            sx={{ 
-                              backgroundColor: 'rgba(139, 92, 246, 0.15)', 
-                              color: '#8b5cf6',
-                              fontSize: '0.75rem',
-                              textTransform: 'capitalize'
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {/* Skills */}
-          {displayCandidate.skills && displayCandidate.skills.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Skills {displayCandidate.skills.length > 0 && `(${displayCandidate.skills.length})`}
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {displayCandidate.skills.map((skill, idx) => (
-                    <Chip 
-                      key={idx} 
-                      label={skill} 
-                      size="medium"
-                      sx={{ 
-                        backgroundColor: 'rgba(238, 187, 195, 0.2)', 
-                        color: '#8b5cf6',
-                        fontSize: '0.85rem',
-                        fontWeight: 500
-                      }}
-                    />
+                  </Box>
+                ) : <Typography variant="body2" sx={{ color: '#64748b' }}>No resume uploaded</Typography>}
+              </AccordionDetails>
+            </Accordion>
+            {displayCandidate.preferredLocations && displayCandidate.preferredLocations.length > 0 && (
+              <Accordion expanded={expandedDetail === 'preferredLocations'} onChange={() => setExpandedDetail(expandedDetail === 'preferredLocations' ? null : 'preferredLocations')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Preferred Locations</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {displayCandidate.preferredLocations.map((loc, idx) => (
+                    <Box key={idx} component="span">
+                      {loc.city && loc.state && loc.country ? `${loc.city}, ${loc.state}, ${loc.country}` : loc.city || loc.state || loc.country}
+                      {idx < displayCandidate.preferredLocations.length - 1 && '; '}
+                    </Box>
                   ))}
-                </Box>
-              </Box>
-            </>
-          )}
-
-          {/* Experience */}
-          {displayCandidate.experience && displayCandidate.experience.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Experience {displayCandidate.experience.length > 0 && `(${displayCandidate.experience.length})`}
-                </Typography>
-                {displayCandidate.experience.map((exp, idx) => (
-                  <Box key={idx} sx={{ mb: idx < displayCandidate.experience.length - 1 ? 3 : 0 }}>
-                    <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
-                      <Table size="small">
-                        <TableBody>
-                          {exp.position && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Position</TableCell>
-                              <TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{exp.position}</TableCell>
-                            </TableRow>
-                          )}
-                          {exp.company && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Company</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{exp.company}</TableCell>
-                            </TableRow>
-                          )}
-                          {exp.role && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Role</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{exp.role}</TableCell>
-                            </TableRow>
-                          )}
-                          {exp.ctc && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>CTC</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>₹ {exp.ctc}</TableCell>
-                            </TableRow>
-                          )}
-                          {(exp.start || exp.end) && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Duration</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>
-                                {exp.start && exp.end ? `${exp.start} - ${exp.end}` : exp.start || exp.end}
-                              </TableCell>
-                            </TableRow>
-                          )}
-                          {exp.description && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150, verticalAlign: 'top' }}>Description</TableCell>
-                              <TableCell sx={{ color: '#1e293b', whiteSpace: 'pre-wrap' }}>{exp.description}</TableCell>
-                            </TableRow>
-                          )}
-                          {!exp.position && !exp.company && !exp.role && !exp.ctc && !exp.start && !exp.end && !exp.description && (
-                            <TableRow>
-                              <TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>
-                                No details available for this experience entry
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.domain && (
+              <Accordion expanded={expandedDetail === 'domain'} onChange={() => setExpandedDetail(expandedDetail === 'domain' ? null : 'domain')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Domain</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{typeof displayCandidate.domain === 'object' ? displayCandidate.domain.name : displayCandidate.domain}</AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.talentPools && displayCandidate.talentPools.length > 0 && (
+              <Accordion expanded={expandedDetail === 'talentPools'} onChange={() => setExpandedDetail(expandedDetail === 'talentPools' ? null : 'talentPools')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Talent Pools</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {displayCandidate.talentPools.map((pool, idx) => (
+                      <Chip key={idx} label={typeof pool === 'object' ? pool.name : pool} size="small" sx={{ backgroundColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', fontSize: '0.75rem' }} />
+                    ))}
                   </Box>
-                ))}
-              </Box>
-            </>
-          )}
-
-          {/* Education */}
-          {displayCandidate.education && displayCandidate.education.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Education {displayCandidate.education.length > 0 && `(${displayCandidate.education.length})`}
-                </Typography>
-                {displayCandidate.education.map((edu, idx) => (
-                  <Box key={idx} sx={{ mb: idx < displayCandidate.education.length - 1 ? 3 : 0 }}>
-                    <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
-                      <Table size="small">
-                        <TableBody>
-                          {edu.course && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Course</TableCell>
-                              <TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{edu.course}</TableCell>
-                            </TableRow>
-                          )}
-                          {edu.clg && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>College</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{edu.clg}</TableCell>
-                            </TableRow>
-                          )}
-                          {(edu.start || edu.end) && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Duration</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>
-                                {edu.start && edu.end ? `${edu.start} - ${edu.end}` : edu.start || edu.end}
-                              </TableCell>
-                            </TableRow>
-                          )}
-                          {edu.grade && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Grade</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{edu.grade}</TableCell>
-                            </TableRow>
-                          )}
-                          {!edu.clg && !edu.course && !edu.start && !edu.end && !edu.grade && (
-                            <TableRow>
-                              <TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>
-                                No details available for this education entry
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.expertiseSkills && displayCandidate.expertiseSkills.length > 0 && (
+              <Accordion expanded={expandedDetail === 'expertiseSkills'} onChange={() => setExpandedDetail(expandedDetail === 'expertiseSkills' ? null : 'expertiseSkills')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Expertise Skills</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {displayCandidate.expertiseSkills.map((skill, idx) => (
+                      <Chip key={idx} label={typeof skill === 'object' ? skill.name : skill} size="small" sx={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6', fontSize: '0.75rem', textTransform: 'capitalize' }} />
+                    ))}
                   </Box>
-                ))}
-              </Box>
-            </>
-          )}
-
-          {/* Certifications */}
-          {displayCandidate.certifications && displayCandidate.certifications.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Certifications {displayCandidate.certifications.length > 0 && `(${displayCandidate.certifications.length})`}
-                </Typography>
-                {displayCandidate.certifications.map((cert, idx) => (
-                  <Box key={idx} sx={{ mb: idx < displayCandidate.certifications.length - 1 ? 3 : 0 }}>
-                    <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
-                      <Table size="small">
-                        <TableBody>
-                          {cert.name && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Name</TableCell>
-                              <TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{cert.name}</TableCell>
-                            </TableRow>
-                          )}
-                          {cert.organization && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Organization</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{cert.organization}</TableCell>
-                            </TableRow>
-                          )}
-                          {cert.date && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Date</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{cert.date}</TableCell>
-                            </TableRow>
-                          )}
-                          {cert.expiryDate && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Expiry Date</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>{cert.expiryDate}</TableCell>
-                            </TableRow>
-                          )}
-                          {cert.link && (
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>Link</TableCell>
-                              <TableCell sx={{ color: '#1e293b' }}>
-                                <Link href={cert.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                                  View Certificate
-                                </Link>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                          {!cert.name && !cert.organization && !cert.date && !cert.expiryDate && !cert.link && (
-                            <TableRow>
-                              <TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>
-                                No details available for this certification entry
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.skills && displayCandidate.skills.length > 0 && (
+              <Accordion expanded={expandedDetail === 'skills'} onChange={() => setExpandedDetail(expandedDetail === 'skills' ? null : 'skills')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Skills ({displayCandidate.skills.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {displayCandidate.skills.map((skill, idx) => (
+                      <Chip key={idx} label={skill} size="medium" sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6', fontSize: '0.85rem', fontWeight: 500 }} />
+                    ))}
                   </Box>
-                ))}
-              </Box>
-            </>
-          )}
-
-          {/* Additional Links */}
-          {displayCandidate.additionalLinks && displayCandidate.additionalLinks.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Additional Links {displayCandidate.additionalLinks.length > 0 && `(${displayCandidate.additionalLinks.length})`}
-                </Typography>
-                <TableContainer component={Paper} sx={{ background: '#ffffff', borderRadius: 2 }}>
-                  <Table size="small">
-                    <TableBody>
-                      {displayCandidate.additionalLinks.map((link, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell sx={{ fontWeight: 700, color: '#90caf9', width: 150 }}>
-                            {link.name || `Link ${idx + 1}`}
-                          </TableCell>
-                          <TableCell sx={{ color: '#1e293b' }}>
-                            {link.link ? (
-                              <Link 
-                                href={link.link} 
-                                target="_blank" 
-                                rel="noopener" 
-                                sx={{ 
-                                  color: '#4fc3f7', 
-                                  textDecoration: 'none', 
-                                  wordBreak: 'break-all',
-                                  '&:hover': { textDecoration: 'underline' } 
-                                }}
-                              >
-                                {link.link}
-                              </Link>
-                            ) : (
-                              <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>
-                                No link provided
-                              </Typography>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            </>
-          )}
-
-          {/* Applied Jobs */}
-          {displayCandidate.appliedJobs && displayCandidate.appliedJobs.length > 0 && (
-            <>
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
-              <Box>
-                <Typography variant="h6" sx={{ color: '#8b5cf6', mb: 2, fontWeight: 600 }}>
-                  Applied Jobs {displayCandidate.appliedJobs.length > 0 && `(${displayCandidate.appliedJobs.length})`}
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {displayCandidate.appliedJobs.map((job, idx) => (
-                    <Chip 
-                      key={idx} 
-                      label={typeof job === 'object' ? (job.title || 'Job') : job}
-                      size="medium"
-                      sx={{ 
-                        backgroundColor: 'rgba(37, 99, 235, 0.12)', 
-                        color: '#2563eb',
-                        fontSize: '0.85rem',
-                        fontWeight: 500
-                      }}
-                    />
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.experience && displayCandidate.experience.length > 0 && (
+              <Accordion expanded={expandedDetail === 'experience'} onChange={() => setExpandedDetail(expandedDetail === 'experience' ? null : 'experience')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Experience ({displayCandidate.experience.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {displayCandidate.experience.map((exp, idx) => (
+                    <Box key={idx} sx={{ mb: idx < displayCandidate.experience.length - 1 ? 2 : 0 }}>
+                      <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1, mb: 1 }}>
+                        <Table size="small">
+                          <TableBody>
+                            {exp.position && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Position</TableCell><TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{exp.position}</TableCell></TableRow>}
+                            {exp.company && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Company</TableCell><TableCell sx={{ color: '#1e293b' }}>{exp.company}</TableCell></TableRow>}
+                            {exp.role && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Role</TableCell><TableCell sx={{ color: '#1e293b' }}>{exp.role}</TableCell></TableRow>}
+                            {exp.ctc && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>CTC</TableCell><TableCell sx={{ color: '#1e293b' }}>₹ {exp.ctc}</TableCell></TableRow>}
+                            {(exp.start || exp.end) && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Duration</TableCell><TableCell sx={{ color: '#1e293b' }}>{exp.start && exp.end ? `${exp.start} - ${exp.end}` : exp.start || exp.end}</TableCell></TableRow>}
+                            {exp.description && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150, verticalAlign: 'top' }}>Description</TableCell><TableCell sx={{ color: '#1e293b', whiteSpace: 'pre-wrap' }}>{exp.description}</TableCell></TableRow>}
+                            {!exp.position && !exp.company && !exp.role && !exp.ctc && !exp.start && !exp.end && !exp.description && <TableRow><TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>No details available</TableCell></TableRow>}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
                   ))}
-                </Box>
-              </Box>
-            </>
-          )}
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.education && displayCandidate.education.length > 0 && (
+              <Accordion expanded={expandedDetail === 'education'} onChange={() => setExpandedDetail(expandedDetail === 'education' ? null : 'education')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Education ({displayCandidate.education.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {displayCandidate.education.map((edu, idx) => (
+                    <Box key={idx} sx={{ mb: idx < displayCandidate.education.length - 1 ? 2 : 0 }}>
+                      <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1, mb: 1 }}>
+                        <Table size="small">
+                          <TableBody>
+                            {edu.course && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Course</TableCell><TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{edu.course}</TableCell></TableRow>}
+                            {edu.clg && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>College</TableCell><TableCell sx={{ color: '#1e293b' }}>{edu.clg}</TableCell></TableRow>}
+                            {(edu.start || edu.end) && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Duration</TableCell><TableCell sx={{ color: '#1e293b' }}>{edu.start && edu.end ? `${edu.start} - ${edu.end}` : edu.start || edu.end}</TableCell></TableRow>}
+                            {edu.grade && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Grade</TableCell><TableCell sx={{ color: '#1e293b' }}>{edu.grade}</TableCell></TableRow>}
+                            {!edu.clg && !edu.course && !edu.start && !edu.end && !edu.grade && <TableRow><TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>No details available</TableCell></TableRow>}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.certifications && displayCandidate.certifications.length > 0 && (
+              <Accordion expanded={expandedDetail === 'certifications'} onChange={() => setExpandedDetail(expandedDetail === 'certifications' ? null : 'certifications')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Certifications ({displayCandidate.certifications.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {displayCandidate.certifications.map((cert, idx) => (
+                    <Box key={idx} sx={{ mb: idx < displayCandidate.certifications.length - 1 ? 2 : 0 }}>
+                      <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1, mb: 1 }}>
+                        <Table size="small">
+                          <TableBody>
+                            {cert.name && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Name</TableCell><TableCell sx={{ color: '#1e293b', fontWeight: 600 }}>{cert.name}</TableCell></TableRow>}
+                            {cert.organization && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Organization</TableCell><TableCell sx={{ color: '#1e293b' }}>{cert.organization}</TableCell></TableRow>}
+                            {cert.date && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Date</TableCell><TableCell sx={{ color: '#1e293b' }}>{cert.date}</TableCell></TableRow>}
+                            {cert.expiryDate && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Expiry Date</TableCell><TableCell sx={{ color: '#1e293b' }}>{cert.expiryDate}</TableCell></TableRow>}
+                            {cert.link && <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>Link</TableCell><TableCell sx={{ color: '#1e293b' }}><Link href={cert.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>View Certificate</Link></TableCell></TableRow>}
+                            {!cert.name && !cert.organization && !cert.date && !cert.expiryDate && !cert.link && <TableRow><TableCell colSpan={2} sx={{ color: '#64748b', fontStyle: 'italic' }}>No details available</TableCell></TableRow>}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.additionalLinks && displayCandidate.additionalLinks.length > 0 && (
+              <Accordion expanded={expandedDetail === 'additionalLinks'} onChange={() => setExpandedDetail(expandedDetail === 'additionalLinks' ? null : 'additionalLinks')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Additional Links ({displayCandidate.additionalLinks.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                    <Table size="small">
+                      <TableBody>
+                        {displayCandidate.additionalLinks.map((link, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ fontWeight: 700, color: '#64748b', width: 150 }}>{link.name || `Link ${idx + 1}`}</TableCell>
+                            <TableCell sx={{ color: '#1e293b' }}>
+                              {link.link ? <Link href={link.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7', textDecoration: 'none', wordBreak: 'break-all', '&:hover': { textDecoration: 'underline' } }}>{link.link}</Link> : <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic' }}>No link provided</Typography>}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {displayCandidate.appliedJobs && displayCandidate.appliedJobs.length > 0 && (
+              <Accordion expanded={expandedDetail === 'appliedJobs'} onChange={() => setExpandedDetail(expandedDetail === 'appliedJobs' ? null : 'appliedJobs')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Applied Jobs ({displayCandidate.appliedJobs.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {displayCandidate.appliedJobs.map((job, idx) => (
+                      <Chip key={idx} label={typeof job === 'object' ? (job.title || 'Job') : job} size="medium" sx={{ backgroundColor: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', fontSize: '0.85rem', fontWeight: 500 }} />
+                    ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            )}
+          </Box>
         </Box>
         )}
       </DialogContent>

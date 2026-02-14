@@ -38,6 +38,8 @@ import {
   Pagination,
   Menu,
   MenuItem,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
@@ -113,6 +115,9 @@ const CandidateList = ({
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedCandidateForComments, setSelectedCandidateForComments] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Feature dialog state
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
@@ -568,19 +573,16 @@ const CandidateList = ({
 
   return (
     <Box sx={{ height: "calc(100vh - 72px)", display: "flex", flexDirection: "column" }}>
-      {/* Fixed Header */}
-      <Paper
-        elevation={3}
+      {/* Fixed Header - transparent, flush under navbar */}
+      <Box
         sx={{
           position: "sticky",
           top: "72px",
           zIndex: 100,
-          background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
+          background: "transparent",
           borderRadius: 0,
-          p: 3,
+          p: { xs: 1.5, sm: 2, md: 3 },
           color: "#1e293b",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Box
@@ -588,22 +590,33 @@ const CandidateList = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: { xs: 1, sm: 0 },
           }}
         >
           {/* Left side - Title */}
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#1e293b",
+              fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            }}
+          >
             Candidate Listings
           </Typography>
           
           {/* Right side - Filter icon and other controls */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
             {hasActiveFilters && (
               <Chip
                 label={`${filteredCandidates.length} results`}
+                size="small"
                 sx={{
                   backgroundColor: "rgba(37, 99, 235, 0.12)",
                   color: "#2563eb",
                   fontWeight: 600,
+                  fontSize: { xs: "0.7rem", sm: "default" },
                 }}
               />
             )}
@@ -611,21 +624,25 @@ const CandidateList = ({
               <>
                 <Chip
                   label={`${selectedCandidates.length} selected`}
+                  size="small"
                   sx={{
                     backgroundColor: "rgba(139, 92, 246, 0.12)",
                     color: "#8b5cf6",
                     fontWeight: 600,
+                    fontSize: { xs: "0.7rem", sm: "default" },
                   }}
                 />
                 <Button
                   variant="contained"
-                  startIcon={<LinkIcon />}
+                  size="small"
+                  startIcon={<LinkIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
                   onClick={handleOpenLinkJobModal}
                   sx={{
                     backgroundColor: "#8b5cf6",
                     color: "#f8fafc",
                     fontWeight: 600,
                     textTransform: "none",
+                    fontSize: { xs: "0.75rem", sm: "default" },
                     "&:hover": {
                       backgroundColor: "#7c3aed",
                     },
@@ -637,12 +654,13 @@ const CandidateList = ({
             )}
             <Tooltip title="Filter Candidates">
               <IconButton
+                size="small"
                 onClick={() => setShowFilterModal(true)}
                 sx={{
                   backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.15)" : "rgba(139, 92, 246, 0.12)",
                   color: hasActiveFilters ? "#2563eb" : "#8b5cf6",
                   border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.3)" : "2px solid rgba(139, 92, 246, 0.3)",
-                  padding: "10px",
+                  padding: { xs: "6px", sm: "10px" },
                   "&:hover": {
                     backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.25)" : "rgba(139, 92, 246, 0.2)",
                     border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.5)" : "2px solid rgba(139, 92, 246, 0.5)",
@@ -651,12 +669,12 @@ const CandidateList = ({
                   transition: "all 0.2s ease",
                 }}
               >
-                <FilterIcon sx={{ fontSize: 28 }} />
+                <FilterIcon sx={{ fontSize: { xs: 22, sm: 28 } }} />
               </IconButton>
             </Tooltip>
           </Box>
         </Box>
-      </Paper>
+      </Box>
 
       {/* Candidate List */}
       <Box
@@ -851,6 +869,7 @@ const CandidateList = ({
                         fontSize: "0.75rem",
                         padding: "12px 8px",
                         minWidth: "120px",
+                        display: { xs: "none", md: "table-cell" },
                       }}
                     >
                       Talent Pool
@@ -863,11 +882,6 @@ const CandidateList = ({
                         fontSize: "0.75rem",
                         padding: "12px 8px",
                         minWidth: "250px",
-                        position: "sticky",
-                        right: 0,
-                        background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-                        zIndex: 2,
-                        boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1153,6 +1167,7 @@ const CandidateList = ({
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "12px 8px",
+                          display: { xs: "none", md: "table-cell" },
                         }}
                       >
                         <Typography
@@ -1171,11 +1186,6 @@ const CandidateList = ({
                         sx={{
                           borderBottom: "2px solid rgba(139, 92, 246, 0.15)",
                           padding: "12px 8px",
-                          position: "sticky",
-                          right: 0,
-                          background: index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.03)",
-                          zIndex: 1,
-                          boxShadow: "-4px 0 8px rgba(0, 0, 0, 0.2)",
                         }}
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -1291,11 +1301,12 @@ const CandidateList = ({
                     // Expanded Candidate Details
                     expandedCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-expanded`}>
-                        <TableCell colSpan={10} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={isMobile ? 9 : 10} sx={{ padding: 0, border: 'none' }}>
                           <CandidateDetails 
                             candidate={candidate} 
                             accessLevel={accessLevel}
                             initialEditMode={editingCandidateId === candidate._id}
+                            accordionMode
                           />
                         </TableCell>
                       </TableRow>
@@ -1304,7 +1315,7 @@ const CandidateList = ({
                     // Suitable Jobs Section
                     expandedJobsCandidateId === candidate._id && (
                       <TableRow key={`${candidate._id}-jobs`}>
-                        <TableCell colSpan={10} sx={{ padding: 0, border: 'none' }}>
+                        <TableCell colSpan={isMobile ? 9 : 10} sx={{ padding: 0, border: 'none' }}>
                           <Box sx={{ 
                             p: 2, 
                             background: 'rgba(255, 255, 255, 0.02)', 
@@ -1597,41 +1608,43 @@ const CandidateList = ({
         </MenuItem>
       </Menu>
 
-      {/* Pagination Controls */}
+      {/* Pagination footer - page numbers only */}
       {pagination.totalPages > 1 && (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          gap: 2,
-          mt: 4,
-          mb: 2,
-          py: 2,
-          borderTop: '2px solid rgba(139, 92, 246, 0.2)'
-        }}>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
-            Page {pagination.currentPage} of {pagination.totalPages} ({pagination.totalCandidates} total candidates)
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            mt: 2,
+            mb: 1,
+            py: 1,
+            px: { xs: 2, sm: 2 },
+            borderTop: '1px solid rgba(139, 92, 246, 0.15)',
+          }}
+        >
           <Pagination
             count={pagination.totalPages}
             page={pagination.currentPage}
             onChange={(event, page) => onPageChange(page)}
             color="primary"
+            boundaryCount={2}
+            siblingCount={0}
             sx={{
+              '& .MuiPagination-ul': { flexWrap: 'nowrap' },
               '& .MuiPaginationItem-root': {
                 color: '#2563eb',
                 fontWeight: 600,
+                minWidth: 32,
                 '&.Mui-selected': {
                   backgroundColor: '#8b5cf6',
                   color: '#fff',
-                  '&:hover': {
-                    backgroundColor: '#7c3aed',
-                  }
+                  '&:hover': { backgroundColor: '#7c3aed' },
                 },
-                '&:hover': {
-                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
-                }
-              }
+                '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.08)' },
+              },
             }}
           />
         </Box>
