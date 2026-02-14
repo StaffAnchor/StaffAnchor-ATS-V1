@@ -70,16 +70,36 @@ axios.interceptors.response.use(
       }
     }
     
-    // Handle 403 Forbidden errors (different from 401)
+    // Handle 403 Forbidden errors
     if (error.response && error.response.status === 403) {
       const requestUrl = error.config?.url || '';
-      
-      // Don't show toast for validation endpoint
-      if (!requestUrl.includes('/validate')) {
+      const errorMessage = error.response?.data?.error || '';
+      const isTokenError = /invalid|expired|token/i.test(errorMessage);
+
+      // 403 from auth middleware = invalid/expired token → treat like 401: clear and redirect, no permission toast
+      if (isTokenError) {
+        localStorage.removeItem('jwt');
+        localStorage.removeItem('user');
+        if (!sessionExpiredShown) {
+          toast.error('Your session has expired. Please login again.');
+          sessionExpiredShown = true;
+          setTimeout(() => { sessionExpiredShown = false; }, 3000);
+        }
+        if (handleLogout) {
+          handleLogout();
+        } else if (navigate) {
+          navigate('/login', { replace: true });
+        }
+        return Promise.reject(error);
+      }
+
+      // Real 403 (e.g. admin required): only show toast when request had auth
+      const hadAuth = !!(error.config?.headers?.Authorization);
+      if (!requestUrl.includes('/validate') && hadAuth) {
         toast.error('Access denied. You do not have permission for this action.');
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

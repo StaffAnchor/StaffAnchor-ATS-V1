@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
@@ -26,25 +26,48 @@ function App() {
   const [bannerHeight, setBannerHeight] = useState(0);
   const navigate = useNavigate();
   
-  // Handle redirect from 404.html
+  // Handle redirect from 404.html after we know auth state. When not logged in, only allow login/signup.
   useEffect(() => {
+    if (loading) return;
     const redirect = sessionStorage.getItem('redirect');
     if (redirect) {
       sessionStorage.removeItem('redirect');
-      navigate(redirect);
+      const isPublicAuth = redirect === '/login' || redirect === '/signup';
+      if (user || isPublicAuth) {
+        navigate(redirect);
+      } else {
+        navigate('/login');
+      }
     }
-  }, [navigate]);
+  }, [navigate, user, loading]);
   
   // Light mode is now the default theme
 
-  // Auto-login with JWT from localStorage
+  // Auto-login only if we have a valid token (validate with backend so expired token doesn't show dashboard)
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setUser(JSON.parse(userData));
+    if (!token || !userData) {
+      setLoading(false);
+      return;
     }
-    setLoading(false); // Done checking authentication
+    const apiUrl = import.meta.env?.VITE_BACKEND_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/auth/validate`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.ok) {
+          setUser(JSON.parse(userData));
+        } else {
+          localStorage.removeItem('jwt');
+          localStorage.removeItem('user');
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('jwt');
+        localStorage.removeItem('user');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   // Set JWT and user in localStorage for 30 days
@@ -95,9 +118,19 @@ function App() {
         <Route path="/apply/:jobId" element={<PublicJobApplication />} />
         <Route path="/candidate-form" element={<PublicCandidateForm />} />
         <Route path="/client-tracking/:trackingToken" element={<ClientCandidateTracking />} />
-        
-        {/* Authenticated routes */}
+
+        {/* Auth pages - no navbar, only when not logged in */}
+        <Route path="/login" element={<Login setUser={handleSetUser} />} />
+        <Route path="/signup" element={<Signup setUser={handleSetUser} />} />
+
+        {/* Root redirect */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
+
+        {/* Authenticated app - navbar + protected routes; unauthenticated redirect to login */}
         <Route path="/*" element={
+          !user ? (
+            <Navigate to="/login" replace />
+          ) : (
           <>
             <Header 
               user={user} 
@@ -108,11 +141,9 @@ function App() {
               bannerHeight={bannerHeight}
               setUser={handleSetUser}
             />
-            <div style={{ paddingTop: user ? `${72 + bannerHeight}px` : '0' }}>
+            <div style={{ paddingTop: `${72 + bannerHeight}px` }}>
               <Routes>
-                <Route path="/" element={<Login setUser={handleSetUser} />} />
-                <Route path="/login" element={<Login setUser={handleSetUser} />} />
-                <Route path="/signup" element={<Signup setUser={handleSetUser} />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route 
                   path="/dashboard" 
                   element={
@@ -193,6 +224,7 @@ function App() {
               </Routes>
             </div>
           </>
+          )
         } />
       </Routes>
     </>
