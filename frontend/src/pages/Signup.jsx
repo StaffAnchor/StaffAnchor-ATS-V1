@@ -28,6 +28,7 @@ import {
   VpnKey as VpnKeyIcon
 } from '@mui/icons-material';
 import officePic03 from '../assets/officepic03.jpg';
+import staffAnchorLogo from '../assets/StaffanchorLogoFinalSVG.svg';
 import './AuthPages.css';
 
 const Signup = ({ setUser }) => {
@@ -130,12 +131,9 @@ const Signup = ({ setUser }) => {
         {/* Right Side - Form */}
         <div className="auth-form-section">
           <Paper elevation={0} className="auth-form-paper">
-            <div className="auth-form-header">
-              <Typography variant="h4" className="auth-form-title">
-                Create Account
-              </Typography>
-              <Typography variant="body2" className="auth-form-subtitle">
-                Join thousands of companies already using StaffAnchor ATS
+            <div className="auth-form-header auth-animate-top">
+              <Typography variant="h4" className="auth-form-title auth-form-title-row" component="div">
+                Create Account with <img src={staffAnchorLogo} alt="StaffAnchor" className="auth-header-logo" />
               </Typography>
             </div>
 
@@ -391,7 +389,7 @@ const Signup = ({ setUser }) => {
                 {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
 
-              <div className="auth-form-footer">
+              <div className="auth-form-footer auth-animate-bottom">
                 <Typography variant="body2" className="auth-form-footer-text">
                   Already have an account?{' '}
                   <Link to="/login" className="auth-link">

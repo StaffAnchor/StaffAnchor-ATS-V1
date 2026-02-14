@@ -6,7 +6,9 @@
   justify-content: center;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .auth-container {
@@ -36,13 +38,33 @@
 
 /* Right Side - Form Section */
 .auth-form-section {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 3rem;
   background: #ffffff;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* "Sign In to [logo]" title row */
+.auth-form-title-row {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35em !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+}
+
+.auth-header-logo {
+  height: 2.7em;
+  width: auto;
+  vertical-align: middle;
+  display: inline-block;
+  object-fit: contain;
 }
 
 .auth-form-paper {
@@ -144,49 +166,91 @@
   .auth-form-section {
     padding: 2rem;
     max-height: 60vh;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 
+/* Mobile: hide image, form only, scrollable */
 @media (max-width: 768px) {
   .auth-page {
-    padding: 1rem;
+    padding: 0;
+    min-height: 100dvh;
+    min-height: 100vh;
+    align-items: stretch;
   }
   
   .auth-container {
-    border-radius: 16px;
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100%;
+    max-height: none;
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
   }
   
   .auth-image-section {
-    height: 250px;
+    display: none;
   }
   
   .auth-form-section {
-    padding: 2rem 1.5rem;
-    max-height: 50vh;
+    padding: 1.5rem;
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    max-height: 100dvh;
+    max-height: 100vh;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  
+  .auth-form-paper {
+    width: 100%;
+    max-width: 100%;
+    padding-top: 0.5rem;
   }
   
   .auth-form-title {
-    font-size: 1.8rem !important;
+    font-size: 1.75rem !important;
   }
 }
 
 @media (max-width: 480px) {
-  .auth-container {
-    height: auto;
+  .auth-page {
+    min-height: 100dvh;
     min-height: 100vh;
   }
   
-  .auth-image-section {
-    height: 200px;
+  .auth-container {
+    min-height: 100dvh;
+    min-height: 100vh;
   }
   
   .auth-form-section {
-    padding: 1.5rem 1rem;
-    max-height: 70vh;
+    padding: 1rem;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
   }
   
   .auth-form-title {
-    font-size: 1.6rem !important;
+    font-size: 1.5rem !important;
+  }
+  
+  .auth-form-subtitle {
+    font-size: 0.875rem !important;
+  }
+  
+  .auth-form {
+    gap: 1.25rem;
+  }
+  
+  .auth-submit-button {
+    height: 44px;
   }
 }
 
@@ -220,6 +284,37 @@
   from {
     opacity: 0;
     transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle top/bottom login page animations */
+.auth-animate-top {
+  animation: authSlideFromTop 0.7s ease-out both;
+}
+
+.auth-animate-bottom {
+  animation: authSlideFromBottom 0.7s ease-out 0.4s both;
+}
+
+@keyframes authSlideFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes authSlideFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
