@@ -14,8 +14,8 @@ import StatusChangeConfirmDialog from './StatusChangeConfirmDialog.jsx';
 import CandidateSearchOptionsModal from './CandidateSearchOptionsModal.jsx';
 import RankedCandidatesDisplay from './RankedCandidatesDisplay.jsx';
 import { toast } from 'react-toastify';
-import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon, TrackChanges as TrackChangesIcon } from '@mui/icons-material';
+import { Typography, Button, Box, TextField, Checkbox, FormControlLabel, Stack, Table, TableBody, TableCell, TableContainer, TableRow, TableHead, Paper, Switch, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Menu, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Delete as DeleteIcon, Add as AddIcon, Share as ShareIcon, People as PeopleIcon, PersonAdd as PersonAddIcon, TrackChanges as TrackChangesIcon, Menu as MenuIcon, ExpandMore as ExpandMoreIcon, Edit as EditIcon, Search as SearchIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
 // Helper function to format experience display (handles both old single value and new range)
@@ -75,6 +75,8 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
   const [showQuestionsModal, setShowQuestionsModal] = useState(false);
   const [companyNameSettings, setCompanyNameSettings] = useState(null);
   const [pendingQuestionsModal, setPendingQuestionsModal] = useState(false);
+  const [actionsMenuAnchor, setActionsMenuAnchor] = useState(null);
+  const [expandedDetail, setExpandedDetail] = useState(null); // accordion: 'location' | 'experience' | 'ctc' | 'remote' | 'status' | 'description' | 'clientContact' | 'internalRecruiter' | null
 
   // Open questions modal when company name modal closes and we have pending settings
   useEffect(() => {
@@ -514,9 +516,11 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
     }
   };
 
+  const hasOpenOverlay = showLinkedCandidatesModal || showCompanyNameModal || showQuestionsModal || showAIWarning || showPreferenceModal || showResultsPopup || showCandidateSearchOptions || showRankedCandidates || showCandidateModal || Boolean(actionsMenuAnchor) || showDeletePopup || statusChangeConfirm.open;
+
   return (
     <Box 
-      onClick={editMode ? undefined : onExpandClick}
+      onClick={editMode ? undefined : (e) => { if (hasOpenOverlay) return; onExpandClick(); }}
       sx={{
         p: 3, 
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -601,134 +605,108 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
 
         {/* Show full details when expanded */}
         {expanded && !editMode && (
-          <>
-            {/* Action buttons */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {accessLevel === 2 && (
-                <Button 
-                  variant="outlined" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditClick();
-                  }}
-                  sx={{ 
-                    borderColor: 'rgba(255, 255, 255, 0.3)', 
-                    color: '#64748b',
-                    '&:hover': { borderColor: '#8b5cf6', color: '#8b5cf6' }
-                  }}
-                >
-                  Edit
-                </Button>
-              )}
-              <Box sx={{ position: 'relative' }}>
-                <Chip
-                  label="AI"
-                  size="small"
-                  sx={{
-                    position: 'absolute',
-                    top: -8,
-                    left: -8,
-                    zIndex: 1,
-                    height: 20,
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    backgroundColor: '#8b5cf6',
-                    color: '#ffffff',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                  }}
-                />
-                <Button 
-                  variant="contained" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    findSuitableCandidates();
-                  }}
-                  disabled={isLoading}
-                  sx={{ 
-                    backgroundColor: '#2563eb', 
-                    color: '#ffffff',
-                    '&:hover': { 
-                      backgroundColor: '#1d4ed8',
-                      color: '#ffffff'
-                    },
-                    '&:disabled': { 
-                      backgroundColor: '#475569',
-                      color: '#ffffff'
-                    }
-                  }}
-                >
-                  {isLoading ? 'Finding...' : 'Find Suitable Candidates'}
-                </Button>
-              </Box>
-              <Button 
-                variant="outlined" 
+          <Box onClick={(e) => e.stopPropagation()} sx={{ width: '100%' }}>
+            {/* Actions - hamburger menu */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
+                  setActionsMenuAnchor(e.currentTarget);
+                }}
+                sx={{
+                  color: '#8b5cf6',
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.2)' },
+                }}
+                size="medium"
+                aria-label="Actions"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="body2" sx={{ color: '#64748b', ml: 1 }}>Actions</Typography>
+            </Box>
+            <Menu
+              anchorEl={actionsMenuAnchor}
+              open={Boolean(actionsMenuAnchor)}
+              onClose={() => setActionsMenuAnchor(null)}
+              PaperProps={{
+                sx: {
+                  minWidth: 220,
+                  mt: 1.5,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                  border: '1px solid rgba(0,0,0,0.08)',
+                },
+              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              {accessLevel === 2 && (
+                <MenuItem
+                  onClick={(e) => { e.stopPropagation(); setActionsMenuAnchor(null); handleEditClick(); }}
+                  sx={{ py: 1.5 }}
+                >
+                  <ListItemIcon><EditIcon fontSize="small" sx={{ color: '#64748b' }} /></ListItemIcon>
+                  Edit
+                </MenuItem>
+              )}
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActionsMenuAnchor(null);
+                  findSuitableCandidates();
+                }}
+                disabled={isLoading}
+                sx={{ py: 1.5 }}
+              >
+                <ListItemIcon><SearchIcon fontSize="small" sx={{ color: '#2563eb' }} /></ListItemIcon>
+                {isLoading ? 'Finding...' : 'Find suitable candidates'}
+              </MenuItem>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActionsMenuAnchor(null);
                   setShowLinkedCandidatesModal(true);
                 }}
-                startIcon={<PeopleIcon />}
-                sx={{ 
-                  borderColor: 'rgba(238, 187, 195, 0.5)', 
-                  color: '#8b5cf6',
-                  '&:hover': { 
-                    borderColor: '#8b5cf6', 
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)' 
-                  }
-                }}
+                sx={{ py: 1.5 }}
               >
-                View Linked Candidates
-              </Button>
-              <Button 
-                variant="outlined" 
-                onClick={handleAddCandidateForJob}
-                startIcon={<PersonAddIcon />}
-                sx={{ 
-                  borderColor: 'rgba(37, 99, 235, 0.5)', 
-                  color: '#2563eb',
-                  '&:hover': { 
-                    borderColor: '#2563eb', 
-                    backgroundColor: 'rgba(37, 99, 235, 0.08)' 
-                  }
-                }}
-              >
-                Add Candidate for this Job
-              </Button>
-              <Button 
-                variant="outlined" 
+                <ListItemIcon><PeopleIcon fontSize="small" sx={{ color: '#8b5cf6' }} /></ListItemIcon>
+                View linked candidates
+              </MenuItem>
+              <MenuItem
                 onClick={(e) => {
                   e.stopPropagation();
+                  setActionsMenuAnchor(null);
+                  handleAddCandidateForJob(e);
+                }}
+                sx={{ py: 1.5 }}
+              >
+                <ListItemIcon><PersonAddIcon fontSize="small" sx={{ color: '#2563eb' }} /></ListItemIcon>
+                Add candidates for this job
+              </MenuItem>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActionsMenuAnchor(null);
                   handleShareableLink();
                 }}
-                startIcon={<ShareIcon />}
-                sx={{ 
-                  borderColor: 'rgba(76, 175, 80, 0.5)', 
-                  color: '#4caf50',
-                  '&:hover': { 
-                    borderColor: '#4caf50', 
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)' 
-                  }
-                }}
+                sx={{ py: 1.5 }}
               >
-                Apply Link
-              </Button>
-              <Button 
-                variant="outlined" 
+                <ListItemIcon><ShareIcon fontSize="small" sx={{ color: '#4caf50' }} /></ListItemIcon>
+                Apply link
+              </MenuItem>
+              <MenuItem
                 onClick={async (e) => {
                   e.stopPropagation();
+                  setActionsMenuAnchor(null);
                   try {
                     let token = job.clientTrackingToken;
-                    // If token doesn't exist, generate it
                     if (!token) {
                       const tokenRes = await axios.post(`${API_URL}/api/client-tracking/generate-link/${job._id}`, {}, {
                         headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }
                       });
                       token = tokenRes.data.clientTrackingToken;
-                      // Update the job in local state
                       Object.assign(job, { clientTrackingToken: token });
-                      // Emit event to update job list
-                      window.dispatchEvent(new CustomEvent('jobUpdated', { 
-                        detail: { jobId: job._id, updatedJob: { ...job, clientTrackingToken: token } } 
-                      }));
+                      window.dispatchEvent(new CustomEvent('jobUpdated', { detail: { jobId: job._id, updatedJob: { ...job, clientTrackingToken: token } } }));
                     }
                     const clientTrackingLink = `${window.location.origin}/client-tracking/${token}`;
                     navigator.clipboard.writeText(clientTrackingLink);
@@ -738,307 +716,176 @@ const JobDetails = ({ job, userId, accessLevel, expanded, onExpandClick }) => {
                     toast.error('Failed to copy client tracking link');
                   }
                 }}
-                startIcon={<TrackChangesIcon />}
-                sx={{ 
-                  borderColor: 'rgba(139, 92, 246, 0.5)', 
-                  color: '#8b5cf6',
-                  '&:hover': { 
-                    borderColor: '#8b5cf6', 
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)' 
-                  }
-                }}
+                sx={{ py: 1.5 }}
               >
-                Client Tracking
-              </Button>
-            </Box>
+                <ListItemIcon><TrackChangesIcon fontSize="small" sx={{ color: '#8b5cf6' }} /></ListItemIcon>
+                Client tracking
+              </MenuItem>
+            </Menu>
 
-            {/* Job Details - Tabular Format */}
-            <TableContainer component={Paper} sx={{ 
-              background: 'rgba(255, 255, 255, 0.03)', 
-              borderRadius: 1,
-              border: '1px solid rgba(255, 255, 255, 0.08)'
-            }}>
-              <Table>
-                <TableBody>
-                  {/* Location */}
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ 
-                      color: '#90caf9', 
-                      fontWeight: 600, 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      width: '30%',
-                      py: 2
-                    }}>
-                      Location
-                    </TableCell>
-                    <TableCell sx={{ 
-                      color: '#1e293b', 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      {job.location}
-                    </TableCell>
-                  </TableRow>
-                  
-                  {/* Years of Experience */}
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ 
-                      color: '#90caf9', 
-                      fontWeight: 600, 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      Years of Experience
-                    </TableCell>
-                    <TableCell sx={{ 
-                      color: '#1e293b', 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      {formatExperience(job)}
-                    </TableCell>
-                  </TableRow>
-                  
-                  {/* CTC */}
-                  {(job.ctcMin !== undefined || job.ctcMax !== undefined) && (
-                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                      <TableCell sx={{ 
-                        color: '#90caf9', 
+            {/* Job Details - Accordion (one open at a time) */}
+            <Box sx={{ '& .MuiAccordion-root': { boxShadow: 'none', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px !important', mb: 1 }, '& .MuiAccordion-root:before': { display: 'none' } }}>
+              <Accordion
+                expanded={expandedDetail === 'location'}
+                onChange={() => setExpandedDetail(expandedDetail === 'location' ? null : 'location')}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Location</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {job.location}
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expandedDetail === 'experience'}
+                onChange={() => setExpandedDetail(expandedDetail === 'experience' ? null : 'experience')}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Years of experience</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {formatExperience(job)}
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expandedDetail === 'ctc'}
+                onChange={() => setExpandedDetail(expandedDetail === 'ctc' ? null : 'ctc')}
+                onClick={(e) => e.stopPropagation()}
+                sx={{ display: (job.ctcMin !== undefined || job.ctcMax !== undefined) ? 'block' : 'none' }}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>CTC</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expandedDetail === 'remote'}
+                onChange={() => setExpandedDetail(expandedDetail === 'remote' ? null : 'remote')}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Remote work</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  {job.remote ? 'Available' : 'Not Available'}
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expandedDetail === 'status'}
+                onChange={() => setExpandedDetail(expandedDetail === 'status' ? null : 'status')}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Status</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <FormControl size="small" sx={{ minWidth: 140 }}>
+                    <Select
+                      value={currentStatus}
+                      onChange={(e) => handleQuickStatusChangeRequest(e.target.value)}
+                      sx={{
+                        backgroundColor: `${getStatusColor(currentStatus)}20`,
+                        color: getStatusColor(currentStatus),
                         fontWeight: 600,
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        py: 2
-                      }}>
-                        CTC
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: '#1e293b', 
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        py: 2
-                      }}>
-                        ₹ {job.ctcMin ?? '-'} - {job.ctcMax ?? '-'} LPA
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  
-                  {/* Industry */}
-                  {job.industry && (
-                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                      <TableCell sx={{ 
-                        color: '#90caf9', 
-                        fontWeight: 600, 
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        py: 2
-                      }}>
-                        Industry
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: '#1e293b', 
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        py: 2
-                      }}>
-                        {job.industry}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  
-                  {/* Remote Work */}
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ 
-                      color: '#90caf9', 
-                      fontWeight: 600, 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      Remote Work
-                    </TableCell>
-                    <TableCell sx={{ 
-                      color: '#1e293b', 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      {job.remote ? 'Available' : 'Not Available'}
-                    </TableCell>
-                  </TableRow>
+                        borderRadius: '6px',
+                        border: 'none',
+                        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                        '&:hover': { backgroundColor: `${getStatusColor(currentStatus)}30` },
+                        '& .MuiSelect-select': { padding: '4px 8px', fontSize: '0.875rem' },
+                      }}
+                    >
+                      <MenuItem value="New">New</MenuItem>
+                      <MenuItem value="In Progress">In Progress</MenuItem>
+                      <MenuItem value="Halted">Halted</MenuItem>
+                      <MenuItem value="Withdrawn">Withdrawn</MenuItem>
+                      <MenuItem value="Ongoing client process">Ongoing client process</MenuItem>
+                      <MenuItem value="Completed">Completed</MenuItem>
+                    </Select>
+                  </FormControl>
+                </AccordionDetails>
+              </Accordion>
 
-                  {/* Status */}
-                  <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                    <TableCell sx={{ 
-                      color: '#90caf9', 
-                      fontWeight: 600, 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      Status
-                    </TableCell>
-                    <TableCell sx={{ 
-                      color: '#1e293b', 
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                      py: 2
-                    }}>
-                      <FormControl size="small" sx={{ minWidth: 140 }}>
-                        <Select
-                          value={currentStatus}
-                          onChange={(e) => handleQuickStatusChangeRequest(e.target.value)}
-                          sx={{
-                            backgroundColor: `${getStatusColor(currentStatus)}20`,
-                            color: getStatusColor(currentStatus),
-                            fontWeight: 600,
-                            borderRadius: '6px',
-                            border: 'none',
-                            '& .MuiOutlinedInput-notchedOutline': {
-                              border: 'none',
-                            },
-                            '&:hover': {
-                              backgroundColor: `${getStatusColor(currentStatus)}30`,
-                            },
-                            '& .MuiSelect-select': {
-                              padding: '4px 8px',
-                              fontSize: '0.875rem',
-                            }
-                          }}
-                        >
-                          <MenuItem value="New">New</MenuItem>
-                          <MenuItem value="In Progress">In Progress</MenuItem>
-                          <MenuItem value="Halted">Halted</MenuItem>
-                          <MenuItem value="Withdrawn">Withdrawn</MenuItem>
-                          <MenuItem value="Ongoing client process">Ongoing client process</MenuItem>
-                          <MenuItem value="Completed">Completed</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                  </TableRow>
-                  
-                  {/* Job Description */}
-                  {job.description && (
-                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                      <TableCell sx={{ 
-                        color: '#90caf9', 
-                        fontWeight: 600, 
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        verticalAlign: 'top',
-                        py: 2
-                      }}>
-                        Job Description
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: '#1e293b', 
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                        lineHeight: 1.6,
-                        py: 2
-                      }}>
-                        {job.description}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  
-                  {/* Client Contact */}
-                  {job.recruiters && job.recruiters.length > 0 && (
-                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                      <TableCell sx={{ 
-                        color: '#90caf9', 
-                        fontWeight: 600, 
-                        borderBottom: job.authorizedUsers && job.authorizedUsers.length > 0 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
-                        verticalAlign: 'top',
-                        py: 2
-                      }}>
-                        Client Contact
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: '#1e293b', 
-                        borderBottom: job.authorizedUsers && job.authorizedUsers.length > 0 ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
-                        py: 2
-                      }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          {job.recruiters.map((recruiter, index) => (
-                            <Paper
-                              key={recruiter._id || index}
-                              sx={{
-                                p: 2,
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                borderRadius: 1,
-                                border: '1px solid rgba(0, 0, 0, 0.05)'
-                              }}
-                            >
-                              <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}>
-                                <strong>Name:</strong> {recruiter.name}
-                              </Typography>
-                              {recruiter.email && (
-                                <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}>
-                                  <strong>Email:</strong> {recruiter.email}
-                                </Typography>
-                              )}
-                              {recruiter.phone && (
-                                <Typography variant="body2" sx={{ color: '#1e293b' }}>
-                                  <strong>Phone:</strong> {recruiter.phone}
-                                </Typography>
-                              )}
-                            </Paper>
+              {job.description && (
+                <Accordion
+                  expanded={expandedDetail === 'description'}
+                  onChange={() => setExpandedDetail(expandedDetail === 'description' ? null : 'description')}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                    <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Job description</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ pt: 0, color: '#1e293b', lineHeight: 1.6 }}>
+                    {job.description}
+                  </AccordionDetails>
+                </Accordion>
+              )}
+
+              {job.recruiters && job.recruiters.length > 0 && (
+                <Accordion
+                  expanded={expandedDetail === 'clientContact'}
+                  onChange={() => setExpandedDetail(expandedDetail === 'clientContact' ? null : 'clientContact')}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                    <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Client contact</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {job.recruiters.map((recruiter, index) => (
+                        <Paper key={recruiter._id || index} sx={{ p: 2, background: 'rgba(0,0,0,0.03)', borderRadius: 1, border: '1px solid rgba(0,0,0,0.06)' }}>
+                          <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}><strong>Name:</strong> {recruiter.name}</Typography>
+                          {recruiter.email && <Typography variant="body2" sx={{ color: '#1e293b', mb: 0.5 }}><strong>Email:</strong> {recruiter.email}</Typography>}
+                          {recruiter.phone && <Typography variant="body2" sx={{ color: '#1e293b' }}><strong>Phone:</strong> {recruiter.phone}</Typography>}
+                        </Paper>
+                      ))}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              )}
+
+              {job.authorizedUsers && job.authorizedUsers.length > 0 && (
+                <Accordion
+                  expanded={expandedDetail === 'internalRecruiter'}
+                  onChange={() => setExpandedDetail(expandedDetail === 'internalRecruiter' ? null : 'internalRecruiter')}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                    <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Internal recruiter contact</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                    <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: 'none' }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ background: 'rgba(139, 92, 246, 0.08)' }}>
+                            <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Name</TableCell>
+                            <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Email</TableCell>
+                            <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Phone</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {job.authorizedUsers.map((user, index) => (
+                            <TableRow key={user._id || index} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                              <TableCell sx={{ color: '#1e293b', py: 1.5 }}>{user.fullName || 'N/A'}</TableCell>
+                              <TableCell sx={{ color: '#1e293b', py: 1.5 }}>{user.email || 'N/A'}</TableCell>
+                              <TableCell sx={{ color: '#1e293b', py: 1.5 }}>{user.phone || 'N/A'}</TableCell>
+                            </TableRow>
                           ))}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {/* Internal Recruiter Contact Details */}
-                  {job.authorizedUsers && job.authorizedUsers.length > 0 && (
-                    <TableRow sx={{ '&:hover': { background: 'rgba(255, 255, 255, 0.05)' } }}>
-                      <TableCell sx={{ 
-                        color: '#90caf9', 
-                        fontWeight: 600, 
-                        borderBottom: 'none',
-                        verticalAlign: 'top',
-                        py: 2
-                      }}>
-                        Internal Recruiter Contact Details
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: '#1e293b', 
-                        borderBottom: 'none',
-                        py: 2
-                      }}>
-                        <TableContainer component={Paper} sx={{ 
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(0, 0, 0, 0.05)',
-                          boxShadow: 'none'
-                        }}>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow sx={{ background: 'rgba(139, 92, 246, 0.08)' }}>
-                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Name</TableCell>
-                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Email</TableCell>
-                                <TableCell sx={{ color: '#8b5cf6', fontWeight: 600, py: 1.5 }}>Phone</TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {job.authorizedUsers.map((user, index) => (
-                                <TableRow 
-                                  key={user._id || index}
-                                  sx={{ 
-                                    '&:hover': { background: 'rgba(255, 255, 255, 0.08)' },
-                                    '&:last-child td': { borderBottom: 0 }
-                                  }}
-                                >
-                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
-                                    {user.fullName || 'N/A'}
-                                  </TableCell>
-                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
-                                    {user.email || 'N/A'}
-                                  </TableCell>
-                                  <TableCell sx={{ color: '#1e293b', py: 1.5 }}>
-                                    {user.phone || 'N/A'}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </AccordionDetails>
+                </Accordion>
+              )}
+            </Box>
+          </Box>
         )}
 
         {editMode && (

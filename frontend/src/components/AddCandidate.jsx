@@ -24,7 +24,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -53,6 +55,8 @@ import API_URL from '../config/api';
 
 const AddCandidate = () => {
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [form, setForm] = useState({
     name: '', 
     email: '', 
@@ -562,48 +566,52 @@ const AddCandidate = () => {
 
   return (
     <Box sx={{ 
-      maxWidth: 900, 
+      maxWidth: isMobile ? '100%' : 900, 
       mx: 'auto', 
-      p: 3,
-      background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
-      borderRadius: 3,
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      border: '1px solid rgba(0, 0, 0, 0.05)'
+      p: isMobile ? 1 : 3,
+      px: isMobile ? 1.5 : 3,
+      background: isMobile ? 'transparent' : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+      borderRadius: isMobile ? 0 : 3,
+      boxShadow: isMobile ? 'none' : '0 8px 32px rgba(0, 0, 0, 0.3)',
+      border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)'
     }}>
       {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-          <PersonIcon sx={{ fontSize: 40, color: '#8b5cf6', mr: 2 }} />
+      <Box sx={{ textAlign: 'center', mb: isMobile ? 2 : 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: isMobile ? 1 : 2, flexWrap: 'wrap', gap: 1 }}>
+          <PersonIcon sx={{ fontSize: isMobile ? 28 : 40, color: '#8b5cf6', mr: isMobile ? 1 : 2 }} />
           <Typography variant="h3" sx={{ 
             fontWeight: 700, 
-            color: '#1e293b'
+            color: '#1e293b',
+            fontSize: isMobile ? '1.35rem' : undefined
           }}>
             Add New Candidate
           </Typography>
         </Box>
-        <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.1rem' }}>
-          Create a comprehensive candidate profile with detailed information
-        </Typography>
+        {!isMobile && (
+          <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.1rem' }}>
+            Create a comprehensive candidate profile with detailed information
+          </Typography>
+        )}
       </Box>
 
       <Paper elevation={0} sx={{
         background: 'transparent',
-        p: 4,
-        borderRadius: 3,
-        border: '1px solid rgba(0, 0, 0, 0.05)'
+        p: isMobile ? 0 : 4,
+        borderRadius: 0,
+        border: 'none'
       }}>
         <Box component="form" onSubmit={handleSubmit}>
           {/* Basic Information Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? 1.5 : 3 }}>
               <PersonIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                 Basic Information
               </Typography>
             </Box>
             
             {/* Full Name */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <TextField
                 name="name"
                 label="Full Name"
@@ -627,7 +635,7 @@ const AddCandidate = () => {
             </Box>
             
             {/* Email Address */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <TextField
                 name="email"
                 label="Email Address"
@@ -652,7 +660,7 @@ const AddCandidate = () => {
             </Box>
             
             {/* Phone Number */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <TextField
                 name="phone"
                 label="Phone Number"
@@ -676,7 +684,7 @@ const AddCandidate = () => {
             </Box>
 
             {/* Resume Upload - Required */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <Typography variant="subtitle2" sx={{ color: '#8b5cf6', mb: 1, fontWeight: 600 }}>
                 Resume (Required)
               </Typography>
@@ -869,19 +877,19 @@ const AddCandidate = () => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Current Location Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? 1.5 : 3 }}>
               <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                 Current Location
               </Typography>
             </Box>
             
             {/* Country */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <FormControl fullWidth required>
                 <InputLabel sx={{ color: '#64748b' }}>Country</InputLabel>
                 <Select 
@@ -903,7 +911,7 @@ const AddCandidate = () => {
             </Box>
             
             {/* State */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <FormControl fullWidth required>
                 <InputLabel sx={{ color: '#64748b' }}>State</InputLabel>
                 <Select 
@@ -926,7 +934,7 @@ const AddCandidate = () => {
             </Box>
             
             {/* City */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: isMobile ? 1.5 : 3 }}>
               <FormControl fullWidth required>
                 <InputLabel sx={{ color: '#64748b' }}>City</InputLabel>
                 <Select 
@@ -949,41 +957,28 @@ const AddCandidate = () => {
             </Box>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Preferred Locations Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
-                  Preferred Locations (up to 3)
-                </Typography>
-              </Box>
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addPreferredLocation}
-                variant="outlined"
-                sx={{
-                  borderColor: '#8b5cf6',
-                  color: '#8b5cf6',
-                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
-                }}
-              >
-                Add Preferred Location
-              </Button>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? 1.5 : 3 }}>
+              <LocationIcon sx={{ color: '#8b5cf6', mr: 1 }} />
+              <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
+                Preferred Locations
+              </Typography>
             </Box>
             
-            <Stack spacing={3}>
+            <Stack spacing={isMobile ? 2 : 3}>
               {preferredLocations.map((loc, idx) => (
                 <Card key={idx} sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2
+                  background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                  border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                  borderRadius: isMobile ? 0 : 2,
+                  boxShadow: 'none'
                 }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                  <CardContent sx={{ p: isMobile ? 0 : undefined }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: isMobile ? 1 : 2 }}>
+                      <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '0.95rem' : undefined }}>
                         Preferred Location #{idx + 1}
                       </Typography>
                       <Box>
@@ -991,6 +986,7 @@ const AddCandidate = () => {
                           <IconButton 
                             onClick={() => removePreferredLocation(idx)}
                             sx={{ color: '#ff6b6b', mr: 1, '&:hover': { backgroundColor: 'rgba(255, 107, 107, 0.1)' } }}
+                            size="small"
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -999,6 +995,7 @@ const AddCandidate = () => {
                           <IconButton 
                             onClick={addPreferredLocation}
                             sx={{ color: '#51cf66', '&:hover': { backgroundColor: 'rgba(81, 207, 102, 0.1)' } }}
+                            size="small"
                           >
                             <AddIcon />
                           </IconButton>
@@ -1079,39 +1076,35 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Experience Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: isMobile ? 1.5 : 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <WorkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                   Work Experience
                 </Typography>
               </Box>
-              <Button
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={addExp}
-                variant="outlined"
-                sx={{
-                  borderColor: '#8b5cf6',
-                  color: '#8b5cf6',
-                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
-                }}
+                sx={{ color: '#8b5cf6', '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.1)' } }}
+                size="small"
               >
-                Add Experience
-              </Button>
+                <AddIcon />
+              </IconButton>
             </Box>
             
-            <Stack spacing={3}>
+            <Stack spacing={isMobile ? 2 : 3}>
               {experience.map((exp, idx) => (
                 <Card key={idx} sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2
+                  background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                  border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                  borderRadius: isMobile ? 0 : 2,
+                  boxShadow: 'none'
                 }}>
-                  <CardContent>
+                  <CardContent sx={{ p: isMobile ? 0 : undefined }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                       <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Experience #{idx + 1}
@@ -1271,39 +1264,35 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Education Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: isMobile ? 1.5 : 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <SchoolIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                   Education
                 </Typography>
               </Box>
-              <Button
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={addEdu}
-                variant="outlined"
-                sx={{
-                  borderColor: '#8b5cf6',
-                  color: '#8b5cf6',
-                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
-                }}
+                sx={{ color: '#8b5cf6', '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.1)' } }}
+                size="small"
               >
-                Add Education
-              </Button>
+                <AddIcon />
+              </IconButton>
             </Box>
             
-            <Stack spacing={3}>
+            <Stack spacing={isMobile ? 2 : 3}>
               {education.map((edu, idx) => (
                 <Card key={idx} sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2
+                  background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                  border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                  borderRadius: isMobile ? 0 : 2,
+                  boxShadow: 'none'
                 }}>
-                  <CardContent>
+                  <CardContent sx={{ p: isMobile ? 0 : undefined }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                       <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Education #{idx + 1}
@@ -1417,39 +1406,35 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Certifications Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: isMobile ? 1.5 : 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <StarIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                   Certifications
                 </Typography>
               </Box>
-              <Button
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={addCert}
-                variant="outlined"
-                sx={{
-                  borderColor: '#8b5cf6',
-                  color: '#8b5cf6',
-                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
-                }}
+                sx={{ color: '#8b5cf6', '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.1)' } }}
+                size="small"
               >
-                Add Certification
-              </Button>
+                <AddIcon />
+              </IconButton>
             </Box>
             
-            <Stack spacing={3}>
+            <Stack spacing={isMobile ? 2 : 3}>
               {certifications.map((cert, idx) => (
                 <Card key={idx} sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2
+                  background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                  border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                  borderRadius: isMobile ? 0 : 2,
+                  boxShadow: 'none'
                 }}>
-                  <CardContent>
+                  <CardContent sx={{ p: isMobile ? 0 : undefined }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                       <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Certification #{idx + 1}
@@ -1538,39 +1523,35 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Additional Links Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: isMobile ? 1.5 : 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <LinkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
-                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600, fontSize: isMobile ? '1.1rem' : undefined }}>
                   Additional Links
                 </Typography>
               </Box>
-              <Button
-                startIcon={<AddIcon />}
+              <IconButton
                 onClick={addLink}
-                variant="outlined"
-                sx={{
-                  borderColor: '#8b5cf6',
-                  color: '#8b5cf6',
-                  '&:hover': { borderColor: '#2563eb', color: '#2563eb' }
-                }}
+                sx={{ color: '#8b5cf6', '&:hover': { backgroundColor: 'rgba(139, 92, 246, 0.1)' } }}
+                size="small"
               >
-                Add Link
-              </Button>
+                <AddIcon />
+              </IconButton>
             </Box>
             
-            <Stack spacing={3}>
+            <Stack spacing={isMobile ? 2 : 3}>
               {additionalLinks.map((link, idx) => (
                 <Card key={idx} sx={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)',
-                  borderRadius: 2
+                  background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                  border: isMobile ? 'none' : '1px solid rgba(0, 0, 0, 0.05)',
+                  borderRadius: isMobile ? 0 : 2,
+                  boxShadow: 'none'
                 }}>
-                  <CardContent>
+                  <CardContent sx={{ p: isMobile ? 0 : undefined }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                       <Typography variant="h6" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                         Link #{idx + 1}
@@ -1636,11 +1617,11 @@ const AddCandidate = () => {
             </Stack>
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Talent Pools Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? 1.5 : 3 }}>
               <GroupIcon sx={{ color: '#8b5cf6', mr: 1 }} />
               <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Talent Pools (Optional)
@@ -1690,11 +1671,11 @@ const AddCandidate = () => {
             )}
           </Box>
 
-          <Divider sx={{ my: 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
+          <Divider sx={{ my: isMobile ? 2 : 4, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
           {/* Link to Jobs Section */}
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ mb: isMobile ? 2 : 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? 1.5 : 3 }}>
               <WorkIcon sx={{ color: '#8b5cf6', mr: 1 }} />
               <Typography variant="h5" sx={{ color: '#8b5cf6', fontWeight: 600 }}>
                 Link to Jobs (Optional)

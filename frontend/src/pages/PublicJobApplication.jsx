@@ -10,8 +10,6 @@ import {
   TextField,
   Button,
   Grid,
-  Card,
-  CardContent,
   Chip,
   CircularProgress,
   Container,
@@ -344,16 +342,12 @@ const PublicJobApplication = () => {
             />
           </Box>
 
-          {/* Success Confirmation Card */}
-          <Card sx={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          {/* Success Confirmation */}
+          <Box sx={{
+            background: 'transparent',
             textAlign: 'center',
             p: { xs: 3, sm: 4, md: 5 }
           }}>
-            <CardContent>
               <CheckCircleIcon sx={{ 
                 fontSize: { xs: 64, sm: 80, md: 96 }, 
                 color: '#4caf50',
@@ -421,16 +415,13 @@ const PublicJobApplication = () => {
                   Keep an eye on your email ({form.email}) for updates about your application status.
                 </Typography>
               </Box>
-            </CardContent>
-          </Card>
+          </Box>
 
           {/* Footer */}
-          <Paper sx={{
+          <Box sx={{
             mt: { xs: 2, sm: 3, md: 4 },
             p: { xs: 2, sm: 3 },
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
+            background: 'transparent',
             textAlign: 'center'
           }}>
             <Typography 
@@ -452,7 +443,7 @@ const PublicJobApplication = () => {
             >
               Connecting Talent with Opportunity
             </Typography>
-          </Paper>
+          </Box>
         </Container>
       </Box>
     );
@@ -493,13 +484,13 @@ const PublicJobApplication = () => {
   return (
     <Box sx={{ 
       minHeight: '100vh',
-      background: '#f8fafc',
+      background: 'transparent',
       py: { xs: 1, sm: 2, md: 4 },
-      px: { xs: 1, sm: 2 }
+      px: { xs: 1.5, sm: 2 }
     }}>
       <ToastContainer position="top-center" autoClose={3000} theme="light" />
       
-      <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      <Container maxWidth={false} sx={{ maxWidth: '100%', width: '100%', px: { xs: 1.5, sm: 2, md: 3 } }}>
         {/* Header with StaffAnchor Branding */}
         <Box sx={{ 
           display: 'flex', 
@@ -519,15 +510,11 @@ const PublicJobApplication = () => {
           />
         </Box>
 
-        {/* Job Details Card */}
-        <Card sx={{
-          mb: { xs: 2, sm: 3, md: 4 },
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          boxShadow: 'none'
+        {/* Job Details - no card box */}
+        <Box sx={{
+          mb: { xs: 2, sm: 3, md: 4 }
         }}>
-          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box sx={{ p: { xs: 0, sm: 0 } }}>
             <Box sx={{ 
               display: 'flex', 
               alignItems: { xs: 'flex-start', sm: 'center' },
@@ -686,18 +673,14 @@ const PublicJobApplication = () => {
                 </Box>
               </>
             )}
-          </CardContent>
-        </Card>
+          </Box>
+        </Box>
 
-        {/* Application Form */}
-        <Card sx={{
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          boxShadow: 'none',
+        {/* Application Form - transparent, full width */}
+        <Box sx={{
           mb: { xs: 2, sm: 3, md: 4 }
         }}>
-          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box sx={{ p: { xs: 0, sm: 0 } }}>
             <Typography variant="h5" sx={{ 
               fontWeight: 700, 
               color: '#1e293b', 
@@ -757,10 +740,10 @@ const PublicJobApplication = () => {
                   }}>
                     Resume / CV <span style={{ color: '#e74c3c' }}>*</span>
                   </Typography>
-                  <Paper sx={{ 
+                  <Box sx={{ 
                     p: { xs: 2, sm: 3 }, 
-                    background: '#ffffff',
-                    border: '2px dashed #ddd',
+                    background: 'transparent',
+                    border: '2px dashed rgba(0,0,0,0.12)',
                     borderRadius: '8px',
                     textAlign: 'center'
                   }}>
@@ -869,7 +852,7 @@ const PublicJobApplication = () => {
                         </IconButton>
                       </Box>
                     )}
-                  </Paper>
+                  </Box>
                 </Box>
 
                 {/* Expertise Selection (Domain → Talent Pools → Skills) - Optional */}
@@ -1069,11 +1052,11 @@ const PublicJobApplication = () => {
                     </Button>
                   </Box>
                   {form.experience.map((exp, index) => (
-                      <Paper key={index} sx={{ 
+                      <Box key={index} sx={{ 
                       p: { xs: 1.5, sm: 2 }, 
                       mb: { xs: 1.5, sm: 2 }, 
-                      background: '#ffffff',
-                      border: '1px solid #e2e8f0'
+                      background: 'transparent',
+                      border: 'none'
                     }}>
                       <Box sx={{ 
                         display: 'flex', 
@@ -1159,7 +1142,7 @@ const PublicJobApplication = () => {
                           />
                         </Grid>
                       </Grid>
-                    </Paper>
+                    </Box>
                   ))}
                 </Box>
 
@@ -1194,11 +1177,11 @@ const PublicJobApplication = () => {
                     </Button>
                   </Box>
                   {form.education.map((edu, index) => (
-                      <Paper key={index} sx={{ 
+                      <Box key={index} sx={{ 
                       p: { xs: 1.5, sm: 2 }, 
                       mb: { xs: 1.5, sm: 2 }, 
-                      background: '#ffffff',
-                      border: '1px solid #e2e8f0'
+                      background: 'transparent',
+                      border: 'none'
                     }}>
                       <Box sx={{ 
                         display: 'flex', 
@@ -1262,17 +1245,15 @@ const PublicJobApplication = () => {
                           />
                         </Grid>
                       </Grid>
-                    </Paper>
+                    </Box>
                   ))}
                 </Box>
 
                 {/* Submit Button */}
                 <Box sx={{ textAlign: 'center', pt: { xs: 2, sm: 3, md: 4 } }}>
-                  <Paper sx={{ 
+                  <Box sx={{ 
                     p: { xs: 2, sm: 3 }, 
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
+                    background: 'transparent'
                   }}>
                     <Typography variant="body2" sx={{ 
                       color: '#475569', 
@@ -1311,20 +1292,18 @@ const PublicJobApplication = () => {
                     >
                       {submitting ? 'Submitting...' : 'Submit Application'}
                     </Button>
-                  </Paper>
+                  </Box>
                 </Box>
               </Stack>
             </form>
-          </CardContent>
-        </Card>
+          </Box>
+        </Box>
 
         {/* Footer */}
-        <Paper sx={{
+        <Box sx={{
           mt: { xs: 2, sm: 3, md: 4 },
           p: { xs: 2, sm: 3 },
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
+          background: 'transparent',
           textAlign: 'center'
         }}>
           <Typography 
@@ -1346,7 +1325,7 @@ const PublicJobApplication = () => {
           >
             Connecting Talent with Opportunity
           </Typography>
-        </Paper>
+        </Box>
       </Container>
     </Box>
   );
