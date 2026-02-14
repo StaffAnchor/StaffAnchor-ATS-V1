@@ -52,7 +52,9 @@ import {
   Timeline as TimelineIcon,
   CalendarToday as CalendarTodayIcon,
   BarChart as BarChartIcon,
-  Percent as PercentIcon
+  Percent as PercentIcon,
+  FilterList as FilterIcon,
+  Clear as ClearIcon
 } from '@mui/icons-material';
 import {
   BarChart,
@@ -90,6 +92,9 @@ const Analytics = () => {
   const [candidateModalTitle, setCandidateModalTitle] = useState('');
   const [candidateModalData, setCandidateModalData] = useState([]);
   const [expandedRecruiter, setExpandedRecruiter] = useState(null);
+  const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [filterSearchQuery, setFilterSearchQuery] = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
 
   const fetchJobs = async () => {
     try {
@@ -198,93 +203,149 @@ const Analytics = () => {
         </Box>
       </Box>
 
-      {/* Filters */}
-      <Paper sx={{ 
-        p: 3, 
-        mb: 3, 
-        borderRadius: 2,
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)'
-      }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={5}>
-            <TextField
-              fullWidth
-              placeholder="Search by Job ID, title, or company..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: '#94a3b8' }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  backgroundColor: '#f8fafc',
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={5}>
-            <FormControl fullWidth>
-              <InputLabel>Filter by Company</InputLabel>
-              <Select
-                value={selectedCompany}
-                label="Filter by Company"
-                onChange={(e) => setSelectedCompany(e.target.value)}
-                sx={{ 
-                  borderRadius: 2, 
-                  backgroundColor: '#f8fafc',
-                  minWidth: 250
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 300,
-                      minWidth: 300,
-                      '& .MuiMenuItem-root': {
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word'
-                      }
-                    }
-                  }
-                }}
-              >
-                <MenuItem value="">All Companies</MenuItem>
-                {companies.map((company) => (
-                  <MenuItem key={company} value={company} sx={{ whiteSpace: 'normal' }}>{company}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCompany('');
-              }}
-              sx={{ 
-                height: '56px',
+      {/* Filter and Clear Filters buttons - same line */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+        <Button
+          variant="outlined"
+          startIcon={<FilterIcon />}
+          onClick={() => {
+            setFilterSearchQuery(searchQuery);
+            setFilterCompany(selectedCompany);
+            setShowFilterDialog(true);
+          }}
+          sx={{
+            borderRadius: 2,
+            borderColor: '#64748b',
+            color: '#64748b',
+            textTransform: 'none',
+            fontWeight: 600,
+            '&:hover': {
+              borderColor: '#475569',
+              backgroundColor: 'rgba(100, 116, 139, 0.08)'
+            }
+          }}
+        >
+          Filter
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<ClearIcon />}
+          onClick={() => {
+            setSearchQuery('');
+            setSelectedCompany('');
+            setFilterSearchQuery('');
+            setFilterCompany('');
+            setShowFilterDialog(false);
+          }}
+          sx={{
+            borderRadius: 2,
+            borderColor: '#ef4444',
+            color: '#ef4444',
+            textTransform: 'none',
+            fontWeight: 600,
+            '&:hover': {
+              borderColor: '#dc2626',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)'
+            }
+          }}
+        >
+          Clear Filters
+        </Button>
+      </Box>
+
+      {/* Filter Dialog - Job ID/search and Company inside popup */}
+      <Dialog
+        open={showFilterDialog}
+        onClose={() => setShowFilterDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          background: '#f8fafc', 
+          color: '#1e293b', 
+          fontWeight: 700, 
+          borderBottom: '1px solid #e2e8f0' 
+        }}>
+          Filter jobs
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          <TextField
+            fullWidth
+            label="Job ID, title, or company"
+            placeholder="Search by Job ID, title, or company..."
+            value={filterSearchQuery}
+            onChange={(e) => setFilterSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: '#94a3b8' }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                borderColor: '#ef4444',
-                color: '#ef4444',
-                '&:hover': {
-                  borderColor: '#dc2626',
-                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                  color: '#dc2626'
+                backgroundColor: '#f8fafc',
+              }
+            }}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Filter by Company</InputLabel>
+            <Select
+              value={filterCompany}
+              label="Filter by Company"
+              onChange={(e) => setFilterCompany(e.target.value)}
+              sx={{ 
+                borderRadius: 2, 
+                backgroundColor: '#f8fafc',
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    maxHeight: 300,
+                    minWidth: 280,
+                    '& .MuiMenuItem-root': { whiteSpace: 'normal', wordBreak: 'break-word' }
+                  }
                 }
               }}
             >
-              Clear Filters
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
+              <MenuItem value="">All Companies</MenuItem>
+              {companies.map((company) => (
+                <MenuItem key={company} value={company} sx={{ whiteSpace: 'normal' }}>{company}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, pt: 0 }}>
+          <Button onClick={() => setShowFilterDialog(false)} sx={{ color: '#64748b' }}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setSearchQuery(filterSearchQuery);
+              setSelectedCompany(filterCompany);
+              setShowFilterDialog(false);
+            }}
+            sx={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%)',
+              color: 'white',
+              fontWeight: 600,
+              '&:hover': { opacity: 0.9 }
+            }}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Jobs Table */}
       <TableContainer component={Paper} sx={{ 

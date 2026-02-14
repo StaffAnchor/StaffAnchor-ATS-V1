@@ -68,6 +68,10 @@ const Banners = () => {
       toast.error('Banner text is required');
       return;
     }
+    if (formData.text.length > 100) {
+      toast.error('Banner text must be 100 characters or less');
+      return;
+    }
 
     if (new Date(formData.endTime) <= new Date(formData.startTime)) {
       toast.error('End time must be after start time');
@@ -359,6 +363,8 @@ const Banners = () => {
               multiline
               rows={3}
               placeholder="Enter your announcement text here..."
+              inputProps={{ maxLength: 100 }}
+              helperText={`${formData.text.length}/100 characters`}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '&:hover fieldset': {
