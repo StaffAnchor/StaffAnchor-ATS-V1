@@ -7,11 +7,12 @@ import AIWarningDialog from './AIWarningDialog.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import ExpertiseSelector from './ExpertiseSelector.jsx';
 import { toast } from 'react-toastify';
-import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton } from '@mui/material';
-import { InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Typography, Button, Box, TextField, Stack, Divider, Link, Card, CardContent, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { InsertDriveFile as FileIcon, CloudUpload as CloudUploadIcon, Delete as DeleteIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import API_URL from '../config/api';
 
-const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) => {
+const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false, accordionMode = false }) => {
+  const [expandedDetail, setExpandedDetail] = useState(null);
   const [showJobs, setShowJobs] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [editMode, setEditMode] = useState(initialEditMode);
@@ -297,6 +298,200 @@ const CandidateDetails = ({ candidate, accessLevel, initialEditMode = false }) =
               sx={{ '& .MuiInputBase-input': { color: '#1e293b' }, '& .MuiInputLabel-root': { color: '#64748b' } }}
             />
           </>
+        ) : accordionMode ? (
+          <Box sx={{ '& .MuiAccordion-root': { boxShadow: 'none', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '8px !important', mb: 1 }, '& .MuiAccordion-root:before': { display: 'none' } }}>
+            <Accordion expanded={expandedDetail === 'name'} onChange={() => setExpandedDetail(expandedDetail === 'name' ? null : 'name')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Name</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{candidate.name}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'email'} onChange={() => setExpandedDetail(expandedDetail === 'email' ? null : 'email')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Email</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{candidate.email}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'phone'} onChange={() => setExpandedDetail(expandedDetail === 'phone' ? null : 'phone')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Phone</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{candidate.phone || 'Not provided'}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'currentCTC'} onChange={() => setExpandedDetail(expandedDetail === 'currentCTC' ? null : 'currentCTC')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Current CTC</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {candidate.currentCTC ? `₹ ${candidate.currentCTC} LPA` : (candidate.experience && candidate.experience.length > 0 && candidate.experience[0].ctc) ? `₹ ${candidate.experience[0].ctc} LPA (from last job)` : 'Not Mentioned'}
+              </AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'expectedCTC'} onChange={() => setExpandedDetail(expandedDetail === 'expectedCTC' ? null : 'expectedCTC')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Expected CTC</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>{candidate.expectedCTC ? `₹ ${candidate.expectedCTC} LPA` : 'Not Mentioned'}</AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'skills'} onChange={() => setExpandedDetail(expandedDetail === 'skills' ? null : 'skills')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Skills</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {candidate.skills && candidate.skills.length > 0 ? (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {candidate.skills.map((skill, idx) => (
+                      <Chip key={idx} label={skill} size="small" sx={{ backgroundColor: 'rgba(238, 187, 195, 0.2)', color: '#8b5cf6', fontSize: '0.8rem' }} />
+                    ))}
+                  </Box>
+                ) : 'No skills listed'}
+              </AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'linkedin'} onChange={() => setExpandedDetail(expandedDetail === 'linkedin' ? null : 'linkedin')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>LinkedIn</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {candidate.linkedin ? <Link href={`https://linkedin.com/in/${candidate.linkedin}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>{candidate.linkedin}</Link> : 'Not provided'}
+              </AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'x'} onChange={() => setExpandedDetail(expandedDetail === 'x' ? null : 'x')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>X (Twitter)</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {candidate.x ? <Link href={`https://twitter.com/${candidate.x}`} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>@{candidate.x}</Link> : 'Not provided'}
+              </AccordionDetails>
+            </Accordion>
+            <Accordion expanded={expandedDetail === 'resume'} onChange={() => setExpandedDetail(expandedDetail === 'resume' ? null : 'resume')} onClick={(e) => e.stopPropagation()}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Resume</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                {candidate.resume && candidate.resume.url ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <FileIcon sx={{ color: '#2563eb', fontSize: 20 }} />
+                      <Link href={candidate.resume.url} target="_blank" rel="noopener" sx={{ color: '#4fc3f7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{candidate.resume.fileName || 'View Resume'}</Link>
+                      {candidate.resume.fileSize && <Typography variant="caption" sx={{ color: '#64748b' }}>({(candidate.resume.fileSize / 1024).toFixed(2)} KB)</Typography>}
+                    </Box>
+                    {(accessLevel === 1 || accessLevel === 2) && (
+                      <>
+                        <input accept=".pdf,.doc,.docx" style={{ display: 'none' }} id="resume-update-acc" type="file" onChange={handleResumeUpload} />
+                        <label htmlFor="resume-update-acc">
+                          <Button component="span" size="small" variant="outlined" startIcon={<CloudUploadIcon />} disabled={uploadingResume} sx={{ borderColor: '#2563eb', color: '#2563eb', '&:hover': { borderColor: '#3a7bd5', backgroundColor: 'rgba(79, 140, 255, 0.1)' } }}>{uploadingResume ? 'Uploading...' : 'Replace'}</Button>
+                        </label>
+                        <Button size="small" variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setShowDeleteResumeConfirm(true)} disabled={deletingResume} sx={{ ml: 1 }}>{deletingResume ? 'Deleting...' : 'Delete'}</Button>
+                      </>
+                    )}
+                  </Box>
+                ) : (
+                  <Box>
+                    <Typography variant="body2" sx={{ color: '#64748b', mb: 1 }}>No resume uploaded</Typography>
+                    {(accessLevel === 1 || accessLevel === 2) && (
+                      <>
+                        <input accept=".pdf,.doc,.docx" style={{ display: 'none' }} id="resume-upload-new-acc" type="file" onChange={handleResumeUpload} />
+                        <label htmlFor="resume-upload-new-acc">
+                          <Button component="span" size="small" variant="outlined" startIcon={<CloudUploadIcon />} disabled={uploadingResume} sx={{ borderColor: '#2563eb', color: '#2563eb', '&:hover': { borderColor: '#3a7bd5', backgroundColor: 'rgba(79, 140, 255, 0.1)' } }}>{uploadingResume ? 'Uploading...' : 'Upload Resume'}</Button>
+                        </label>
+                      </>
+                    )}
+                  </Box>
+                )}
+              </AccordionDetails>
+            </Accordion>
+            {candidate.experience && candidate.experience.length > 0 && (
+              <Accordion expanded={expandedDetail === 'experience'} onChange={() => setExpandedDetail(expandedDetail === 'experience' ? null : 'experience')} onClick={(e) => e.stopPropagation()}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Experience</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                    <Table size="small">
+                      <TableBody>
+                        {candidate.experience.map((exp, idx) => (
+                          <React.Fragment key={idx}>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Company</TableCell><TableCell>{exp.company}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Position</TableCell><TableCell>{exp.position}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Role</TableCell><TableCell>{exp.role}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>CTC</TableCell><TableCell>{exp.ctc ? `₹ ${exp.ctc}` : '-'}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Duration</TableCell><TableCell>{exp.start} - {exp.end}</TableCell></TableRow>
+                            {idx < candidate.experience.length - 1 && <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1 }} /></TableCell></TableRow>}
+                          </React.Fragment>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {candidate.education && candidate.education.length > 0 && (
+              <Accordion expanded={expandedDetail === 'education'} onChange={() => setExpandedDetail(expandedDetail === 'education' ? null : 'education')} onClick={(e) => e.stopPropagation()}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Education</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                    <Table size="small">
+                      <TableBody>
+                        {candidate.education.map((edu, idx) => (
+                          <React.Fragment key={idx}>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>College</TableCell><TableCell>{edu.clg}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Course</TableCell><TableCell>{edu.course}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Duration</TableCell><TableCell>{edu.start} - {edu.end}</TableCell></TableRow>
+                            {idx < candidate.education.length - 1 && <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1 }} /></TableCell></TableRow>}
+                          </React.Fragment>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {candidate.certifications && candidate.certifications.length > 0 && (
+              <Accordion expanded={expandedDetail === 'certifications'} onChange={() => setExpandedDetail(expandedDetail === 'certifications' ? null : 'certifications')} onClick={(e) => e.stopPropagation()}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Certifications</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                    <Table size="small">
+                      <TableBody>
+                        {candidate.certifications.map((cert, idx) => (
+                          <React.Fragment key={idx}>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Name</TableCell><TableCell>{cert.name}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Organization</TableCell><TableCell>{cert.organization}</TableCell></TableRow>
+                            <TableRow><TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>Link</TableCell><TableCell>{cert.link ? <Link href={cert.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>View Certificate</Link> : 'No link provided'}</TableCell></TableRow>
+                            {idx < candidate.certifications.length - 1 && <TableRow><TableCell colSpan={2}><Divider sx={{ my: 1 }} /></TableCell></TableRow>}
+                          </React.Fragment>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+            {candidate.additionalLinks && candidate.additionalLinks.length > 0 && (
+              <Accordion expanded={expandedDetail === 'additionalLinks'} onChange={() => setExpandedDetail(expandedDetail === 'additionalLinks' ? null : 'additionalLinks')} onClick={(e) => e.stopPropagation()}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ '& .MuiAccordionSummary-content': { my: 1.5 } }}>
+                  <Typography sx={{ fontWeight: 600, color: '#64748b' }}>Additional Links</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ pt: 0, color: '#1e293b' }}>
+                  <TableContainer component={Paper} sx={{ background: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                    <Table size="small">
+                      <TableBody>
+                        {candidate.additionalLinks.map((link, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell sx={{ fontWeight: 700, color: '#64748b', width: 100 }}>{link.name || 'Link'}</TableCell>
+                            <TableCell>{link.link ? <Link href={link.link} target="_blank" rel="noopener" sx={{ color: '#4fc3f7' }}>{link.link}</Link> : 'N/A'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </AccordionDetails>
+              </Accordion>
+            )}
+          </Box>
         ) : (
           <>
             <Typography variant="h6" sx={{fontWeight: 600}}>Candidate Details</Typography>

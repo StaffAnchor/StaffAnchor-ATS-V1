@@ -300,6 +300,11 @@ const JobList = ({ accessLevel, userId }) => {
     setExpandedJobId((prev) => (prev === jobId ? null : jobId));
   };
 
+  const displayJobId = (id) => {
+    if (!id) return 'N/A';
+    return id.length > 5 ? id.slice(0, 5) + '...' : id;
+  };
+
   const hasActiveFilters = Object.values(activeFilters).some(
     (value) =>
       value !== "" &&
@@ -413,19 +418,21 @@ const JobList = ({ accessLevel, userId }) => {
 
   return (
     <Box sx={{ height: "calc(100vh - 72px)", display: "flex", flexDirection: "column" }}>
-      {/* Fixed Header */}
+      {/* Fixed Header - compact bar flush under navbar */}
       <Paper
-        elevation={3}
+        elevation={0}
+        square
         sx={{
           position: "sticky",
           top: "72px",
           zIndex: 100,
-          background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
+          background: "transparent",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
           borderRadius: 0,
-          p: 3,
+          marginTop: 0,
+          py: { xs: 0.75, md: 1.25 },
+          px: { xs: 1, md: 2 },
           color: "#1e293b",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Box
@@ -433,15 +440,25 @@ const JobList = ({ accessLevel, userId }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: { xs: 0.75, md: 1 },
           }}
         >
-          {/* Left side - Title */}
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
+          {/* Left side - Title (compact) */}
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#1e293b",
+              fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+              lineHeight: 1.3,
+            }}
+          >
             Job Listings
           </Typography>
-          
-          {/* Right side - Filter icon and other controls */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+
+          {/* Right side - Filter and controls (compact) */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.75, md: 1.5 } }}>
             {accessLevel === 1 && (
               <Button
                 variant={showOnlyAssigned ? "contained" : "outlined"}
@@ -456,6 +473,10 @@ const JobList = ({ accessLevel, userId }) => {
                   },
                   fontWeight: 600,
                   textTransform: "none",
+                  fontSize: "0.7rem",
+                  px: { xs: 1, md: 1.5 },
+                  py: { xs: 0.35, md: 0.5 },
+                  minHeight: 0,
                 }}
               >
                 View assigned jobs
@@ -468,17 +489,20 @@ const JobList = ({ accessLevel, userId }) => {
                   backgroundColor: "rgba(37, 99, 235, 0.12)",
                   color: "#2563eb",
                   fontWeight: 600,
+                  fontSize: "0.7rem",
+                  height: { xs: 20, md: 26 },
                 }}
               />
             )}
             <Tooltip title="Filter Jobs">
               <IconButton
                 onClick={() => setShowFilterModal(true)}
+                size="small"
                 sx={{
                   backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.15)" : "rgba(139, 92, 246, 0.12)",
                   color: hasActiveFilters ? "#2563eb" : "#8b5cf6",
                   border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.3)" : "2px solid rgba(139, 92, 246, 0.3)",
-                  padding: "10px",
+                  padding: { xs: "4px", md: "6px" },
                   "&:hover": {
                     backgroundColor: hasActiveFilters ? "rgba(37, 99, 235, 0.25)" : "rgba(139, 92, 246, 0.2)",
                     border: hasActiveFilters ? "2px solid rgba(37, 99, 235, 0.5)" : "2px solid rgba(139, 92, 246, 0.5)",
@@ -487,7 +511,7 @@ const JobList = ({ accessLevel, userId }) => {
                   transition: "all 0.2s ease",
                 }}
               >
-                <FilterIcon sx={{ fontSize: 28 }} />
+                <FilterIcon sx={{ fontSize: { xs: 18, md: 22 } }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -500,7 +524,8 @@ const JobList = ({ accessLevel, userId }) => {
           flex: 1,
           overflowY: "auto",
           background: "var(--color-bg-dark)",
-          p: 2,
+          py: 2,
+          px: 0,
         }}
       >
 
@@ -532,16 +557,51 @@ const JobList = ({ accessLevel, userId }) => {
               </Typography>
             </Box>
           ) : (
-            <TableContainer
-              component={Paper}
+            <Box
               sx={{
-                background: "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-                border: "1px solid rgba(0, 0, 0, 0.05)",
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                position: "relative",
+                width: "100%",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 32,
+                  background: "linear-gradient(to right, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 60%, transparent 100%)",
+                  pointerEvents: "none",
+                  zIndex: 1,
+                  display: { xs: "block", md: "none" },
+                },
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 32,
+                  background: "linear-gradient(to left, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 60%, transparent 100%)",
+                  pointerEvents: "none",
+                  zIndex: 1,
+                  display: { xs: "block", md: "none" },
+                },
               }}
             >
-              <Table>
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                square
+                sx={{
+                  background: "#ffffff",
+                  border: "1px solid rgba(0, 0, 0, 0.08)",
+                  borderRadius: 0,
+                  overflowX: { xs: "auto", md: "visible" },
+                  overflowY: "auto",
+                  WebkitOverflowScrolling: { xs: "touch", md: "auto" },
+                  minWidth: { xs: 0, md: "auto" },
+                }}
+              >
+              <Table sx={{ minWidth: { xs: 640, md: "auto" } }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -553,8 +613,8 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
-                        py: 2,
+                        fontSize: "0.75rem",
+                        py: { xs: 1, md: 2 },
                       }}
                     >
                       Job ID
@@ -563,8 +623,8 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
-                        py: 2,
+                        fontSize: "0.75rem",
+                        py: { xs: 1, md: 2 },
                       }}
                     >
                       Job Title
@@ -573,7 +633,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
+                        fontSize: "0.75rem",
                       }}
                     >
                       Company
@@ -582,7 +642,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
+                        fontSize: "0.75rem",
                       }}
                     >
                       Assignee
@@ -592,7 +652,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
+                        fontSize: "0.75rem",
                         cursor: "pointer",
                         userSelect: "none",
                         '&:hover': {
@@ -624,7 +684,7 @@ const JobList = ({ accessLevel, userId }) => {
                       sx={{
                         color: "#8b5cf6",
                         fontWeight: 700,
-                        fontSize: "0.95rem",
+                        fontSize: "0.75rem",
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
@@ -689,26 +749,26 @@ const JobList = ({ accessLevel, userId }) => {
                           },
                         }}
                       >
-                        <TableCell sx={{ py: 2 }}>
+                        <TableCell sx={{ py: { xs: 1, md: 2 } }}>
                           <Typography
                             variant="body2"
                             sx={{
                               color: "#8b5cf6",
                               fontWeight: 600,
-                              fontSize: "0.85rem",
+                              fontSize: "0.7rem",
                               fontFamily: "monospace",
                             }}
                           >
-                            {job.jobId || 'N/A'}
+                            {displayJobId(job.jobId)}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
+                        <TableCell sx={{ py: { xs: 1, md: 2 } }}>
                           <Typography
                             variant="h6"
                             sx={{
                               color: "#1e293b",
                               fontWeight: 600,
-                              fontSize: "1rem",
+                              fontSize: "0.75rem",
                             }}
                           >
                             {job.title}
@@ -719,6 +779,7 @@ const JobList = ({ accessLevel, userId }) => {
                             variant="body2"
                             sx={{
                               color: "#64748b",
+                              fontSize: "0.7rem",
                             }}
                           >
                             {job.organization}
@@ -734,6 +795,7 @@ const JobList = ({ accessLevel, userId }) => {
                                   sx={{
                                     color: "#94a3b8",
                                     fontStyle: "italic",
+                                    fontSize: "0.7rem",
                                   }}
                                 >
                                   No assignee
@@ -769,6 +831,8 @@ const JobList = ({ accessLevel, userId }) => {
                                         color: '#8b5cf6',
                                         fontWeight: 500,
                                         cursor: 'pointer',
+                                        fontSize: '0.7rem',
+                                        height: { xs: 20, md: 24 },
                                         '&:hover': {
                                           backgroundColor: 'rgba(139, 92, 246, 0.2)',
                                         }
@@ -780,8 +844,8 @@ const JobList = ({ accessLevel, userId }) => {
                             );
                           })()}
                         </TableCell>
-                        <TableCell align="center" onClick={(e) => e.stopPropagation()}>
-                          <FormControl size="small" sx={{ minWidth: 140 }}>
+                        <TableCell align="center" onClick={(e) => e.stopPropagation()} sx={{ fontSize: '0.7rem' }}>
+                          <FormControl size="small" sx={{ minWidth: { xs: 100, md: 140 } }}>
                             <Select
                               value={job.status || 'New'}
                               onChange={(e) => handleStatusChangeRequest(job._id, e.target.value, job.title, job.status || 'New')}
@@ -798,8 +862,8 @@ const JobList = ({ accessLevel, userId }) => {
                                   backgroundColor: `${getStatusColor(job.status || 'New')}30`,
                                 },
                                 '& .MuiSelect-select': {
-                                  padding: '4px 8px',
-                                  fontSize: '0.875rem',
+                                  padding: { xs: '2px 6px', md: '4px 8px' },
+                                  fontSize: '0.7rem',
                                 }
                               }}
                             >
@@ -869,7 +933,8 @@ const JobList = ({ accessLevel, userId }) => {
                   )))}
                 </TableBody>
               </Table>
-            </TableContainer>
+              </TableContainer>
+            </Box>
           )}
         </Box>
 

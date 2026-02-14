@@ -20,6 +20,7 @@ import {
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
 import officePic02 from '../assets/officepic02.jpg';
+import staffAnchorLogo from '../assets/StaffanchorLogoFinalSVG.svg';
 import './AuthPages.css';
 
 const Login = ({ setUser }) => {
@@ -59,9 +60,9 @@ const Login = ({ setUser }) => {
         {/* Right Side - Form */}
         <div className="auth-form-section">
           <Paper elevation={0} className="auth-form-paper">
-            <div className="auth-form-header">
-              <Typography variant="h4" className="auth-form-title">
-                Sign In
+            <div className="auth-form-header auth-animate-top">
+              <Typography variant="h4" className="auth-form-title auth-form-title-row" component="div">
+                Sign In to <img src={staffAnchorLogo} alt="StaffAnchor" className="auth-header-logo" />
               </Typography>
               <Typography variant="body2" className="auth-form-subtitle">
                 Enter your credentials to access your account
@@ -187,7 +188,7 @@ const Login = ({ setUser }) => {
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
 
-              <div className="auth-form-footer">
+              <div className="auth-form-footer auth-animate-bottom">
                 <Typography variant="body2" className="auth-form-footer-text">
                   Don't have an account?{' '}
                   <Link to="/signup" className="auth-link">

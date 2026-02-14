@@ -373,13 +373,15 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
         </Box>
       </DialogContent>
       
-      <DialogActions sx={{ 
-        p: 3, 
-        pt: 2,
-        borderTop: '1px solid rgba(0, 0, 0, 0.05)',
-        gap: 2
-      }}>
-        <Button 
+      <DialogActions
+        sx={{
+          p: 3,
+          pt: 2,
+          borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+          gap: 2,
+        }}
+      >
+        <Button
           onClick={handleClear}
           variant="outlined"
           sx={{
@@ -393,21 +395,7 @@ const JobFilterModal = ({ open, onClose, filters, onApplyFilters, onClearFilters
         >
           Clear Filters
         </Button>
-        <Box sx={{ flex: 1 }} />
-        <Button 
-          onClick={onClose}
-          variant="outlined"
-          sx={{
-            borderColor: 'rgba(0, 0, 0, 0.08)',
-            color: '#64748b',
-            '&:hover': {
-              borderColor: '#64748b',
-            },
-          }}
-        >
-          Cancel
-        </Button>
-        <Button 
+        <Button
           onClick={handleApply}
           variant="contained"
           sx={{

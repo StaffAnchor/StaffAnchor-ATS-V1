@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import logo from '../assets/StaffanchorLogoFinal.png';
-import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, Avatar, CircularProgress } from '@mui/material';
+import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, CircularProgress, useTheme, useMediaQuery, Collapse } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon, CloudUpload as CloudUploadIcon, Menu as MenuIcon, Logout as LogoutIcon, ExpandMore as ExpandMoreIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import Profile from '../pages/Profile';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -11,7 +11,11 @@ import API_URL from '../config/api';
 const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, setUser }) => {
   const navigate = useNavigate ? useNavigate() : () => {};
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md = 900px
   const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState(null);
+  const [addSubmenuExpanded, setAddSubmenuExpanded] = useState(false);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
@@ -32,6 +36,23 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
+  };
+
+  const handleOpenMobileMenu = (event) => {
+    setMobileMenuAnchor(event.currentTarget);
+    setAddSubmenuExpanded(false);
+  };
+
+  const handleCloseMobileMenu = () => {
+    setMobileMenuAnchor(null);
+    setAddSubmenuExpanded(false);
+  };
+
+  const handleMobileNav = (fn) => {
+    return () => {
+      if (fn) fn();
+      handleCloseMobileMenu();
+    };
   };
 
   const handleAddJob = () => {
@@ -169,13 +190,24 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
       zIndex: 1200,
       top: `${bannerHeight}px`
     }} elevation={0}>
-      <Toolbar sx={{ display: 'flex', alignItems: 'center', minHeight: 72, maxWidth: '100%', width: '100%', px: 3 }}>
-        {/* Logo */}
+      <Toolbar sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        minHeight: { xs: 56, md: 72 }, 
+        maxWidth: '100%', 
+        width: '100%', 
+        px: { xs: 1.5, md: 3 } 
+      }}>
+        {/* Logo - top left */}
         <Box 
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             cursor: 'pointer',
+            flexShrink: 0,
+            height: { xs: 40, md: 56 },
+            width: { xs: 40, md: 56 },
             '&:hover': {
               opacity: 0.8,
               transform: 'scale(1.02)',
@@ -188,8 +220,9 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             src={logo}
             alt="StaffAnchor"
             style={{ 
-              height: 64, 
-              width: 64, 
+              height: '100%',
+              width: 'auto',
+              maxHeight: 56,
               objectFit: 'contain', 
               background: 'transparent', 
               borderRadius: 8, 
@@ -198,8 +231,30 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
           />
         </Box>
 
-        {/* Dashboard Navigation - Only show when user is logged in */}
-        {user && setView && (
+        {/* Mobile: Hamburger at center, then spacer so profile/logout stay right */}
+        {user && isMobile && (
+          <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+            <IconButton
+              onClick={handleOpenMobileMenu}
+              sx={{
+                color: '#475569',
+                backgroundColor: 'rgba(0,0,0,0.04)',
+                '&:hover': {
+                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                  color: '#2563eb',
+                },
+                width: 44,
+                height: 44,
+              }}
+              aria-label="Open menu"
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
+        )}
+
+        {/* Dashboard Navigation - Desktop only, when user is logged in */}
+        {user && setView && !isMobile && (
           <Box sx={{ 
             display: 'flex', 
             gap: 1, 
@@ -508,30 +563,134 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                   width: 40,
                   height: 40,
                 }}
+                aria-label="Profile"
               >
                 <AccountCircleIcon />
               </IconButton>
-              <Button 
-                onClick={onLogout} 
-                variant="outlined" 
-                sx={{ 
-                  borderColor: '#ef4444', 
-                  color: '#ef4444', 
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  '&:hover': {
-                    borderColor: '#dc2626',
-                    color: '#dc2626',
-                    background: 'rgba(239, 68, 68, 0.08)'
-                  }
-                }}
-              >
-                Logout
-              </Button>
+              {isMobile ? (
+                <IconButton
+                  onClick={onLogout}
+                  sx={{
+                    color: '#ef4444',
+                    '&:hover': {
+                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                    },
+                    width: 40,
+                    height: 40,
+                  }}
+                  aria-label="Logout"
+                >
+                  <LogoutIcon />
+                </IconButton>
+              ) : (
+                <Button 
+                  onClick={onLogout} 
+                  variant="outlined" 
+                  sx={{ 
+                    borderColor: '#ef4444', 
+                    color: '#ef4444', 
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    '&:hover': {
+                      borderColor: '#dc2626',
+                      color: '#dc2626',
+                      background: 'rgba(239, 68, 68, 0.08)'
+                    }
+                  }}
+                >
+                  Logout
+                </Button>
+              )}
             </>
           )}
         </Box>
       </Toolbar>
+
+      {/* Mobile nav dropdown */}
+      <Menu
+        anchorEl={mobileMenuAnchor}
+        open={Boolean(mobileMenuAnchor)}
+        onClose={handleCloseMobileMenu}
+        PaperProps={{
+          sx: {
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 2,
+            minWidth: 280,
+            maxWidth: 'calc(100vw - 32px)',
+            mt: 1.5,
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+            maxHeight: 'calc(100dvh - 100px)',
+            overflow: 'auto',
+          }
+        }}
+        transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+      >
+        <MenuItem onClick={handleMobileNav(() => { setView?.('jobs'); navigate('/dashboard'); })} sx={{ py: 1.5 }}>
+          <ListItemIcon><WorkIcon sx={{ color: '#2563eb' }} /></ListItemIcon>
+          <ListItemText>Jobs</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleMobileNav(() => { setView?.('candidates'); navigate('/dashboard'); })} sx={{ py: 1.5 }}>
+          <ListItemIcon><PersonIcon sx={{ color: '#8b5cf6' }} /></ListItemIcon>
+          <ListItemText>Candidates</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleMobileNav(() => { setView?.('talentPools'); navigate('/dashboard'); })} sx={{ py: 1.5 }}>
+          <ListItemIcon><AnalyticsIcon sx={{ color: '#64748b' }} /></ListItemIcon>
+          <ListItemText>Domain, Talent pools and skills</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleMobileNav(() => navigate('/clients'))} sx={{ py: 1.5 }}>
+          <ListItemIcon><BusinessIcon sx={{ color: '#10b981' }} /></ListItemIcon>
+          <ListItemText>Clients</ListItemText>
+        </MenuItem>
+        {accessLevel === 2 && (
+          <MenuItem onClick={handleMobileNav(handleInternalRecruitersTab)} sx={{ py: 1.5 }}>
+            <ListItemIcon><PersonIcon sx={{ color: '#64748b' }} /></ListItemIcon>
+            <ListItemText>Internal Recruiters</ListItemText>
+          </MenuItem>
+        )}
+        <MenuItem onClick={handleMobileNav(handleAnalytics)} sx={{ py: 1.5 }}>
+          <ListItemIcon><AnalyticsIcon sx={{ color: '#2563eb' }} /></ListItemIcon>
+          <ListItemText>Analytics</ListItemText>
+        </MenuItem>
+        {accessLevel === 2 && (
+          <MenuItem onClick={handleMobileNav(handleBannerTab)} sx={{ py: 1.5 }}>
+            <ListItemIcon><CampaignIcon sx={{ color: '#64748b' }} /></ListItemIcon>
+            <ListItemText>Banner</ListItemText>
+          </MenuItem>
+        )}
+        {/* Expandable Add section */}
+        <MenuItem
+          onClick={() => setAddSubmenuExpanded((e) => !e)}
+          sx={{ py: 1.5, borderTop: '1px solid #e2e8f0', mt: 0.5 }}
+        >
+          <ListItemIcon>
+            <AddIcon sx={{ color: '#10b981' }} />
+          </ListItemIcon>
+          <ListItemText>Add</ListItemText>
+          {addSubmenuExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+        </MenuItem>
+        <Collapse in={addSubmenuExpanded} timeout="auto" unmountOnExit>
+          <Box sx={{ pl: 3, pr: 1, py: 0.5 }}>
+            <MenuItem dense onClick={handleMobileNav(handleAddCandidate)} sx={{ py: 1.25 }}>
+              <ListItemIcon><PersonIcon sx={{ fontSize: 20, color: '#8b5cf6' }} /></ListItemIcon>
+              <ListItemText primary="Add Candidate" />
+            </MenuItem>
+            <MenuItem dense onClick={handleMobileNav(handleAddJob)} sx={{ py: 1.25 }}>
+              <ListItemIcon><WorkIcon sx={{ fontSize: 20, color: '#2563eb' }} /></ListItemIcon>
+              <ListItemText primary="Add Job" />
+            </MenuItem>
+            <MenuItem dense onClick={handleMobileNav(() => navigate('/add-client'))} sx={{ py: 1.25 }}>
+              <ListItemIcon><BusinessIcon sx={{ fontSize: 20, color: '#10b981' }} /></ListItemIcon>
+              <ListItemText primary="Add Client" />
+            </MenuItem>
+            <MenuItem dense onClick={handleMobileNav(handleAddByResume)} sx={{ py: 1.25 }}>
+              <ListItemIcon><DescriptionIcon sx={{ fontSize: 20, color: '#10b981' }} /></ListItemIcon>
+              <ListItemText primary="Add Candidate by Resume" />
+            </MenuItem>
+          </Box>
+        </Collapse>
+      </Menu>
 
       {/* Feature Under Development Dialog */}
       <Dialog

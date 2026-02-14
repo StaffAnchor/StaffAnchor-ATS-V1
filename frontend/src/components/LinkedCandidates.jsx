@@ -358,6 +358,7 @@ const LinkedCandidates = ({ open, onClose, jobId, jobTitle, accessLevel }) => {
       }}
       maxWidth="xl"
       fullWidth
+      BackdropProps={{ onClick: (e) => { e.stopPropagation(); onClose(); } }}
       PaperProps={{
         sx: {
           background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',

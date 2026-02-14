@@ -533,12 +533,6 @@ const CandidateFilterModal = ({ open, onClose, filters, onApplyFilters, onClearF
         >
           Clear All
         </Button>
-        <Button 
-          onClick={onClose}
-          sx={{ color: '#64748b', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' } }}
-        >
-          Cancel
-        </Button>
         <Button
           onClick={handleApply}
           variant="contained"
