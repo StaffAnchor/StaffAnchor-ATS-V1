@@ -31,14 +31,14 @@ import {
   ListItemText,
   Card,
   CardContent,
-  TablePagination
+  TablePagination,
+  Menu
 } from '@mui/material';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   FilterList as FilterIcon,
-  Visibility as VisibilityIcon,
   Clear as ClearIcon,
   Domain as DomainIcon,
   Group as GroupIcon,
@@ -73,6 +73,7 @@ const TalentPools = ({ user }) => {
   const [filterDomain, setFilterDomain] = useState('');
   const [filterTalentPool, setFilterTalentPool] = useState([]); // Changed to array for multiple selection
   const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [addMenuAnchor, setAddMenuAnchor] = useState(null);
   
   // Pagination
   const [page, setPage] = useState(0);
@@ -335,81 +336,56 @@ const TalentPools = ({ user }) => {
         </Typography>
       </Box>
 
-      {/* Action Buttons */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenDomainDialog(true)}
+      {/* Action row: + icon (add menu), Filter, Clear Filters - same line */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, flexWrap: 'nowrap' }}>
+        <IconButton
+          onClick={(e) => setAddMenuAnchor(e.currentTarget)}
           sx={{
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-            color: 'white',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-            '&:hover': {
-              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-            }
-          }}
-        >
-          Add Domain
-        </Button>
-        
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenTalentPoolDialog(true)}
-          sx={{
-            background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-            color: 'white',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-            '&:hover': {
-              background: 'linear-gradient(135deg, #db2777 0%, #be185d 100%)',
-            }
-          }}
-        >
-          Add Talent Pool
-        </Button>
-        
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenSkillDialog(true)}
-          sx={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-            color: 'white',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-            '&:hover': {
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-            }
-          }}
-        >
-          Add Skill
-        </Button>
-        
-        <Button
-          variant="outlined"
-          startIcon={<VisibilityIcon />}
-          onClick={() => setOpenCandidatePoolDialog(true)}
-          sx={{
-            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.12)',
             color: '#8b5cf6',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
             '&:hover': {
-              borderColor: '#7c3aed',
-              backgroundColor: 'rgba(139, 92, 246, 0.08)'
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
             }
           }}
+          size="medium"
         >
-          See Candidate Pool
-        </Button>
-        
+          <AddIcon />
+        </IconButton>
+        <Menu
+          anchorEl={addMenuAnchor}
+          open={Boolean(addMenuAnchor)}
+          onClose={() => setAddMenuAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        >
+          <MenuItem
+            onClick={() => {
+              setAddMenuAnchor(null);
+              setOpenDomainDialog(true);
+            }}
+          >
+            <DomainIcon sx={{ mr: 1.5, fontSize: 20 }} />
+            Add domain
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setAddMenuAnchor(null);
+              setOpenTalentPoolDialog(true);
+            }}
+          >
+            <GroupIcon sx={{ mr: 1.5, fontSize: 20 }} />
+            Add talent pool
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setAddMenuAnchor(null);
+              setOpenSkillDialog(true);
+            }}
+          >
+            <StarIcon sx={{ mr: 1.5, fontSize: 20 }} />
+            Add skills
+          </MenuItem>
+        </Menu>
         <Button
           variant="outlined"
           startIcon={<FilterIcon />}
@@ -419,7 +395,7 @@ const TalentPools = ({ user }) => {
             color: '#64748b',
             textTransform: 'none',
             fontWeight: 600,
-            px: 3,
+            px: 2,
             '&:hover': {
               borderColor: '#475569',
               backgroundColor: 'rgba(100, 116, 139, 0.08)'
@@ -428,8 +404,7 @@ const TalentPools = ({ user }) => {
         >
           Filter
         </Button>
-        
-        {(filterDomain || filterTalentPool) && (
+        {(filterDomain || (filterTalentPool && filterTalentPool.length > 0)) ? (
           <Button
             variant="text"
             startIcon={<ClearIcon />}
@@ -445,7 +420,7 @@ const TalentPools = ({ user }) => {
           >
             Clear Filters
           </Button>
-        )}
+        ) : null}
       </Box>
 
       {/* Active Filters Display & Stats */}
