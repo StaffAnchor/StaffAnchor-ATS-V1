@@ -1143,3 +1143,201 @@ exports.getCandidatesByJobApplication = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 };
+
+// Extract text from a buffer (PDF) using temp file and textract
+const extractTextFromPdfBuffer = (buffer, originalName) => {
+  return new Promise(async (resolve, reject) => {
+    let tempFilePath = null;
+    try {
+      const fileExt = path.extname(originalName) || '.pdf';
+      const tempFileName = `resume_rank_${Date.now()}_${Math.random().toString(36).slice(2)}${fileExt}`;
+      tempFilePath = path.join(os.tmpdir(), tempFileName);
+      await fs.writeFile(tempFilePath, buffer);
+      textract.fromFileWithPath(tempFilePath, (err, text) => {
+        fs.unlink(tempFilePath).catch(() => {});
+        if (err) return reject(err);
+        resolve(text || '');
+      });
+    } catch (e) {
+      if (tempFilePath) fs.unlink(tempFilePath).catch(() => {});
+      reject(e);
+    }
+  });
+};
+
+/**
+ * Rank uploaded resumes against job criteria (job title, description, optional fields).
+ * Expects multipart: jobTitle, jobDescription, yearsOfExperience?, mustHaves?, goodToHave?, resumes (up to 20 PDFs).
+ * Returns { success, rankings: [{ name, contactDetails, positives, negatives, verdict, relevancyScore }] }.
+ */
+exports.rankResumes = async (req, res) => {
+  try {
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({ error: 'No resume files uploaded. Please upload at least one PDF.' });
+    }
+    const jobTitle = (req.body.jobTitle || '').trim();
+    const jobDescription = (req.body.jobDescription || '').trim();
+    if (!jobTitle || !jobDescription) {
+      return res.status(400).json({ error: 'Job Title and Job Description are required.' });
+    }
+    const yearsOfExperience = (req.body.yearsOfExperience || '').trim();
+    const mustHaves = (req.body.mustHaves || '').trim();
+    const goodToHave = (req.body.goodToHave || '').trim();
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // 1) Extract text from each PDF
+    const resumeTexts = [];
+    for (const file of req.files) {
+      try {
+        const text = await extractTextFromPdfBuffer(file.buffer, file.originalname || 'resume.pdf');
+        resumeTexts.push({ name: file.originalname || 'resume.pdf', text: text || '(No text extracted)' });
+      } catch (err) {
+        console.error('Error extracting text from', file.originalname, err);
+        resumeTexts.push({ name: file.originalname || 'resume.pdf', text: '(Failed to extract text)', error: true });
+      }
+    }
+
+    // 2) For each resume, get name, email, phone, and a short summary (for ranking)
+    const extractPrompt = (resumeText, index) => `You are a resume parser. From the following resume text, extract ONLY:
+- name (full name)
+- email (if present)
+- phone (if present)
+- summary: 2-4 sentences describing experience, skills, and suitability for roles (no personal opinion, just facts).
+
+Resume text:
+${resumeText}
+
+Return ONLY valid JSON (no markdown, no code blocks):
+{ "name": "Full Name", "email": "email or empty string", "phone": "phone or empty string", "summary": "2-4 sentence summary" }`;
+
+    const candidates = [];
+    for (let i = 0; i < resumeTexts.length; i++) {
+      const { name: fileName, text, error } = resumeTexts[i];
+      if (error) {
+        candidates.push({
+          index: i + 1,
+          name: fileName.replace(/\.pdf$/i, '') || 'Unknown',
+          email: '',
+          phone: '',
+          summary: 'Could not extract content from this resume.'
+        });
+        continue;
+      }
+      try {
+        const result = await model.generateContent(extractPrompt(text, i));
+        const response = result.response;
+        const rawText = response.text();
+        const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        candidates.push({
+          index: i + 1,
+          name: parsed.name || 'Unknown',
+          email: parsed.email || '',
+          phone: parsed.phone || '',
+          summary: parsed.summary || ''
+        });
+      } catch (parseErr) {
+        candidates.push({
+          index: i + 1,
+          name: fileName.replace(/\.pdf$/i, '') || 'Unknown',
+          email: '',
+          phone: '',
+          summary: 'Could not parse this resume.'
+        });
+      }
+    }
+
+    // 3) Single ranking call: job criteria + candidate summaries -> positives, negatives, verdict, relevancyScore
+    const jobSection = `
+Job Title: ${jobTitle}
+Job Description: ${jobDescription}
+${yearsOfExperience ? `Years of experience: ${yearsOfExperience}` : ''}
+${mustHaves ? `Must haves: ${mustHaves}` : ''}
+${goodToHave ? `Good to have: ${goodToHave}` : ''}
+`;
+
+    const candidatesBlock = candidates.map(c =>
+      `Candidate ${c.index}: Name: ${c.name} | Email: ${c.email} | Phone: ${c.phone} | Summary: ${c.summary}`
+    ).join('\n');
+
+    const rankingPrompt = `You are an expert recruitment AI. Given the job criteria and candidate summaries below, rank and evaluate each candidate.
+
+${jobSection}
+
+CANDIDATES:
+${candidatesBlock}
+
+For each candidate (by index 1 to ${candidates.length}), provide:
+- positives: 1-3 short bullet points (what makes them a good fit)
+- negatives: 1-3 short bullet points (gaps or concerns)
+- verdict: one short sentence (e.g. "Strong fit", "Moderate fit", "Weak fit")
+- relevancyScore: number 0-100 (how well they match the job)
+
+Return ONLY valid JSON (no markdown, no code blocks):
+{
+  "rankings": [
+    {
+      "candidateIndex": 1,
+      "positives": "bullet1; bullet2",
+      "negatives": "bullet1; bullet2",
+      "verdict": "One sentence verdict",
+      "relevancyScore": 85
+    }
+  ]
+}
+Include one object per candidate index (1 through ${candidates.length}), sorted by relevancyScore descending.`;
+
+    const rankResult = await model.generateContent(rankingPrompt);
+    const rankText = rankResult.response.text();
+    const rankCleaned = rankText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    let rankData;
+    try {
+      rankData = JSON.parse(rankCleaned);
+    } catch (e) {
+      throw new Error('Failed to parse AI ranking response');
+    }
+
+    const rankingByIndex = {};
+    (rankData.rankings || []).forEach((r) => {
+      rankingByIndex[r.candidateIndex] = r;
+    });
+
+    const contactFormat = (c) => {
+      const parts = [];
+      if (c.email) parts.push(c.email);
+      if (c.phone) parts.push(c.phone);
+      return parts.length ? parts.join(' | ') : '—';
+    };
+
+    const rankings = candidates.map((c) => {
+      const r = rankingByIndex[c.index] || {};
+      return {
+        name: c.name,
+        contactDetails: contactFormat(c),
+        positives: r.positives || '—',
+        negatives: r.negatives || '—',
+        verdict: r.verdict || '—',
+        relevancyScore: typeof r.relevancyScore === 'number' ? r.relevancyScore : 0
+      };
+    });
+
+    // Sort by relevancy score descending
+    rankings.sort((a, b) => (b.relevancyScore || 0) - (a.relevancyScore || 0));
+
+    res.json({ success: true, rankings });
+  } catch (err) {
+    console.error('Error in rankResumes:', err);
+    if (err.status === 429 || err.message?.includes('quota') || err.message?.includes('rate limit')) {
+      return res.status(429).json({
+        error: 'AI_RATE_LIMIT',
+        message: 'The AI service is currently busy. Please try again in a minute.'
+      });
+    }
+    res.status(500).json({
+      error: 'Failed to generate rankings',
+      message: err.message || 'An error occurred.'
+    });
+  }
+};

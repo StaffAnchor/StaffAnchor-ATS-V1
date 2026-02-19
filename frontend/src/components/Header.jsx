@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import logo from '../assets/StaffanchorLogoFinal.png';
 import { AppBar, Toolbar, Box, Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogContent, DialogActions, Typography, CircularProgress, useTheme, useMediaQuery, Collapse } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon, CloudUpload as CloudUploadIcon, Menu as MenuIcon, Logout as LogoutIcon, ExpandMore as ExpandMoreIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
+import { Add as AddIcon, Work as WorkIcon, Person as PersonIcon, Analytics as AnalyticsIcon, Description as DescriptionIcon, Construction as ConstructionIcon, AccountCircle as AccountCircleIcon, Business as BusinessIcon, Campaign as CampaignIcon, CloudUpload as CloudUploadIcon, Menu as MenuIcon, Logout as LogoutIcon, ExpandMore as ExpandMoreIcon, ChevronRight as ChevronRightIcon, EmojiEvents as EmojiEventsIcon } from '@mui/icons-material';
 import Profile from '../pages/Profile';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -384,6 +384,25 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                 Banner
               </Button>
             )}
+
+            {/* 9. Candidate Rankings */}
+            <Button
+              onClick={() => navigate('/candidate-rankings')}
+              sx={{
+                ...getTabStyle(location.pathname === '/candidate-rankings'),
+                textTransform: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: '8px',
+                minWidth: 'auto',
+                display: 'flex',
+                gap: 0.5,
+                alignItems: 'center'
+              }}
+            >
+              <EmojiEventsIcon sx={{ fontSize: '1.1rem' }} />
+              Candidate Rankings
+            </Button>
             
             {/* Add button with dropdown */}
             <IconButton
@@ -659,6 +678,10 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             <ListItemText>Banner</ListItemText>
           </MenuItem>
         )}
+        <MenuItem onClick={handleMobileNav(() => navigate('/candidate-rankings'))} sx={{ py: 1.5 }}>
+          <ListItemIcon><EmojiEventsIcon sx={{ color: '#f59e0b' }} /></ListItemIcon>
+          <ListItemText>Candidate Rankings</ListItemText>
+        </MenuItem>
         {/* Expandable Add section */}
         <MenuItem
           onClick={() => setAddSubmenuExpanded((e) => !e)}

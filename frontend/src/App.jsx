@@ -17,6 +17,7 @@ import AddClient from './components/AddClient.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ActiveBanner from './components/ActiveBanner.jsx';
 import Analytics from './pages/Analytics.jsx';
+import CandidateRankings from './pages/CandidateRankings.jsx';
 import { setupAxiosInterceptors } from './utils/axiosConfig.js';
 
 function App() {
@@ -218,6 +219,14 @@ function App() {
                   element={
                     <ProtectedRoute user={user}>
                       <Analytics />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/candidate-rankings" 
+                  element={
+                    <ProtectedRoute user={user}>
+                      <CandidateRankings />
                     </ProtectedRoute>
                   } 
                 />

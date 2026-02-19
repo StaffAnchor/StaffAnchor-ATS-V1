@@ -18,6 +18,15 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// PDF-only filter for rank-resumes (up to 20 PDFs)
+const pdfOnlyFilter = (req, file, cb) => {
+  if (file.mimetype === 'application/pdf') {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF files are allowed for candidate rankings.'), false);
+  }
+};
+
 // Configure multer
 const upload = multer({
   storage: storage,
@@ -27,5 +36,15 @@ const upload = multer({
   }
 });
 
+// Multiple PDFs for rank-resumes (max 20, PDF only)
+const uploadRankResumes = multer({
+  storage: storage,
+  fileFilter: pdfOnlyFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB per file
+  }
+}).array('resumes', 20);
+
 module.exports = upload;
+module.exports.uploadRankResumes = uploadRankResumes;
 
