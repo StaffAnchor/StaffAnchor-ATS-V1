@@ -3,6 +3,7 @@ const router = express.Router();
 const candidateController = require('../controllers/candidateController');
 const { authenticateToken, requireDeletionPermission } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const uploadRankResumes = upload.uploadRankResumes;
 
 // Public routes (no authentication required)
 router.post('/public/apply/:jobId', candidateController.submitPublicJobApplication);
@@ -14,6 +15,9 @@ router.use(authenticateToken);
 
 // Resume parsing route (must be before generic routes)
 router.post('/parse-resume', upload.single('resume'), candidateController.parseResume);
+
+// Rank resumes against job criteria (up to 20 PDFs)
+router.post('/rank-resumes', uploadRankResumes, candidateController.rankResumes);
 
 // Get candidates who applied to a specific job
 router.get('/job/:jobId/applicants', candidateController.getCandidatesByJobApplication);
