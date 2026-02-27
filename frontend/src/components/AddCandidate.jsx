@@ -105,6 +105,8 @@ const AddCandidate = () => {
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [fromResumeParsing, setFromResumeParsing] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [parsedCandidatesQueue, setParsedCandidatesQueue] = useState([]);
+  const appliedInitialResumeDataRef = React.useRef(false);
 
   const skillCategories = [
     { value: 'sales-and-business-development', label: 'Sales and Business Development' },
@@ -159,78 +161,62 @@ const AddCandidate = () => {
     }
   }, [location.state, jobs]);
 
-  // Handle resume parsing data
-  React.useEffect(() => {
-    if (location.state?.fromResumeParsing && location.state?.parsedData) {
-      const data = location.state.parsedData;
-
-      // Set basic form fields
-      setForm(prev => ({
-        ...prev,
-        name: data.name || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        linkedin: data.linkedin ? `https://linkedin.com/in/${data.linkedin}` : '',
-        totalExperienceYears: data.totalExperienceYears || '',
-        totalExperienceMonths: data.totalExperienceMonths || ''
-      }));
-
-      // Set experience
-      if (data.experience && data.experience.length > 0) {
-        setExperience(data.experience);
+  // Helper: apply one parsed resume (parsedData + file) into the form
+  const applyParsedItemToForm = React.useCallback((data, file) => {
+    setForm(prev => ({
+      ...prev,
+      name: data.name || '',
+      email: data.email || '',
+      phone: data.phone || '',
+      linkedin: data.linkedin ? `https://linkedin.com/in/${data.linkedin}` : '',
+      totalExperienceYears: data.totalExperienceYears || '',
+      totalExperienceMonths: data.totalExperienceMonths || ''
+    }));
+    if (data.experience && data.experience.length > 0) setExperience(data.experience);
+    if (data.education && data.education.length > 0) setEducation(data.education);
+    if (data.currentLocation) setCurrentLocation(data.currentLocation);
+    if (data.preferredLocations && data.preferredLocations.length > 0) setPreferredLocations(data.preferredLocations);
+    if (data.selectedDomain) setSelectedDomain(data.selectedDomain);
+    setTimeout(() => {
+      if (data.selectedTalentPools && data.selectedTalentPools.length > 0) {
+        setSelectedExpertiseTalentPools(data.selectedTalentPools);
+        setTimeout(() => {
+          if (data.selectedSkills && data.selectedSkills.length > 0) setSelectedExpertiseSkills(data.selectedSkills);
+        }, 300);
       }
-
-      // Set education
-      if (data.education && data.education.length > 0) {
-        setEducation(data.education);
-      }
-
-      // Set current location
-      if (data.currentLocation) {
-        setCurrentLocation(data.currentLocation);
-      }
-
-      // Set preferred locations
-      if (data.preferredLocations && data.preferredLocations.length > 0) {
-        setPreferredLocations(data.preferredLocations);
-      }
-
-      // Set domain first (important: must be set before talent pools and skills)
-      if (data.selectedDomain) {
-        setSelectedDomain(data.selectedDomain);
-      }
-
-      // Use setTimeout to ensure domain is set and talent pools are fetched before setting selections
-      // This gives the ExpertiseSelector time to load talent pools for the selected domain
-      setTimeout(() => {
-        // Set talent pools
-        if (data.selectedTalentPools && data.selectedTalentPools.length > 0) {
-          setSelectedExpertiseTalentPools(data.selectedTalentPools);
-          
-          // Set skills after another delay to ensure talent pools are set first
-          setTimeout(() => {
-            if (data.selectedSkills && data.selectedSkills.length > 0) {
-              setSelectedExpertiseSkills(data.selectedSkills);
-            }
-          }, 300);
-        }
-      }, 800); // Wait 800ms for ExpertiseSelector to fetch and load talent pool options
-
-      // Set resume file
-      if (location.state?.resumeFile) {
-        setResumeFile(location.state.resumeFile);
-        setResumeFileName(location.state.resumeFile.name);
-      }
-
-      // Mark as from resume parsing
-      setFromResumeParsing(true);
-
-      // Show success message
-      toast.success('Resume parsed successfully! Please review the auto-filled information.', {
-        autoClose: 5000
-      });
+    }, 800);
+    if (file) {
+      setResumeFile(file);
+      setResumeFileName(file.name);
     }
-  }, [location.state]);
+    setFromResumeParsing(true);
+  }, []);
+
+  // Handle resume parsing data (single or multiple from "Add by Resume")
+  React.useEffect(() => {
+    if (appliedInitialResumeDataRef.current) return;
+    const state = location.state;
+    if (!state?.fromResumeParsing) return;
+
+    if (state.parsedCandidates && state.parsedCandidates.length > 0) {
+      appliedInitialResumeDataRef.current = true;
+      setParsedCandidatesQueue(state.parsedCandidates);
+      const first = state.parsedCandidates[0];
+      applyParsedItemToForm(first.parsedData, first.file);
+      toast.success(
+        state.parsedCandidates.length === 1
+          ? 'Resume parsed successfully! Please review the auto-filled information.'
+          : `${state.parsedCandidates.length} resumes parsed. Review and save each candidate.`,
+        { autoClose: 5000 }
+      );
+      return;
+    }
+    if (state.parsedData) {
+      appliedInitialResumeDataRef.current = true;
+      applyParsedItemToForm(state.parsedData, state.resumeFile);
+      toast.success('Resume parsed successfully! Please review the auto-filled information.', { autoClose: 5000 });
+    }
+  }, [location.state, applyParsedItemToForm]);
 
   // Fetch skills when category changes
   React.useEffect(() => {
@@ -529,31 +515,41 @@ const AddCandidate = () => {
         }
       }
 
-      setMsg('Candidate added successfully!');
-      toast.success('Candidate added successfully!');
-      
       // Dispatch event to notify parent component
       window.dispatchEvent(new CustomEvent('candidateAdded', { 
         detail: { candidate: response.data } 
       }));
-      
-      // Reset form
-      setForm({ name: '', email: '', phone: '', linkedin: '', totalExperienceYears: '', totalExperienceMonths: '', currentCTC: '', expectedCTC: '' });
-      setResumeFile(null);
-      setResumeFileName('');
-      setSelectedCategory('');
-      setSelectedSkills([]);
-      setAvailableSkills([]);
-      setExperience([{ company: '', position: '', role: '', ctc: '', start: '', end: '' }]);
-      setEducation([{ clg: '', course: '', start: '', end: '' }]);
-      setCertifications([{ name: '', organization: '', link: '' }]);
-      setAdditionalLinks([{ name: '', link: '' }]);
-      setCurrentLocation({ country: '', state: '', city: '' });
-      setPreferredLocations([{ country: '', state: '', city: '' }]);
-      setSelectedTalentPools([]);
-      setResumeFile(null);
-      setResumeFileName('');
-      setSelectedJobs([]);
+
+      const nextQueue = parsedCandidatesQueue.slice(1);
+      setParsedCandidatesQueue(nextQueue);
+
+      if (nextQueue.length > 0) {
+        setMsg('Candidate added! Review and save the next.');
+        toast.success('Candidate added! Review the next parsed resume.');
+        applyParsedItemToForm(nextQueue[0].parsedData, nextQueue[0].file);
+      } else {
+        setMsg('Candidate added successfully!');
+        toast.success('Candidate added successfully!');
+        setFromResumeParsing(false);
+        // Reset form
+        setForm({ name: '', email: '', phone: '', linkedin: '', totalExperienceYears: '', totalExperienceMonths: '', currentCTC: '', expectedCTC: '' });
+        setResumeFile(null);
+        setResumeFileName('');
+        setSelectedCategory('');
+        setSelectedSkills([]);
+        setAvailableSkills([]);
+        setExperience([{ company: '', position: '', role: '', ctc: '', start: '', end: '' }]);
+        setEducation([{ clg: '', course: '', start: '', end: '' }]);
+        setCertifications([{ name: '', organization: '', link: '' }]);
+        setAdditionalLinks([{ name: '', link: '' }]);
+        setCurrentLocation({ country: '', state: '', city: '' });
+        setPreferredLocations([{ country: '', state: '', city: '' }]);
+        setSelectedTalentPools([]);
+        setSelectedDomain('');
+        setSelectedExpertiseTalentPools([]);
+        setSelectedExpertiseSkills([]);
+        setSelectedJobs([]);
+      }
     } catch (error) {
       console.error('Error adding candidate:', error);
       const errorMessage = error.response?.data?.error || 'Error adding candidate';
