@@ -24,7 +24,7 @@ import axios from 'axios';
 import API_URL from '../config/api';
 import RankingLoadingPopup from '../components/RankingLoadingPopup';
 
-const MAX_RESUMES = 20;
+const MAX_RESUMES = 10;
 const PDF_MIME = 'application/pdf';
 
 export default function CandidateRankings() {

@@ -16,7 +16,7 @@ router.use(authenticateToken);
 // Resume parsing route (must be before generic routes)
 router.post('/parse-resume', upload.single('resume'), candidateController.parseResume);
 
-// Rank resumes against job criteria (up to 20 PDFs)
+// Rank resumes against job criteria (up to 10 PDF's)
 router.post('/rank-resumes', uploadRankResumes, candidateController.rankResumes);
 
 // Get candidates who applied to a specific job

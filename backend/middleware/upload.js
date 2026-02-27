@@ -18,7 +18,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// PDF-only filter for rank-resumes (up to 20 PDFs)
+// PDF-only filter for rank-resumes (up to 10 PDFs)
 const pdfOnlyFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') {
     cb(null, true);
@@ -36,14 +36,14 @@ const upload = multer({
   }
 });
 
-// Multiple PDFs for rank-resumes (max 20, PDF only)
+// Multiple PDFs for rank-resumes (max 10, PDF only)
 const uploadRankResumes = multer({
   storage: storage,
   fileFilter: pdfOnlyFilter,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB per file
   }
-}).array('resumes', 20);
+}).array('resumes', 10);
 
 module.exports = upload;
 module.exports.uploadRankResumes = uploadRankResumes;

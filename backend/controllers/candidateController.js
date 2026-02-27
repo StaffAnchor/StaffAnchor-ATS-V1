@@ -1167,7 +1167,7 @@ const extractTextFromPdfBuffer = (buffer, originalName) => {
 
 /**
  * Rank uploaded resumes against job criteria (job title, description, optional fields).
- * Expects multipart: jobTitle, jobDescription, yearsOfExperience?, mustHaves?, goodToHave?, resumes (up to 20 PDFs).
+ * Expects multipart: jobTitle, jobDescription, yearsOfExperience?, mustHaves?, goodToHave?, resumes (up to 10 PDFs).
  * Returns { success, rankings: [{ name, contactDetails, positives, negatives, verdict, relevancyScore }] }.
  */
 exports.rankResumes = async (req, res) => {

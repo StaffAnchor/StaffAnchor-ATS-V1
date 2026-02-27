@@ -19,7 +19,9 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [parsingResume, setParsingResume] = useState(false);
+  const [parsingResumeProgress, setParsingResumeProgress] = useState({ current: 0, total: 0 });
   const [showResumeUploadDialog, setShowResumeUploadDialog] = useState(false);
+  const MAX_RESUMES_ADD_BY_RESUME = 5;
   
   const handleLogoClick = () => {
     if (user) {
@@ -73,56 +75,69 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
   };
 
   const handleResumeUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (files.length === 0) return;
 
-    // Validate file type
     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error('Only PDF and DOC/DOCX files are allowed');
-      return;
-    }
+    const validFiles = files
+      .filter((f) => {
+        if (!allowedTypes.includes(f.type)) {
+          toast.error(`Skipped "${f.name}": only PDF and DOC/DOCX are allowed`);
+          return false;
+        }
+        if (f.size > 10 * 1024 * 1024) {
+          toast.error(`Skipped "${f.name}": file must be less than 10MB`);
+          return false;
+        }
+        return true;
+      })
+      .slice(0, MAX_RESUMES_ADD_BY_RESUME);
 
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size must be less than 10MB');
-      return;
+    if (validFiles.length === 0) return;
+    if (files.length > MAX_RESUMES_ADD_BY_RESUME) {
+      toast.info(`Only the first ${MAX_RESUMES_ADD_BY_RESUME} files will be processed.`);
     }
 
     setParsingResume(true);
+    setParsingResumeProgress({ current: 0, total: validFiles.length });
     setShowResumeUploadDialog(false);
 
+    const token = localStorage.getItem('jwt');
+    const parsedCandidates = [];
+
     try {
-      const formData = new FormData();
-      formData.append('resume', file);
-
-      const token = localStorage.getItem('jwt');
-      const response = await axios.post(
-        `${API_URL}/api/candidates/parse-resume`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
+      for (let i = 0; i < validFiles.length; i++) {
+        setParsingResumeProgress({ current: i + 1, total: validFiles.length });
+        const file = validFiles[i];
+        const formData = new FormData();
+        formData.append('resume', file);
+        const response = await axios.post(
+          `${API_URL}/api/candidates/parse-resume`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
           }
-        }
-      );
+        );
+        parsedCandidates.push({ parsedData: response.data, file });
+      }
 
-      const parsedData = response.data;
-      
-      // Navigate to AddCandidate with parsed data and the file
-      navigate('/dashboard', { 
-        state: { 
-          parsedData,
-          resumeFile: file,
-          fromResumeParsing: true
-        } 
-      });
-      
+      const state = {
+        fromResumeParsing: true,
+        parsedCandidates
+      };
+      if (parsedCandidates.length === 1) {
+        state.parsedData = parsedCandidates[0].parsedData;
+        state.resumeFile = parsedCandidates[0].file;
+      }
+
+      navigate('/dashboard', { state });
       if (setView) setView('addCandidate');
-      toast.success('Resume parsed successfully!');
+      toast.success(parsedCandidates.length === 1 ? 'Resume parsed successfully!' : `${parsedCandidates.length} resumes parsed. Review and save each candidate.`);
     } catch (error) {
-      // Check if it's a rate limit error
       if (error.response?.status === 429 || error.response?.data?.error === 'AI_RATE_LIMIT') {
         toast.error('⏳ AI service is busy. Please try again in a minute.', {
           autoClose: 8000,
@@ -137,6 +152,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
       }
     } finally {
       setParsingResume(false);
+      setParsingResumeProgress({ current: 0, total: 0 });
     }
   };
 
@@ -776,13 +792,14 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
             Upload Resume for AI Parsing
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
-            Upload a PDF or DOC/DOCX file. Our AI will automatically extract information and intelligently match the candidate to appropriate domains, talent pools, and skills.
+            Upload up to {MAX_RESUMES_ADD_BY_RESUME} PDF or DOC/DOCX files. Our AI will extract information and match each candidate to domains, talent pools, and skills.
           </Typography>
           <input
             accept=".pdf,.doc,.docx"
             style={{ display: 'none' }}
             id="resume-upload-input"
             type="file"
+            multiple
             onChange={handleResumeUpload}
           />
           <label htmlFor="resume-upload-input">
@@ -802,7 +819,7 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
                 }
               }}
             >
-              Choose File
+              Choose file(s) (up to {MAX_RESUMES_ADD_BY_RESUME})
             </Button>
           </label>
         </DialogContent>
@@ -837,10 +854,12 @@ const Header = ({ user, onLogout, view, setView, accessLevel, bannerHeight = 0, 
         <DialogContent sx={{ textAlign: 'center', py: 4, px: 4 }}>
           <CircularProgress sx={{ color: '#8b5cf6', mb: 2 }} />
           <Typography variant="body1" sx={{ color: '#1e293b', fontWeight: 500 }}>
-            Parsing resume with AI...
+            {parsingResumeProgress.total > 1
+              ? `Parsing resume ${parsingResumeProgress.current} of ${parsingResumeProgress.total}...`
+              : 'Parsing resume with AI...'}
           </Typography>
           <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 1 }}>
-            This may take 5-10 seconds
+            This may take 5–10 seconds per file
           </Typography>
         </DialogContent>
       </Dialog>
