@@ -27,14 +27,18 @@ function App() {
   const [bannerHeight, setBannerHeight] = useState(0);
   const navigate = useNavigate();
   
-  // Handle redirect from 404.html after we know auth state. When not logged in, only allow login/signup.
+  // Handle redirect from 404.html after we know auth state. When not logged in, allow login/signup and public routes (apply, candidate-form, client-tracking).
   useEffect(() => {
     if (loading) return;
     const redirect = sessionStorage.getItem('redirect');
     if (redirect) {
       sessionStorage.removeItem('redirect');
       const isPublicAuth = redirect === '/login' || redirect === '/signup';
-      if (user || isPublicAuth) {
+      const isPublicRoute =
+        redirect.startsWith('/apply/') ||
+        redirect === '/candidate-form' ||
+        redirect.startsWith('/client-tracking/');
+      if (user || isPublicAuth || isPublicRoute) {
         navigate(redirect);
       } else {
         navigate('/login');
